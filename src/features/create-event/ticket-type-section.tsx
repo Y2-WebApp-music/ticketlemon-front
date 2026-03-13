@@ -48,7 +48,7 @@ export function TicketTypeSection({
           {ticketTypes.map((ticket) => (
             <div
               key={ticket.id}
-              className="overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm"
+              className="overflow-hidden rounded-xl border border-border bg-card p-5"
             >
               {ticket.isCollapsed ? (
                 <div className="flex flex-wrap items-center gap-3">

@@ -1,7 +1,7 @@
 import { Label } from "@/components/ui/label"
-import { Upload } from "lucide-react"
+import { ImagePlus } from "lucide-react"
 
-const UPLOAD_HINT = "Only .png, .jpg, .jpeg, .webp, max 10MB."
+const UPLOAD_HINT = "Only .png, .jpeg (Max 10 MB)"
 
 export interface EventCoverSectionProps {
   sectionRef: (el: HTMLElement | null) => void
@@ -20,10 +20,12 @@ export function EventCoverSection({
 }: EventCoverSectionProps) {
   return (
     <section ref={sectionRef} id="event-cover" className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label className="text-sm">Poster</Label>
-          <label className="flex aspect-240/320 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors hover:bg-muted/50">
+          <Label className="text-sm">
+            Poster <span className="text-destructive">*</span>
+          </Label>
+          <label className="flex min-h-[200px] cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors hover:bg-muted/50">
             {posterPreview ? (
               <img
                 src={posterPreview}
@@ -32,7 +34,7 @@ export function EventCoverSection({
               />
             ) : (
               <>
-                <Upload className="size-8 text-muted-foreground" />
+                <ImagePlus className="size-10 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
                   Upload Poster
                 </span>
@@ -47,9 +49,9 @@ export function EventCoverSection({
           </label>
           <p className="text-xs text-muted-foreground">{UPLOAD_HINT}</p>
         </div>
-        <div className="space-y-2 sm:col-span-2">
+        <div className="space-y-2">
           <Label className="text-sm">Thumbnail</Label>
-          <label className="flex aspect-1512/471 max-h-48 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors hover:bg-muted/50">
+          <label className="flex min-h-[200px] cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/30 transition-colors hover:bg-muted/50">
             {thumbnailPreview ? (
               <img
                 src={thumbnailPreview}
@@ -58,7 +60,7 @@ export function EventCoverSection({
               />
             ) : (
               <>
-                <Upload className="size-8 text-muted-foreground" />
+                <ImagePlus className="size-10 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
                   Upload Thumbnail
                 </span>

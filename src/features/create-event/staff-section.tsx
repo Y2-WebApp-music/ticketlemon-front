@@ -33,7 +33,7 @@ export function StaffSection({
           {staffEntries.map((staff) => (
             <div
               key={staff.id}
-              className="overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm"
+              className="overflow-hidden rounded-xl border border-border bg-card p-5"
             >
               <div className="flex flex-col gap-4">
                 <div className="flex flex-wrap items-end gap-2">

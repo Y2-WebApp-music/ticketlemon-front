@@ -44,7 +44,7 @@ export function DateRangeSection({
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className="overflow-hidden rounded-xl border border-border bg-card p-5 shadow-sm"
+              className="overflow-hidden rounded-xl border border-border bg-card p-5"
             >
               {entry.isCollapsed ? (
                 <div className="flex flex-wrap items-center gap-3">

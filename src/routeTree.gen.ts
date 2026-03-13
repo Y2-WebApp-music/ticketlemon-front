@@ -8,219 +8,219 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root"
-import { Route as SignInRouteImport } from "./routes/sign-in"
-import { Route as ShowcaseRouteImport } from "./routes/showcase"
-import { Route as OrganizerRouteImport } from "./routes/organizer"
-import { Route as MyTicketsRouteImport } from "./routes/my-tickets"
-import { Route as IndexRouteImport } from "./routes/index"
-import { Route as ProfileIndexRouteImport } from "./routes/profile/index"
-import { Route as OrganizerIndexRouteImport } from "./routes/organizer/index"
-import { Route as MyTicketsIndexRouteImport } from "./routes/my-tickets/index"
-import { Route as OrganizerCreateRouteImport } from "./routes/organizer/create"
-import { Route as MyTicketsTicketIdRouteImport } from "./routes/my-tickets/$ticketId"
-import { Route as EventsEventIdRouteImport } from "./routes/events/$eventId"
-import { Route as MyTicketsTicketIdIndexRouteImport } from "./routes/my-tickets/$ticketId/index"
-import { Route as EventsEventIdIndexRouteImport } from "./routes/events/$eventId/index"
-import { Route as OrganizerEventsEventIdRouteImport } from "./routes/organizer/events/$eventId"
-import { Route as MyTicketsTicketIdQrRouteImport } from "./routes/my-tickets/$ticketId/qr"
-import { Route as EventsEventIdPurchaseRouteImport } from "./routes/events/$eventId/purchase"
-import { Route as EventsEventIdChooseRouteImport } from "./routes/events/$eventId/choose"
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignInRouteImport } from './routes/sign-in'
+import { Route as ShowcaseRouteImport } from './routes/showcase'
+import { Route as OrganizerRouteImport } from './routes/organizer'
+import { Route as MyTicketsRouteImport } from './routes/my-tickets'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProfileIndexRouteImport } from './routes/profile/index'
+import { Route as OrganizerIndexRouteImport } from './routes/organizer/index'
+import { Route as MyTicketsIndexRouteImport } from './routes/my-tickets/index'
+import { Route as OrganizerCreateRouteImport } from './routes/organizer/create'
+import { Route as MyTicketsTicketIdRouteImport } from './routes/my-tickets/$ticketId'
+import { Route as EventsEventIdRouteImport } from './routes/events/$eventId'
+import { Route as MyTicketsTicketIdIndexRouteImport } from './routes/my-tickets/$ticketId/index'
+import { Route as EventsEventIdIndexRouteImport } from './routes/events/$eventId/index'
+import { Route as OrganizerEventsEventIdRouteImport } from './routes/organizer/events/$eventId'
+import { Route as MyTicketsTicketIdQrRouteImport } from './routes/my-tickets/$ticketId/qr'
+import { Route as EventsEventIdPurchaseRouteImport } from './routes/events/$eventId/purchase'
+import { Route as EventsEventIdChooseRouteImport } from './routes/events/$eventId/choose'
 
 const SignInRoute = SignInRouteImport.update({
-  id: "/sign-in",
-  path: "/sign-in",
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShowcaseRoute = ShowcaseRouteImport.update({
-  id: "/showcase",
-  path: "/showcase",
+  id: '/showcase',
+  path: '/showcase',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrganizerRoute = OrganizerRouteImport.update({
-  id: "/organizer",
-  path: "/organizer",
+  id: '/organizer',
+  path: '/organizer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyTicketsRoute = MyTicketsRouteImport.update({
-  id: "/my-tickets",
-  path: "/my-tickets",
+  id: '/my-tickets',
+  path: '/my-tickets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
-  id: "/profile/",
-  path: "/profile/",
+  id: '/profile/',
+  path: '/profile/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrganizerIndexRoute = OrganizerIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => OrganizerRoute,
 } as any)
 const MyTicketsIndexRoute = MyTicketsIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => MyTicketsRoute,
 } as any)
 const OrganizerCreateRoute = OrganizerCreateRouteImport.update({
-  id: "/create",
-  path: "/create",
+  id: '/create',
+  path: '/create',
   getParentRoute: () => OrganizerRoute,
 } as any)
 const MyTicketsTicketIdRoute = MyTicketsTicketIdRouteImport.update({
-  id: "/$ticketId",
-  path: "/$ticketId",
+  id: '/$ticketId',
+  path: '/$ticketId',
   getParentRoute: () => MyTicketsRoute,
 } as any)
 const EventsEventIdRoute = EventsEventIdRouteImport.update({
-  id: "/events/$eventId",
-  path: "/events/$eventId",
+  id: '/events/$eventId',
+  path: '/events/$eventId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyTicketsTicketIdIndexRoute = MyTicketsTicketIdIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => MyTicketsTicketIdRoute,
 } as any)
 const EventsEventIdIndexRoute = EventsEventIdIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => EventsEventIdRoute,
 } as any)
 const OrganizerEventsEventIdRoute = OrganizerEventsEventIdRouteImport.update({
-  id: "/events/$eventId",
-  path: "/events/$eventId",
+  id: '/events/$eventId',
+  path: '/events/$eventId',
   getParentRoute: () => OrganizerRoute,
 } as any)
 const MyTicketsTicketIdQrRoute = MyTicketsTicketIdQrRouteImport.update({
-  id: "/qr",
-  path: "/qr",
+  id: '/qr',
+  path: '/qr',
   getParentRoute: () => MyTicketsTicketIdRoute,
 } as any)
 const EventsEventIdPurchaseRoute = EventsEventIdPurchaseRouteImport.update({
-  id: "/purchase",
-  path: "/purchase",
+  id: '/purchase',
+  path: '/purchase',
   getParentRoute: () => EventsEventIdRoute,
 } as any)
 const EventsEventIdChooseRoute = EventsEventIdChooseRouteImport.update({
-  id: "/choose",
-  path: "/choose",
+  id: '/choose',
+  path: '/choose',
   getParentRoute: () => EventsEventIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute
-  "/my-tickets": typeof MyTicketsRouteWithChildren
-  "/organizer": typeof OrganizerRouteWithChildren
-  "/showcase": typeof ShowcaseRoute
-  "/sign-in": typeof SignInRoute
-  "/events/$eventId": typeof EventsEventIdRouteWithChildren
-  "/my-tickets/$ticketId": typeof MyTicketsTicketIdRouteWithChildren
-  "/organizer/create": typeof OrganizerCreateRoute
-  "/my-tickets/": typeof MyTicketsIndexRoute
-  "/organizer/": typeof OrganizerIndexRoute
-  "/profile/": typeof ProfileIndexRoute
-  "/events/$eventId/choose": typeof EventsEventIdChooseRoute
-  "/events/$eventId/purchase": typeof EventsEventIdPurchaseRoute
-  "/my-tickets/$ticketId/qr": typeof MyTicketsTicketIdQrRoute
-  "/organizer/events/$eventId": typeof OrganizerEventsEventIdRoute
-  "/events/$eventId/": typeof EventsEventIdIndexRoute
-  "/my-tickets/$ticketId/": typeof MyTicketsTicketIdIndexRoute
+  '/': typeof IndexRoute
+  '/my-tickets': typeof MyTicketsRouteWithChildren
+  '/organizer': typeof OrganizerRouteWithChildren
+  '/showcase': typeof ShowcaseRoute
+  '/sign-in': typeof SignInRoute
+  '/events/$eventId': typeof EventsEventIdRouteWithChildren
+  '/my-tickets/$ticketId': typeof MyTicketsTicketIdRouteWithChildren
+  '/organizer/create': typeof OrganizerCreateRoute
+  '/my-tickets/': typeof MyTicketsIndexRoute
+  '/organizer/': typeof OrganizerIndexRoute
+  '/profile/': typeof ProfileIndexRoute
+  '/events/$eventId/choose': typeof EventsEventIdChooseRoute
+  '/events/$eventId/purchase': typeof EventsEventIdPurchaseRoute
+  '/my-tickets/$ticketId/qr': typeof MyTicketsTicketIdQrRoute
+  '/organizer/events/$eventId': typeof OrganizerEventsEventIdRoute
+  '/events/$eventId/': typeof EventsEventIdIndexRoute
+  '/my-tickets/$ticketId/': typeof MyTicketsTicketIdIndexRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute
-  "/showcase": typeof ShowcaseRoute
-  "/sign-in": typeof SignInRoute
-  "/organizer/create": typeof OrganizerCreateRoute
-  "/my-tickets": typeof MyTicketsIndexRoute
-  "/organizer": typeof OrganizerIndexRoute
-  "/profile": typeof ProfileIndexRoute
-  "/events/$eventId/choose": typeof EventsEventIdChooseRoute
-  "/events/$eventId/purchase": typeof EventsEventIdPurchaseRoute
-  "/my-tickets/$ticketId/qr": typeof MyTicketsTicketIdQrRoute
-  "/organizer/events/$eventId": typeof OrganizerEventsEventIdRoute
-  "/events/$eventId": typeof EventsEventIdIndexRoute
-  "/my-tickets/$ticketId": typeof MyTicketsTicketIdIndexRoute
+  '/': typeof IndexRoute
+  '/showcase': typeof ShowcaseRoute
+  '/sign-in': typeof SignInRoute
+  '/organizer/create': typeof OrganizerCreateRoute
+  '/my-tickets': typeof MyTicketsIndexRoute
+  '/organizer': typeof OrganizerIndexRoute
+  '/profile': typeof ProfileIndexRoute
+  '/events/$eventId/choose': typeof EventsEventIdChooseRoute
+  '/events/$eventId/purchase': typeof EventsEventIdPurchaseRoute
+  '/my-tickets/$ticketId/qr': typeof MyTicketsTicketIdQrRoute
+  '/organizer/events/$eventId': typeof OrganizerEventsEventIdRoute
+  '/events/$eventId': typeof EventsEventIdIndexRoute
+  '/my-tickets/$ticketId': typeof MyTicketsTicketIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/": typeof IndexRoute
-  "/my-tickets": typeof MyTicketsRouteWithChildren
-  "/organizer": typeof OrganizerRouteWithChildren
-  "/showcase": typeof ShowcaseRoute
-  "/sign-in": typeof SignInRoute
-  "/events/$eventId": typeof EventsEventIdRouteWithChildren
-  "/my-tickets/$ticketId": typeof MyTicketsTicketIdRouteWithChildren
-  "/organizer/create": typeof OrganizerCreateRoute
-  "/my-tickets/": typeof MyTicketsIndexRoute
-  "/organizer/": typeof OrganizerIndexRoute
-  "/profile/": typeof ProfileIndexRoute
-  "/events/$eventId/choose": typeof EventsEventIdChooseRoute
-  "/events/$eventId/purchase": typeof EventsEventIdPurchaseRoute
-  "/my-tickets/$ticketId/qr": typeof MyTicketsTicketIdQrRoute
-  "/organizer/events/$eventId": typeof OrganizerEventsEventIdRoute
-  "/events/$eventId/": typeof EventsEventIdIndexRoute
-  "/my-tickets/$ticketId/": typeof MyTicketsTicketIdIndexRoute
+  '/': typeof IndexRoute
+  '/my-tickets': typeof MyTicketsRouteWithChildren
+  '/organizer': typeof OrganizerRouteWithChildren
+  '/showcase': typeof ShowcaseRoute
+  '/sign-in': typeof SignInRoute
+  '/events/$eventId': typeof EventsEventIdRouteWithChildren
+  '/my-tickets/$ticketId': typeof MyTicketsTicketIdRouteWithChildren
+  '/organizer/create': typeof OrganizerCreateRoute
+  '/my-tickets/': typeof MyTicketsIndexRoute
+  '/organizer/': typeof OrganizerIndexRoute
+  '/profile/': typeof ProfileIndexRoute
+  '/events/$eventId/choose': typeof EventsEventIdChooseRoute
+  '/events/$eventId/purchase': typeof EventsEventIdPurchaseRoute
+  '/my-tickets/$ticketId/qr': typeof MyTicketsTicketIdQrRoute
+  '/organizer/events/$eventId': typeof OrganizerEventsEventIdRoute
+  '/events/$eventId/': typeof EventsEventIdIndexRoute
+  '/my-tickets/$ticketId/': typeof MyTicketsTicketIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/my-tickets"
-    | "/organizer"
-    | "/showcase"
-    | "/sign-in"
-    | "/events/$eventId"
-    | "/my-tickets/$ticketId"
-    | "/organizer/create"
-    | "/my-tickets/"
-    | "/organizer/"
-    | "/profile/"
-    | "/events/$eventId/choose"
-    | "/events/$eventId/purchase"
-    | "/my-tickets/$ticketId/qr"
-    | "/organizer/events/$eventId"
-    | "/events/$eventId/"
-    | "/my-tickets/$ticketId/"
+    | '/'
+    | '/my-tickets'
+    | '/organizer'
+    | '/showcase'
+    | '/sign-in'
+    | '/events/$eventId'
+    | '/my-tickets/$ticketId'
+    | '/organizer/create'
+    | '/my-tickets/'
+    | '/organizer/'
+    | '/profile/'
+    | '/events/$eventId/choose'
+    | '/events/$eventId/purchase'
+    | '/my-tickets/$ticketId/qr'
+    | '/organizer/events/$eventId'
+    | '/events/$eventId/'
+    | '/my-tickets/$ticketId/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/showcase"
-    | "/sign-in"
-    | "/organizer/create"
-    | "/my-tickets"
-    | "/organizer"
-    | "/profile"
-    | "/events/$eventId/choose"
-    | "/events/$eventId/purchase"
-    | "/my-tickets/$ticketId/qr"
-    | "/organizer/events/$eventId"
-    | "/events/$eventId"
-    | "/my-tickets/$ticketId"
+    | '/'
+    | '/showcase'
+    | '/sign-in'
+    | '/organizer/create'
+    | '/my-tickets'
+    | '/organizer'
+    | '/profile'
+    | '/events/$eventId/choose'
+    | '/events/$eventId/purchase'
+    | '/my-tickets/$ticketId/qr'
+    | '/organizer/events/$eventId'
+    | '/events/$eventId'
+    | '/my-tickets/$ticketId'
   id:
-    | "__root__"
-    | "/"
-    | "/my-tickets"
-    | "/organizer"
-    | "/showcase"
-    | "/sign-in"
-    | "/events/$eventId"
-    | "/my-tickets/$ticketId"
-    | "/organizer/create"
-    | "/my-tickets/"
-    | "/organizer/"
-    | "/profile/"
-    | "/events/$eventId/choose"
-    | "/events/$eventId/purchase"
-    | "/my-tickets/$ticketId/qr"
-    | "/organizer/events/$eventId"
-    | "/events/$eventId/"
-    | "/my-tickets/$ticketId/"
+    | '__root__'
+    | '/'
+    | '/my-tickets'
+    | '/organizer'
+    | '/showcase'
+    | '/sign-in'
+    | '/events/$eventId'
+    | '/my-tickets/$ticketId'
+    | '/organizer/create'
+    | '/my-tickets/'
+    | '/organizer/'
+    | '/profile/'
+    | '/events/$eventId/choose'
+    | '/events/$eventId/purchase'
+    | '/my-tickets/$ticketId/qr'
+    | '/organizer/events/$eventId'
+    | '/events/$eventId/'
+    | '/my-tickets/$ticketId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -233,124 +233,124 @@ export interface RootRouteChildren {
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/sign-in": {
-      id: "/sign-in"
-      path: "/sign-in"
-      fullPath: "/sign-in"
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
       preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/showcase": {
-      id: "/showcase"
-      path: "/showcase"
-      fullPath: "/showcase"
+    '/showcase': {
+      id: '/showcase'
+      path: '/showcase'
+      fullPath: '/showcase'
       preLoaderRoute: typeof ShowcaseRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/organizer": {
-      id: "/organizer"
-      path: "/organizer"
-      fullPath: "/organizer"
+    '/organizer': {
+      id: '/organizer'
+      path: '/organizer'
+      fullPath: '/organizer'
       preLoaderRoute: typeof OrganizerRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/my-tickets": {
-      id: "/my-tickets"
-      path: "/my-tickets"
-      fullPath: "/my-tickets"
+    '/my-tickets': {
+      id: '/my-tickets'
+      path: '/my-tickets'
+      fullPath: '/my-tickets'
       preLoaderRoute: typeof MyTicketsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/": {
-      id: "/"
-      path: "/"
-      fullPath: "/"
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/profile/": {
-      id: "/profile/"
-      path: "/profile"
-      fullPath: "/profile/"
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
       preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/organizer/": {
-      id: "/organizer/"
-      path: "/"
-      fullPath: "/organizer/"
+    '/organizer/': {
+      id: '/organizer/'
+      path: '/'
+      fullPath: '/organizer/'
       preLoaderRoute: typeof OrganizerIndexRouteImport
       parentRoute: typeof OrganizerRoute
     }
-    "/my-tickets/": {
-      id: "/my-tickets/"
-      path: "/"
-      fullPath: "/my-tickets/"
+    '/my-tickets/': {
+      id: '/my-tickets/'
+      path: '/'
+      fullPath: '/my-tickets/'
       preLoaderRoute: typeof MyTicketsIndexRouteImport
       parentRoute: typeof MyTicketsRoute
     }
-    "/organizer/create": {
-      id: "/organizer/create"
-      path: "/create"
-      fullPath: "/organizer/create"
+    '/organizer/create': {
+      id: '/organizer/create'
+      path: '/create'
+      fullPath: '/organizer/create'
       preLoaderRoute: typeof OrganizerCreateRouteImport
       parentRoute: typeof OrganizerRoute
     }
-    "/my-tickets/$ticketId": {
-      id: "/my-tickets/$ticketId"
-      path: "/$ticketId"
-      fullPath: "/my-tickets/$ticketId"
+    '/my-tickets/$ticketId': {
+      id: '/my-tickets/$ticketId'
+      path: '/$ticketId'
+      fullPath: '/my-tickets/$ticketId'
       preLoaderRoute: typeof MyTicketsTicketIdRouteImport
       parentRoute: typeof MyTicketsRoute
     }
-    "/events/$eventId": {
-      id: "/events/$eventId"
-      path: "/events/$eventId"
-      fullPath: "/events/$eventId"
+    '/events/$eventId': {
+      id: '/events/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/events/$eventId'
       preLoaderRoute: typeof EventsEventIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    "/my-tickets/$ticketId/": {
-      id: "/my-tickets/$ticketId/"
-      path: "/"
-      fullPath: "/my-tickets/$ticketId/"
+    '/my-tickets/$ticketId/': {
+      id: '/my-tickets/$ticketId/'
+      path: '/'
+      fullPath: '/my-tickets/$ticketId/'
       preLoaderRoute: typeof MyTicketsTicketIdIndexRouteImport
       parentRoute: typeof MyTicketsTicketIdRoute
     }
-    "/events/$eventId/": {
-      id: "/events/$eventId/"
-      path: "/"
-      fullPath: "/events/$eventId/"
+    '/events/$eventId/': {
+      id: '/events/$eventId/'
+      path: '/'
+      fullPath: '/events/$eventId/'
       preLoaderRoute: typeof EventsEventIdIndexRouteImport
       parentRoute: typeof EventsEventIdRoute
     }
-    "/organizer/events/$eventId": {
-      id: "/organizer/events/$eventId"
-      path: "/events/$eventId"
-      fullPath: "/organizer/events/$eventId"
+    '/organizer/events/$eventId': {
+      id: '/organizer/events/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/organizer/events/$eventId'
       preLoaderRoute: typeof OrganizerEventsEventIdRouteImport
       parentRoute: typeof OrganizerRoute
     }
-    "/my-tickets/$ticketId/qr": {
-      id: "/my-tickets/$ticketId/qr"
-      path: "/qr"
-      fullPath: "/my-tickets/$ticketId/qr"
+    '/my-tickets/$ticketId/qr': {
+      id: '/my-tickets/$ticketId/qr'
+      path: '/qr'
+      fullPath: '/my-tickets/$ticketId/qr'
       preLoaderRoute: typeof MyTicketsTicketIdQrRouteImport
       parentRoute: typeof MyTicketsTicketIdRoute
     }
-    "/events/$eventId/purchase": {
-      id: "/events/$eventId/purchase"
-      path: "/purchase"
-      fullPath: "/events/$eventId/purchase"
+    '/events/$eventId/purchase': {
+      id: '/events/$eventId/purchase'
+      path: '/purchase'
+      fullPath: '/events/$eventId/purchase'
       preLoaderRoute: typeof EventsEventIdPurchaseRouteImport
       parentRoute: typeof EventsEventIdRoute
     }
-    "/events/$eventId/choose": {
-      id: "/events/$eventId/choose"
-      path: "/choose"
-      fullPath: "/events/$eventId/choose"
+    '/events/$eventId/choose': {
+      id: '/events/$eventId/choose'
+      path: '/choose'
+      fullPath: '/events/$eventId/choose'
       preLoaderRoute: typeof EventsEventIdChooseRouteImport
       parentRoute: typeof EventsEventIdRoute
     }
@@ -381,7 +381,7 @@ const MyTicketsRouteChildren: MyTicketsRouteChildren = {
 }
 
 const MyTicketsRouteWithChildren = MyTicketsRoute._addFileChildren(
-  MyTicketsRouteChildren
+  MyTicketsRouteChildren,
 )
 
 interface OrganizerRouteChildren {
@@ -397,7 +397,7 @@ const OrganizerRouteChildren: OrganizerRouteChildren = {
 }
 
 const OrganizerRouteWithChildren = OrganizerRoute._addFileChildren(
-  OrganizerRouteChildren
+  OrganizerRouteChildren,
 )
 
 interface EventsEventIdRouteChildren {
@@ -413,7 +413,7 @@ const EventsEventIdRouteChildren: EventsEventIdRouteChildren = {
 }
 
 const EventsEventIdRouteWithChildren = EventsEventIdRoute._addFileChildren(
-  EventsEventIdRouteChildren
+  EventsEventIdRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
