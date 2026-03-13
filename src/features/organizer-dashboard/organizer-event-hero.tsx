@@ -1,7 +1,10 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { EventStatus, getEventStatusBadgeVariant } from "@/constants/event-status.constant"
+import {
+  EventStatus,
+  getEventStatusBadgeVariant,
+} from "@/constants/event-status.constant"
 import type { EventDetail, EventTicketType } from "@/types/event"
 import {
   formatDateLabel,
@@ -36,10 +39,14 @@ function useNow(intervalMs: number) {
 }
 
 /** Nearest sale date from now (soonest >= now, or first if all past). */
-function getNearestSaleFromNow(saleDateList: string[]): { date: string; label: string } | null {
+function getNearestSaleFromNow(
+  saleDateList: string[]
+): { date: string; label: string } | null {
   if (!saleDateList.length) return null
   const now = dayjs()
-  const future = saleDateList.filter((d) => dayjs(d).isAfter(now)).sort((a, b) => dayjs(a).diff(dayjs(b)))
+  const future = saleDateList
+    .filter((d) => dayjs(d).isAfter(now))
+    .sort((a, b) => dayjs(a).diff(dayjs(b)))
   const nearest = future[0] ?? saleDateList[0]
   return { date: nearest, label: future.length ? "First Sale" : "First Sale" }
 }
@@ -51,7 +58,9 @@ function getOnSaleRemaining(
 ): { remaining: number; total: number } {
   const now = dayjs()
   const pastSaleSet = new Set(
-    saleDateList.filter((d) => dayjs(d).isBefore(now) || dayjs(d).isSame(now, "minute")).map((d) => d)
+    saleDateList
+      .filter((d) => dayjs(d).isBefore(now) || dayjs(d).isSame(now, "minute"))
+      .map((d) => d)
   )
   let remaining = 0
   let total = 0
@@ -67,14 +76,18 @@ function getOnSaleRemaining(
 /** For On Sale: start of current sale period = max(sale_date_list < now). */
 function getTimeUseStart(saleDateList: string[]): string | null {
   const now = dayjs()
-  const past = saleDateList.filter((d) => dayjs(d).isBefore(now)).sort((a, b) => dayjs(b).diff(dayjs(a)))
+  const past = saleDateList
+    .filter((d) => dayjs(d).isBefore(now))
+    .sort((a, b) => dayjs(b).diff(dayjs(a)))
   return past[0] ?? null
 }
 
 /** Nearest show date in the future (for countdown). */
 function getShowBeginTarget(showDateList: string[]): string | null {
   const now = dayjs()
-  const future = showDateList.filter((d) => dayjs(d).isAfter(now)).sort((a, b) => dayjs(a).diff(dayjs(b)))
+  const future = showDateList
+    .filter((d) => dayjs(d).isAfter(now))
+    .sort((a, b) => dayjs(a).diff(dayjs(b)))
   return future[0] ?? null
 }
 
@@ -83,7 +96,10 @@ function getTicketSaleTimeUseMs(ticketTypes: EventTicketType[]): number {
   let sum = 0
   for (const tt of ticketTypes) {
     if (tt.sold_out_date) {
-      sum += Math.max(0, dayjs(tt.sold_out_date).diff(dayjs(tt.start_sale_date)))
+      sum += Math.max(
+        0,
+        dayjs(tt.sold_out_date).diff(dayjs(tt.start_sale_date))
+      )
     }
   }
   return sum
@@ -109,9 +125,7 @@ function InfoBlock({
   )
 }
 
-export function OrganizerEventHero({
-  event,
-}: OrganizerEventHeroProps) {
+export function OrganizerEventHero({ event }: OrganizerEventHeroProps) {
   const formattedDates = event.show_date_list.map((iso) => formatDateLabel(iso))
   const statusBadgeVariant = getEventStatusBadgeVariant(event.status_id)
   const showLiveTime =
@@ -147,7 +161,14 @@ export function OrganizerEventHero({
           subtext: nearest?.label ?? "—",
         },
       ]
-      const buttons: ButtonConfig[] = [{ key: "staff", label: "Staff Code", variant: "outline", icon: "focus" }]
+      const buttons: ButtonConfig[] = [
+        {
+          key: "staff",
+          label: "Staff Code",
+          variant: "outline",
+          icon: "focus",
+        },
+      ]
       return { blocks, buttons }
     }
 
@@ -166,12 +187,24 @@ export function OrganizerEventHero({
           key: "time-use",
           label: "Time use",
           value: formatDuration(elapsedMs),
-          subtext: timeUseStart ? `from ${formatDateLabel(timeUseStart)}` : undefined,
+          subtext: timeUseStart
+            ? `from ${formatDateLabel(timeUseStart)}`
+            : undefined,
         },
       ]
       const buttons: ButtonConfig[] = [
-        { key: "see-selling", label: "See Selling", variant: "default", icon: "ticket" },
-        { key: "staff", label: "Staff Code", variant: "outline", icon: "focus" },
+        {
+          key: "see-selling",
+          label: "See Selling",
+          variant: "default",
+          icon: "ticket",
+        },
+        {
+          key: "staff",
+          label: "Staff Code",
+          variant: "outline",
+          icon: "focus",
+        },
       ]
       return { blocks, buttons }
     }
@@ -187,7 +220,9 @@ export function OrganizerEventHero({
           key: "show-begin",
           label: "Show Begin",
           value: formatDuration(countdownMs),
-          subtext: showBeginTarget ? `Round: ${formatDateLabel(showBeginTarget)}` : undefined,
+          subtext: showBeginTarget
+            ? `Round: ${formatDateLabel(showBeginTarget)}`
+            : undefined,
         },
         {
           key: "ticket-sale-time",
@@ -197,8 +232,18 @@ export function OrganizerEventHero({
         },
       ]
       const buttons: ButtonConfig[] = [
-        { key: "staff", label: "Staff Code", variant: "outline", icon: "focus" },
-        { key: "export", label: "Export Data", variant: "default", icon: "upload" },
+        {
+          key: "staff",
+          label: "Staff Code",
+          variant: "outline",
+          icon: "focus",
+        },
+        {
+          key: "export",
+          label: "Export Data",
+          variant: "default",
+          icon: "upload",
+        },
       ]
       return { blocks, buttons }
     }
@@ -213,18 +258,34 @@ export function OrganizerEventHero({
           key: "show-begin",
           label: "Show Begin",
           value: formatDuration(countdownMs),
-          subtext: showBeginTarget ? `Round: ${formatDateLabel(showBeginTarget)}` : undefined,
+          subtext: showBeginTarget
+            ? `Round: ${formatDateLabel(showBeginTarget)}`
+            : undefined,
         },
       ]
-      const buttons: ButtonConfig[] = [{ key: "staff", label: "Staff Code", variant: "outline", icon: "focus" }]
+      const buttons: ButtonConfig[] = [
+        {
+          key: "staff",
+          label: "Staff Code",
+          variant: "outline",
+          icon: "focus",
+        },
+      ]
       return { blocks, buttons }
     }
 
     // End
     if (statusId === EventStatus.END) {
-      const blocks: Block[] = [{ key: "check-in", label: "Check In", value: "—", subtext: "TODO" }]
+      const blocks: Block[] = [
+        { key: "check-in", label: "Check In", value: "—", subtext: "TODO" },
+      ]
       const buttons: ButtonConfig[] = [
-        { key: "export", label: "Export Data", variant: "default", icon: "upload" },
+        {
+          key: "export",
+          label: "Export Data",
+          variant: "default",
+          icon: "upload",
+        },
       ]
       return { blocks, buttons }
     }
@@ -239,8 +300,7 @@ export function OrganizerEventHero({
     icon: "focus" | "ticket" | "upload"
   }) => {
     const iconClass = "size-4"
-    const outlineClass =
-      "gap-2 border-primary text-primary hover:bg-primary/10"
+    const outlineClass = "gap-2 border-primary text-primary hover:bg-primary/10"
     return (
       <Button
         key={config.key}
@@ -248,8 +308,12 @@ export function OrganizerEventHero({
         className={config.variant === "outline" ? outlineClass : "gap-2"}
       >
         {config.icon === "focus" && <Focus className={iconClass} aria-hidden />}
-        {config.icon === "ticket" && <Ticket className={iconClass} aria-hidden />}
-        {config.icon === "upload" && <Upload className={iconClass} aria-hidden />}
+        {config.icon === "ticket" && (
+          <Ticket className={iconClass} aria-hidden />
+        )}
+        {config.icon === "upload" && (
+          <Upload className={iconClass} aria-hidden />
+        )}
         {config.label}
       </Button>
     )
@@ -262,14 +326,14 @@ export function OrganizerEventHero({
           alt=""
           className="absolute inset-0 h-full w-full object-cover blur-lg sm:blur-none"
         />
-        <div className="absolute right-4 top-4">
+        <div className="absolute top-4 right-4">
           <Button variant="secondary" size="sm" className="gap-2">
             <Pencil className="size-4" aria-hidden />
             Edit Thumbnail
           </Button>
         </div>
       </div>
-      <div className="relative mx-auto w-full max-w-[1280px] px-4 py-8 sm:px-6 sm:-mt-72">
+      <div className="relative mx-auto w-full max-w-[1280px] px-4 py-8 sm:-mt-72 sm:px-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <div className="flex flex-col gap-6 md:flex-row md:gap-8 lg:min-w-0 lg:flex-1">
             <div className="mx-auto w-full max-w-[240px] shrink-0 md:mx-0">
@@ -287,10 +351,10 @@ export function OrganizerEventHero({
                   {event.title}
                 </h1>
                 <div className="mt-3 flex items-center gap-2">
-                  <Badge className="text-base p-3" variant={statusBadgeVariant}>
+                  <Badge className="p-3 text-base" variant={statusBadgeVariant}>
                     {event.status_label}
                   </Badge>
-                  <div className="grow flex items-center justify-end gap-2">
+                  <div className="flex grow items-center justify-end gap-2">
                     <Button variant="outline" size="sm" className="gap-2">
                       Unpublished Event
                     </Button>
@@ -301,7 +365,7 @@ export function OrganizerEventHero({
                   </div>
                 </div>
               </div>
-              <div className="rounded-xl h-full border border-border bg-card p-5 shadow-sm">
+              <div className="h-full rounded-xl border border-border bg-card p-5 shadow-sm">
                 <div className="space-y-4">
                   <div className="flex gap-3">
                     <CalendarRange
@@ -337,9 +401,11 @@ export function OrganizerEventHero({
             </div>
           </div>
           {event.status_id !== EventStatus.CANCELLED && statusCardData && (
-            <div className="h-full flex items-center justify-center">
-              <Card className="w-full gap-0 shrink-0 rounded-xl border border-border p-5 shadow-sm lg:w-[280px] lg:sticky lg:top-24">
-                <h2 className="text-lg font-medium text-primary text-center">Event Status</h2>
+            <div className="flex h-full items-center justify-center">
+              <Card className="w-full shrink-0 gap-0 rounded-xl border border-border p-5 shadow-sm lg:sticky lg:top-24 lg:w-[280px]">
+                <h2 className="text-center text-lg font-medium text-primary">
+                  Event Status
+                </h2>
                 {statusCardData.blocks.map((block) => (
                   <InfoBlock
                     key={block.key}
@@ -348,7 +414,7 @@ export function OrganizerEventHero({
                     subtext={block.subtext}
                   />
                 ))}
-                <div className="flex gap-2 mt-2 items-center justify-center">
+                <div className="mt-2 flex items-center justify-center gap-2">
                   {statusCardData.buttons.map((btn) => renderStatusButton(btn))}
                 </div>
               </Card>

@@ -72,7 +72,8 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
     ? undefined
     : "Phone number must be digits only (max 13)."
 
-  const canSave = !firstNameError && !lastNameError && !emailError && !phoneError
+  const canSave =
+    !firstNameError && !lastNameError && !emailError && !phoneError
 
   const update = <K extends keyof ProfileFormValues>(
     key: K,
@@ -80,7 +81,10 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
   ) => setValues((prev) => ({ ...prev, [key]: value }))
 
   const fileInputId = "profile-image"
-  const safeDialCode = ensureDialCode(values.phoneCountryCode, DEFAULT_PHONE_REGION)
+  const safeDialCode = ensureDialCode(
+    values.phoneCountryCode,
+    DEFAULT_PHONE_REGION
+  )
 
   return (
     <Card className="border-border" size="sm">
@@ -227,7 +231,9 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
               inputMode="numeric"
               pattern="\d*"
               onChange={(e) => {
-                const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 13)
+                const digitsOnly = e.target.value
+                  .replace(/\D/g, "")
+                  .slice(0, 13)
                 update("phone", digitsOnly)
               }}
               aria-invalid={phoneError ? true : undefined}
@@ -250,7 +256,7 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
           />
         </div>
       </CardContent>
-      <CardFooter className="border-t border-border justify-end">
+      <CardFooter className="justify-end border-t border-border">
         <Button
           type="button"
           disabled={!canSave || saving}
@@ -272,4 +278,3 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
     </Card>
   )
 }
-

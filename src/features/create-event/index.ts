@@ -25,10 +25,7 @@ export type { TicketSettingSectionProps } from "./ticket-setting-section"
 export { TicketTypeSection } from "./ticket-type-section"
 export type { TicketTypeSectionProps } from "./ticket-type-section"
 
-export {
-  createId,
-  formatDateRangeLabel,
-} from "@/types/create-event"
+export { createId, formatDateRangeLabel } from "@/types/create-event"
 export type {
   DateRangeEntry,
   StaffEntry,

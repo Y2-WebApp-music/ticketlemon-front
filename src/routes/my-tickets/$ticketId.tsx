@@ -8,4 +8,3 @@ export const Route = createFileRoute("/my-tickets/$ticketId")({
 function MyTicketDetailRoute() {
   return <Outlet />
 }
-

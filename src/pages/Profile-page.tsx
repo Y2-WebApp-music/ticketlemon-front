@@ -42,7 +42,9 @@ export default function ProfilePage() {
           </div>
 
           <div className="max-w-[720px]">
-            {activeId === "basic" && <ProfileForm initialValues={userProfileMock} />}
+            {activeId === "basic" && (
+              <ProfileForm initialValues={userProfileMock} />
+            )}
             {activeId === "password" && <ChangePasswordCard />}
             {activeId === "payment" && (
               <PaymentMethodsCard initialMethods={paymentMethodsMock} />
@@ -63,4 +65,3 @@ export default function ProfilePage() {
     </PageLayout>
   )
 }
-

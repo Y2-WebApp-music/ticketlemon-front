@@ -58,14 +58,14 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
         />
         <Link
           to="/my-tickets"
-          className="absolute left-2 top-2 inline-flex items-center gap-2 rounded-lg bg-white/80 px-3 py-2 text-sm font-medium text-primary backdrop-blur"
+          className="absolute top-2 left-2 inline-flex items-center gap-2 rounded-lg bg-white/80 px-3 py-2 text-sm font-medium text-primary backdrop-blur"
         >
           <ChevronLeft className="size-4" aria-hidden />
           Back
         </Link>
       </div>
 
-      <div className="mx-auto max-w-[1336px] min-w-0 px-4 pb-20 pt-6 sm:px-6">
+      <div className="mx-auto max-w-[1336px] min-w-0 px-4 pt-6 pb-20 sm:px-6">
         {/* Desktop back */}
         <div className="hidden sm:block">
           <Link
@@ -90,7 +90,7 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
             </div>
 
             <div className="space-y-2">
-              <p className="text-base font-medium leading-6 text-foreground sm:text-xl sm:leading-7 sm:tracking-tight">
+              <p className="text-base leading-6 font-medium text-foreground sm:text-xl sm:leading-7 sm:tracking-tight">
                 {detail.title}
               </p>
               <p className="text-base font-medium text-primary sm:text-base">
@@ -102,10 +102,10 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
 
             {/* Description (desktop only per Figma layout) */}
             <div className="hidden space-y-2 sm:block">
-              <p className="text-xl font-medium leading-7 text-foreground">
+              <p className="text-xl leading-7 font-medium text-foreground">
                 {detail.descriptionTitle}
               </p>
-              <div className="whitespace-pre-wrap text-base leading-6 text-foreground">
+              <div className="text-base leading-6 whitespace-pre-wrap text-foreground">
                 {detail.description}
               </div>
             </div>
@@ -183,4 +183,3 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
     </PageLayout>
   )
 }
-

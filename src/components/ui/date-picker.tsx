@@ -32,7 +32,7 @@ export function DatePicker({
   triggerClassName,
   disabled,
   dateFormat = "PPP",
-  captionLayout= "dropdown"
+  captionLayout = "dropdown",
 }: DatePickerProps) {
   return (
     <Popover>
@@ -44,7 +44,7 @@ export function DatePicker({
           disabled={disabled}
           className={cn(
             value ? "text-foreground" : "text-muted-foreground",
-            "w-full justify-between rounded-lg font-normal border-input hover:bg-primary-foreground aria-expanded:text-foreground [&_svg]:text-foreground [&_svg]:opacity-70",
+            "w-full justify-between rounded-lg border-input font-normal hover:bg-primary-foreground aria-expanded:text-foreground [&_svg]:text-foreground [&_svg]:opacity-70",
             triggerClassName
           )}
         >

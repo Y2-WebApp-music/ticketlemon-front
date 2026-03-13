@@ -8,7 +8,9 @@ export interface EditorJsTabProps {
 }
 
 export function EditorJsTab({ initialData = null }: EditorJsTabProps) {
-  const [editorData, setEditorData] = useState<OutputData | null>(initialData ?? null)
+  const [editorData, setEditorData] = useState<OutputData | null>(
+    initialData ?? null
+  )
   const [editorReadOnly, setEditorReadOnly] = useState(false)
 
   return (

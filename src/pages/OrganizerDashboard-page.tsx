@@ -27,7 +27,7 @@ export default function OrganizerDashboardPage() {
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between gap-4">
-              <h1 className="text-xl font-normal leading-7 text-primary">
+              <h1 className="text-xl leading-7 font-normal text-primary">
                 My Event
               </h1>
               <Button asChild>
@@ -58,7 +58,10 @@ export default function OrganizerDashboardPage() {
                 Event Status <span className="text-destructive">*</span>
               </Label>
               <Select>
-                <SelectTrigger id="organizer-status" className="w-full rounded-lg">
+                <SelectTrigger
+                  id="organizer-status"
+                  className="w-full rounded-lg"
+                >
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
@@ -75,7 +78,10 @@ export default function OrganizerDashboardPage() {
                 Event Sort <span className="text-destructive">*</span>
               </Label>
               <Select>
-                <SelectTrigger id="organizer-sort" className="w-full rounded-lg">
+                <SelectTrigger
+                  id="organizer-sort"
+                  className="w-full rounded-lg"
+                >
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent>
@@ -91,7 +97,7 @@ export default function OrganizerDashboardPage() {
 
           {/* Coming Event */}
           <section className="flex flex-col gap-4">
-            <h2 className="text-xl font-normal leading-7 text-foreground">
+            <h2 className="text-xl leading-7 font-normal text-foreground">
               Coming Event
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -103,7 +109,7 @@ export default function OrganizerDashboardPage() {
 
           {/* All Events */}
           <section className="flex flex-col gap-4">
-            <h2 className="text-xl font-normal leading-7 text-foreground">
+            <h2 className="text-xl leading-7 font-normal text-foreground">
               All Events
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">

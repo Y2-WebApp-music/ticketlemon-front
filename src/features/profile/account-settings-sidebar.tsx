@@ -40,7 +40,10 @@ export function AccountSettingsSidebar({
             Account Setting
           </span>
           <ChevronUp
-            className={cn("size-4 transition-transform", open ? "" : "rotate-180")}
+            className={cn(
+              "size-4 transition-transform",
+              open ? "" : "rotate-180"
+            )}
             aria-hidden
           />
         </button>
@@ -71,4 +74,3 @@ export function AccountSettingsSidebar({
     </aside>
   )
 }
-

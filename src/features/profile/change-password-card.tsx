@@ -20,10 +20,13 @@ export function ChangePasswordCard() {
 
   const currentOk = currentPassword.trim().length > 0
   const newOk = newPassword.length >= 8
-  const confirmOk = confirmPassword.length > 0 && confirmPassword === newPassword
+  const confirmOk =
+    confirmPassword.length > 0 && confirmPassword === newPassword
 
   const currentError = currentOk ? undefined : "Current password is required."
-  const newError = newOk ? undefined : "New password must be at least 8 characters."
+  const newError = newOk
+    ? undefined
+    : "New password must be at least 8 characters."
   const confirmError =
     confirmPassword.length === 0
       ? "Confirm password is required."
@@ -92,7 +95,7 @@ export function ChangePasswordCard() {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="border-t border-border justify-end">
+      <CardFooter className="justify-end border-t border-border">
         <Button
           type="button"
           disabled={!canSave || saving}
@@ -116,4 +119,3 @@ export function ChangePasswordCard() {
     </Card>
   )
 }
-

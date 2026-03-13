@@ -85,10 +85,7 @@ export default function OrganizerEventDetailPage({
       <PageLayout>
         <main className="flex min-h-[50vh] flex-col items-center justify-center px-4">
           <p className="text-muted-foreground">Event not found.</p>
-          <Link
-            to="/organizer"
-            className="mt-4 text-primary hover:underline"
-          >
+          <Link to="/organizer" className="mt-4 text-primary hover:underline">
             Back to dashboard
           </Link>
         </main>
@@ -108,7 +105,7 @@ export default function OrganizerEventDetailPage({
             Back
           </Link>
         </div> */}
-        <OrganizerEventHero event={event}/>
+        <OrganizerEventHero event={event} />
         <OrganizerEventTabs
           eventId={event.id}
           description={event.description}

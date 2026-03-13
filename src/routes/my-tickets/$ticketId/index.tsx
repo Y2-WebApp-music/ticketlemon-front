@@ -10,4 +10,3 @@ function MyTicketDetailIndexRoute() {
   const { ticketId } = Route.useParams()
   return <MyTicketDetailPage ticketId={ticketId} />
 }
-

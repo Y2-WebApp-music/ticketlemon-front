@@ -28,10 +28,7 @@ export function FormsTab() {
       </section>
       <section>
         <h2 className="mb-4 text-xl font-semibold">Textarea</h2>
-        <Textarea
-          placeholder="Type your message here."
-          className="max-w-md"
-        />
+        <Textarea placeholder="Type your message here." className="max-w-md" />
       </section>
       <section>
         <h2 className="mb-4 text-xl font-semibold">Checkbox</h2>

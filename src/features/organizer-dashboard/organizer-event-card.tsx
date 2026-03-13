@@ -6,13 +6,13 @@ import { EventStatus } from "@/constants/event-status.constant"
 
 /** Status badge variant: pass (green), warning (yellow), or use default/outline for On Sale / Sold Out etc. */
 export type OrganizerEventStatus =
-  | "show"      // pass (green)
-  | "scheduled"  // warning (yellow)
-  | "on_sale"   // primary
-  | "sold_out"  // outline
-  | "draft"     // secondary
+  | "show" // pass (green)
+  | "scheduled" // warning (yellow)
+  | "on_sale" // primary
+  | "sold_out" // outline
+  | "draft" // secondary
   | "event_end" // secondary/muted
-  | "cancel"    // destructive
+  | "cancel" // destructive
 
 export interface OrganizerEventCardProps {
   eventId: string
@@ -75,39 +75,35 @@ export function OrganizerEventCard({
             alt={imageAlt}
             className="size-full object-cover"
           />
-          <div className="absolute right-2 top-2">
+          <div className="absolute top-2 right-2">
             <Badge variant={badgeVariant} className="shadow-sm">
               {label}
             </Badge>
           </div>
         </div>
         <div className="flex flex-1 flex-col gap-2 p-3">
-          <p className="text-lg font-medium leading-7 text-primary">{date}</p>
-          <p className="line-clamp-2 text-sm font-normal leading-6 text-foreground">
+          <p className="text-lg leading-7 font-medium text-primary">{date}</p>
+          <p className="line-clamp-2 text-sm leading-6 font-normal text-foreground">
             {title}
           </p>
-          <p className="text-sm font-medium leading-[14px] text-muted-foreground">
+          <p className="text-sm leading-[14px] font-medium text-muted-foreground">
             {venue}
           </p>
           {/* Dynamic Info */}
           <div className="mt-auto flex items-center gap-1 rounded-full border border-primary px-3 py-1.5 text-xs font-medium text-primary">
-            {status == EventStatus.SHOW ?
-              <Target className="size-4 shrink-0" aria-hidden/>
-              :
-              status == EventStatus.ON_SALE ?
+            {status == EventStatus.SHOW ? (
+              <Target className="size-4 shrink-0" aria-hidden />
+            ) : status == EventStatus.ON_SALE ? (
               <Ticket className="size-4 shrink-0" aria-hidden />
-              :
-              status == EventStatus.SOLD_OUT ?
+            ) : status == EventStatus.SOLD_OUT ? (
               <Radio className="size-4 shrink-0" aria-hidden />
-              :
-              status == EventStatus.SCHEDULED ?
+            ) : status == EventStatus.SCHEDULED ? (
               <Timer className="size-4 shrink-0" aria-hidden />
-              :
-              status == EventStatus.END ?
-                <Target className="size-4 shrink-0" aria-hidden/>
-              :
-                <Ticket className="size-4 shrink-0" aria-hidden />
-            }
+            ) : status == EventStatus.END ? (
+              <Target className="size-4 shrink-0" aria-hidden />
+            ) : (
+              <Ticket className="size-4 shrink-0" aria-hidden />
+            )}
             {bottomLine}
           </div>
         </div>

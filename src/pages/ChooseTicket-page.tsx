@@ -15,7 +15,14 @@ function parsePriceToNumber(price: string): number {
 
 interface SessionWithRemaining {
   sessionLabel: string
-  tickets: { id: string; title: string; description?: string; price: string; priceValue: number; remaining: number }[]
+  tickets: {
+    id: string
+    title: string
+    description?: string
+    price: string
+    priceValue: number
+    remaining: number
+  }[]
 }
 
 function buildSessionsFromTicketTypes(

@@ -9,4 +9,3 @@ export const Route = createFileRoute("/sign-in")({
 function SignInRoute() {
   return <SignInPage />
 }
-

@@ -39,7 +39,10 @@ export function TicketSettingSection({
           <div className="flex flex-wrap gap-4">
             <div className="min-w-[160px] space-y-2">
               <Label>Minimum ticket</Label>
-              <Select value={ticketMinPerOrder} onValueChange={onTicketMinChange}>
+              <Select
+                value={ticketMinPerOrder}
+                onValueChange={onTicketMinChange}
+              >
                 <SelectTrigger className="w-full rounded-lg">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
@@ -53,7 +56,10 @@ export function TicketSettingSection({
             </div>
             <div className="min-w-[160px] space-y-2">
               <Label>Maximum ticket</Label>
-              <Select value={ticketMaxPerOrder} onValueChange={onTicketMaxChange}>
+              <Select
+                value={ticketMaxPerOrder}
+                onValueChange={onTicketMaxChange}
+              >
                 <SelectTrigger className="w-full rounded-lg">
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>

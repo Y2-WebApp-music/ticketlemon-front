@@ -1,5 +1,9 @@
 import { PageLayout } from "@/components/layouts"
-import { EventHero, EventTabs, type TicketTypeGroup } from "@/features/event-detail"
+import {
+  EventHero,
+  EventTabs,
+  type TicketTypeGroup,
+} from "@/features/event-detail"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import { getEventDetail } from "@/mocks/event-detail"
 import type { EventTicketType } from "@/types/event"
@@ -51,10 +55,12 @@ function groupTicketTypesByEventDate(
   }
   return Array.from(byDate.entries())
     .sort(([a], [b]) => a.localeCompare(b))
-    .map(([eventDate, list]): TicketTypeGroup => ({
-      sessionLabel: formatDateLabel(eventDate),
-      tickets: mapTicketTypesToCardProps(list),
-    }))
+    .map(
+      ([eventDate, list]): TicketTypeGroup => ({
+        sessionLabel: formatDateLabel(eventDate),
+        tickets: mapTicketTypesToCardProps(list),
+      })
+    )
 }
 
 export interface EventDetailPageProps {

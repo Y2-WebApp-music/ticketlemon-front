@@ -105,7 +105,9 @@ export function PurchaseContactForm({
               inputMode="numeric"
               pattern="\d*"
               onChange={(e) => {
-                const digitsOnly = e.target.value.replace(/\D/g, "").slice(0, 13)
+                const digitsOnly = e.target.value
+                  .replace(/\D/g, "")
+                  .slice(0, 13)
                 onPhoneChange(digitsOnly)
               }}
               aria-invalid={phoneError ? true : undefined}

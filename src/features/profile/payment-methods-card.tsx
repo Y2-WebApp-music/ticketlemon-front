@@ -3,12 +3,7 @@ import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import type { PaymentMethod } from "@/types/profile"
 
@@ -21,16 +16,12 @@ export function PaymentMethodsCard({
 }: {
   initialMethods: PaymentMethod[]
 }) {
-  const [methods, setMethods] = React.useState<PaymentMethod[]>(
-    initialMethods
-  )
+  const [methods, setMethods] = React.useState<PaymentMethod[]>(initialMethods)
 
   const defaultId = methods.find((m) => m.isDefault)?.id ?? null
 
   const setDefault = (id: string) => {
-    setMethods((prev) =>
-      prev.map((m) => ({ ...m, isDefault: m.id === id }))
-    )
+    setMethods((prev) => prev.map((m) => ({ ...m, isDefault: m.id === id })))
     toast.success("Default payment method updated")
   }
 
@@ -115,4 +106,3 @@ export function PaymentMethodsCard({
     </Card>
   )
 }
-

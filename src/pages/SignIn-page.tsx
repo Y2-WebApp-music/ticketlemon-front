@@ -35,9 +35,8 @@ export default function SignInPage() {
     email: string
     password: string
   }>({ email: "", password: "" })
-  const [dataForm, setDataForm] = React.useState<RegisterDataForm>(
-    initialDataForm
-  )
+  const [dataForm, setDataForm] =
+    React.useState<RegisterDataForm>(initialDataForm)
   const [signInLoading, setSignInLoading] = React.useState(false)
   const [signInError, setSignInError] = React.useState<string | null>(null)
 
@@ -150,7 +149,7 @@ export default function SignInPage() {
 
       {/* Desktop */}
       <div className="relative mx-auto hidden min-h-svh w-full grid-cols-2 lg:grid">
-        <div className="relative overflow-hidden bg-background px-16 flex flex-col items-center justify-end">
+        <div className="relative flex flex-col items-center justify-end overflow-hidden bg-background px-16">
           <TicketlemonFull className="h-14 w-auto" aria-label="ticketlemon" />
 
           <div className="mt-16 w-[60%]">
@@ -201,7 +200,10 @@ export default function SignInPage() {
                       setSignInError(null)
                     }}
                     onPasswordChange={(value) => {
-                      setSignInDataForm((prev) => ({ ...prev, password: value }))
+                      setSignInDataForm((prev) => ({
+                        ...prev,
+                        password: value,
+                      }))
                       setSignInError(null)
                     }}
                     onSignIn={handleSignIn}

@@ -65,8 +65,7 @@ export function StaffSection({
                 </div>
                 <div className="max-w-md space-y-2">
                   <Label>
-                    Staff Email{" "}
-                    <span className="text-destructive">*</span>
+                    Staff Email <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     type="email"

@@ -10,4 +10,3 @@ function MyTicketQrRoute() {
   const { ticketId } = Route.useParams()
   return <MyTicketQrPage ticketId={ticketId} />
 }
-

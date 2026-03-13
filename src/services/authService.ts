@@ -14,7 +14,9 @@ export interface SignInCredentials {
  * Expects API to return body shape { access_token, role, permission } or { data: { access_token, role, permission } }.
  * @throws Error or formatted API error on failure
  */
-export async function signIn(credentials: SignInCredentials): Promise<SignInResponse> {
+export async function signIn(
+  credentials: SignInCredentials
+): Promise<SignInResponse> {
   const res = await httpClient.request({
     method: "POST",
     url: "/auth/sign-in",

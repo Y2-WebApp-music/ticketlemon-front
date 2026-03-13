@@ -80,16 +80,14 @@ export function RegisterStep2Form({
         type="button"
         variant="ghost"
         size="sm"
-        className="-ml-2 mb-1 text-muted-foreground hover:text-foreground"
+        className="mb-1 -ml-2 text-muted-foreground hover:text-foreground"
         onClick={onBack}
         aria-label="Back to previous step"
       >
         <ChevronLeftIcon className="size-4" />
         Back
       </Button>
-      <h1 className={`w-full text-left ${headingClass}`}>
-        Create an account
-      </h1>
+      <h1 className={`w-full text-left ${headingClass}`}>Create an account</h1>
       <div className="w-full space-y-4">
         <div className="space-y-2">
           <Label htmlFor={`reg-firstname-${idPrefix}`} className="text-sm">
@@ -101,7 +99,10 @@ export function RegisterStep2Form({
             placeholder="Enter first name"
             value={firstName}
             onChange={(e) =>
-              onDataFormChange((prev) => ({ ...prev, firstName: e.target.value }))
+              onDataFormChange((prev) => ({
+                ...prev,
+                firstName: e.target.value,
+              }))
             }
             className="rounded-lg"
           />
@@ -116,7 +117,10 @@ export function RegisterStep2Form({
             placeholder="Enter last name"
             value={lastName}
             onChange={(e) =>
-              onDataFormChange((prev) => ({ ...prev, lastName: e.target.value }))
+              onDataFormChange((prev) => ({
+                ...prev,
+                lastName: e.target.value,
+              }))
             }
             className="rounded-lg"
           />
@@ -135,7 +139,7 @@ export function RegisterStep2Form({
               >
                 <SelectTrigger
                   size="sm"
-                  className="h-7 border-0 bg-transparent py-0 pr-1 pl-1.5 shadow-none focus-visible:ring-0 rounded-lg"
+                  className="h-7 rounded-lg border-0 bg-transparent py-0 pr-1 pl-1.5 shadow-none focus-visible:ring-0"
                   aria-label="Country code"
                 >
                   <SelectValue />
@@ -162,7 +166,7 @@ export function RegisterStep2Form({
                   phone: e.target.value.replace(/\D/g, "").slice(0, 13),
                 }))
               }
-              className="pl-1 rounded-lg"
+              className="rounded-lg pl-1"
             />
           </InputGroup>
         </div>
@@ -217,7 +221,7 @@ export function RegisterStep2Form({
           />
           <Label
             htmlFor={`reg-newsletter-${idPrefix}`}
-            className="text-sm font-normal cursor-pointer"
+            className="cursor-pointer text-sm font-normal"
           >
             Subscribe to Ticketlemon&apos;s newsletter
           </Label>
@@ -237,12 +241,12 @@ export function RegisterStep2Form({
             />
             <Label
               htmlFor={`reg-terms-${idPrefix}`}
-              className="text-sm font-normal cursor-pointer"
+              className="cursor-pointer text-sm font-normal"
             >
               Accept terms and condition
             </Label>
           </div>
-          <p className="text-xs text-muted-foreground pl-6">
+          <p className="pl-6 text-xs text-muted-foreground">
             I agree that I have read and accepted Ticketlemon&apos;s{" "}
             <button
               type="button"

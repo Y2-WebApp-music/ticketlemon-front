@@ -48,7 +48,7 @@ export function TicketTypeCard({
       {/* Mobile: stack. Desktop: row with button on right */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
-          <p className="text-sm font-medium leading-6 text-foreground sm:text-lg sm:leading-7 sm:tracking-tight">
+          <p className="text-sm leading-6 font-medium text-foreground sm:text-lg sm:leading-7 sm:tracking-tight">
             {title}
           </p>
           <p className="text-xs leading-5 text-muted-foreground sm:text-sm sm:leading-6">
@@ -60,7 +60,7 @@ export function TicketTypeCard({
           <Button
             type="button"
             size="sm"
-            className="hidden h-9 w-fit shrink-0 self-start px-3 sm:inline-flex sm:mt-0"
+            className="hidden h-9 w-fit shrink-0 self-start px-3 sm:mt-0 sm:inline-flex"
             onClick={(e) => {
               e.stopPropagation()
               onViewQr()
@@ -74,4 +74,3 @@ export function TicketTypeCard({
     </div>
   )
 }
-

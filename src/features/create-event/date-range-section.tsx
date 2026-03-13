@@ -55,7 +55,7 @@ export function DateRangeSection({
                     <CalendarRange className="size-6" />
                   </div>
                   <div className="min-w-0 flex-1 text-left">
-                    <p className="text-lg font-medium leading-7 text-foreground">
+                    <p className="text-lg leading-7 font-medium text-foreground">
                       {entry.startDate
                         ? format(entry.startDate, "d MMM yyyy")
                         : "—"}
@@ -188,9 +188,7 @@ export function DateRangeSection({
                     </Button>
                     <Button
                       type="button"
-                      onClick={() =>
-                        onUpdate(entry.id, { isCollapsed: true })
-                      }
+                      onClick={() => onUpdate(entry.id, { isCollapsed: true })}
                     >
                       <Save className="size-4" />
                       Save

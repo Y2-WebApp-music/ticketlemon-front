@@ -67,9 +67,7 @@ export function RegisterStep1Form({
 
   return (
     <>
-      <h1 className={`w-full text-left ${headingClass}`}>
-        Create an account
-      </h1>
+      <h1 className={`w-full text-left ${headingClass}`}>Create an account</h1>
       <div className="w-full space-y-4">
         <div className="space-y-2">
           <Label htmlFor={`reg-email-${idPrefix}`} className="text-sm">

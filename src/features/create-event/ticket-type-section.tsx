@@ -59,7 +59,7 @@ export function TicketTypeSection({
                     <Ticket className="size-6" />
                   </div>
                   <div className="min-w-0 flex-1 text-left">
-                    <p className="text-lg font-medium leading-7 text-foreground">
+                    <p className="text-lg leading-7 font-medium text-foreground">
                       {ticket.name || "—"}
                     </p>
                     <p className="text-base leading-6 text-muted-foreground">
@@ -77,9 +77,7 @@ export function TicketTypeSection({
                         ? `${Number(ticket.quantity).toLocaleString()} Ticket`
                         : ""}
                       {ticket.quantity && ticket.price && " | "}
-                      {ticket.price
-                        ? `${ticket.price} THB per Ticket`
-                        : ""}
+                      {ticket.price ? `${ticket.price} THB per Ticket` : ""}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
@@ -106,8 +104,7 @@ export function TicketTypeSection({
                   <div className="grid gap-4 sm:grid-cols-3">
                     <div className="space-y-2 sm:col-span-2">
                       <Label>
-                        Ticket Name{" "}
-                        <span className="text-destructive">*</span>
+                        Ticket Name <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         placeholder="VVIP + Soundcheck"
@@ -120,8 +117,7 @@ export function TicketTypeSection({
                     </div>
                     <div className="space-y-2">
                       <Label>
-                        Ticket Price{" "}
-                        <span className="text-destructive">*</span>
+                        Ticket Price <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         placeholder="350 THB"
@@ -134,8 +130,7 @@ export function TicketTypeSection({
                     </div>
                     <div className="space-y-2">
                       <Label>
-                        Quantity{" "}
-                        <span className="text-destructive">*</span>
+                        Quantity <span className="text-destructive">*</span>
                       </Label>
                       <Input
                         placeholder="23,000"
@@ -218,9 +213,7 @@ export function TicketTypeSection({
                     </Button>
                     <Button
                       type="button"
-                      onClick={() =>
-                        onUpdate(ticket.id, { isCollapsed: true })
-                      }
+                      onClick={() => onUpdate(ticket.id, { isCollapsed: true })}
                     >
                       <Save className="size-4" />
                       Save

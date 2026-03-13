@@ -24,7 +24,7 @@ export function ChooseTicketFooter({
       className={cn(
         "fixed inset-x-0 bottom-0 z-40 flex flex-col justify-center",
         "bg-primary px-4 py-5 shadow-lg sm:px-6",
-        "min-h-[90px] max-h-[240px] overflow-hidden"
+        "max-h-[240px] min-h-[90px] overflow-hidden"
       )}
     >
       <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

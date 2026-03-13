@@ -15,6 +15,10 @@ export type {
 } from "./my-ticket"
 export type { OrganizerEvent, OrganizerEventStatus } from "./organizer"
 export type { SignInResponse, UserRole, Permission } from "./auth"
-export type { DateRangeEntry, StaffEntry, TicketTypeEntry } from "./create-event"
+export type {
+  DateRangeEntry,
+  StaffEntry,
+  TicketTypeEntry,
+} from "./create-event"
 export { createId, formatDateRangeLabel } from "./create-event"
 export type { SuccessResponse, ErrorResponseProps } from "./responseHandler"

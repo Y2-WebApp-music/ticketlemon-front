@@ -9,8 +9,8 @@ export function PurchaseImportant() {
         </li>
         <li>
           You will receive your confirmation email within 2 hours after payment.
-          If you do not receive this email, please contact billing@ticketlemon.com
-          along with your proof of payment.
+          If you do not receive this email, please contact
+          billing@ticketlemon.com along with your proof of payment.
         </li>
       </ul>
     </div>

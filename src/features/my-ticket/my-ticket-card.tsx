@@ -52,22 +52,18 @@ export function MyTicketCard({
           "h-[180px] w-full rounded-t-xl sm:h-[240px] sm:w-[180px] sm:rounded-t-none sm:rounded-l-xl"
         )}
       >
-        <img
-          src={imageUrl}
-          alt=""
-          className="size-full object-cover"
-        />
+        <img src={imageUrl} alt="" className="size-full object-cover" />
       </div>
       {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col gap-2 p-3 sm:p-3.5">
         <div className="min-w-0 flex-1 space-y-0.5">
-          <p className="text-xs font-normal leading-5 text-muted-foreground sm:text-sm sm:leading-5">
+          <p className="text-xs leading-5 font-normal text-muted-foreground sm:text-sm sm:leading-5">
             {title}
           </p>
           <p className="text-xs font-medium text-primary sm:text-sm sm:leading-5">
             {date}
           </p>
-          <p className="text-xs font-medium leading-[14px] text-muted-foreground sm:text-xs">
+          <p className="text-xs leading-[14px] font-medium text-muted-foreground sm:text-xs">
             {venue}
           </p>
         </div>
@@ -88,7 +84,7 @@ export function MyTicketCard({
             {ticketLines.map((line, i) => (
               <p
                 key={i}
-                className="text-xs font-medium leading-[14px] text-foreground sm:text-xs"
+                className="text-xs leading-[14px] font-medium text-foreground sm:text-xs"
               >
                 {line}
               </p>
@@ -111,7 +107,12 @@ export function MyTicketCard({
             </Button>
           )}
           {!isUnpaid && viewTo && (
-            <Button asChild variant="outline" size="sm" className="shrink-0 border-primary/50 text-primary hover:bg-primary/10">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="shrink-0 border-primary/50 text-primary hover:bg-primary/10"
+            >
               <Link to={viewTo}>
                 <Ticket className="size-4" aria-hidden />
                 View Ticket
@@ -125,7 +126,7 @@ export function MyTicketCard({
 
   const cardClass = cn(
     "flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card text-left shadow-sm sm:flex-row",
-    "min-w-0 max-w-full",
+    "max-w-full min-w-0",
     "sm:max-w-[600px]",
     className
   )

@@ -11,9 +11,15 @@ export const eventDetailsById: Record<string, EventDetail> = {
     title: "2026 JOY ASIA TOUR 'JOY SPLASH' IN BANGKOK",
     poster_url: eventDetailImageUrl,
     thumbnail_url: eventDetailImageUrl,
-    show_date_list: [new Date().toISOString(), new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString()],
+    show_date_list: [
+      new Date().toISOString(),
+      new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString(),
+    ],
     // collect start sale date
-    sale_date_list: [new Date().toISOString(), new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString()],
+    sale_date_list: [
+      new Date().toISOString(),
+      new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString(),
+    ],
     venue: "Phenix Grand Ballroom",
     age_restriction: null,
     description: {

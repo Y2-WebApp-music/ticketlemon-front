@@ -58,10 +58,7 @@ function OrganizerNavBar() {
           >
             Profile
           </Link>
-          <div
-            className="size-12 shrink-0 rounded-full bg-muted"
-            aria-hidden
-          />
+          <div className="size-12 shrink-0 rounded-full bg-muted" aria-hidden />
         </div>
       </div>
     </header>

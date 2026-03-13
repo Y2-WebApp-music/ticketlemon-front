@@ -19,11 +19,7 @@ export function EventCoverSection({
   onThumbnailChange,
 }: EventCoverSectionProps) {
   return (
-    <section
-      ref={sectionRef}
-      id="event-cover"
-      className="space-y-4"
-    >
+    <section ref={sectionRef} id="event-cover" className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-2">
           <Label className="text-sm">Poster</Label>

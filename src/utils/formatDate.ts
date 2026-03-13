@@ -25,9 +25,13 @@ export function formatDuration(ms: number): string {
 }
 
 /** Elapsed time from `from` to now (or to `to`). Returns ms. */
-export function getElapsedMs(from: string | Dayjs, to?: string | Dayjs): number {
+export function getElapsedMs(
+  from: string | Dayjs,
+  to?: string | Dayjs
+): number {
   const fromDate = typeof from === "string" ? dayjs(from) : from
-  const toDate = to != null ? (typeof to === "string" ? dayjs(to) : to) : dayjs()
+  const toDate =
+    to != null ? (typeof to === "string" ? dayjs(to) : to) : dayjs()
   return Math.max(0, toDate.diff(fromDate))
 }
 

@@ -27,4 +27,3 @@ export const paymentMethodsMock: PaymentMethod[] = [
     expYear: 2027,
   },
 ]
-

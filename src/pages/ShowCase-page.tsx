@@ -22,7 +22,10 @@ export default function ShowCasePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <ShowcaseHeader theme={theme as "dark" | "light"} onToggleTheme={toggleTheme} />
+      <ShowcaseHeader
+        theme={theme as "dark" | "light"}
+        onToggleTheme={toggleTheme}
+      />
 
       <main className="w-full px-10 py-8">
         <Tabs defaultValue="buttons" className="w-full">

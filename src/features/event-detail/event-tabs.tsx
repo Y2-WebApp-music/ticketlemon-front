@@ -53,7 +53,9 @@ export function EventTabs({
               <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 rounded-xl bg-primary px-5 py-4 text-left text-white transition-opacity hover:opacity-95">
                 <div className="flex items-center gap-2">
                   <Ticket className="size-6 shrink-0" aria-hidden />
-                  <span className="text-lg font-medium">{group.sessionLabel}</span>
+                  <span className="text-lg font-medium">
+                    {group.sessionLabel}
+                  </span>
                 </div>
                 <ChevronUp className="size-6 shrink-0" aria-hidden />
               </CollapsibleTrigger>

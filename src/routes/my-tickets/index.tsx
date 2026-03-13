@@ -9,4 +9,3 @@ export const Route = createFileRoute("/my-tickets/")({
 function MyTicketsIndexRoute() {
   return <MyTicketsPage />
 }
-

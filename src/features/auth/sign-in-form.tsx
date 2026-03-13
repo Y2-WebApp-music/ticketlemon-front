@@ -125,7 +125,9 @@ export function SignInForm({
             }}
             className="rounded-lg"
             aria-invalid={!!emailError}
-            aria-describedby={emailError ? `signin-email-error-${idPrefix}` : undefined}
+            aria-describedby={
+              emailError ? `signin-email-error-${idPrefix}` : undefined
+            }
           />
           {emailError && (
             <p
@@ -153,7 +155,9 @@ export function SignInForm({
             }}
             className="rounded-lg"
             aria-invalid={!!passwordError}
-            aria-describedby={passwordError ? `signin-password-error-${idPrefix}` : undefined}
+            aria-describedby={
+              passwordError ? `signin-password-error-${idPrefix}` : undefined
+            }
           />
           {passwordError && (
             <p
@@ -191,12 +195,8 @@ export function SignInForm({
               </span>
               <div className="h-px flex-1 bg-border" />
             </div>
-            <div className="w-full flex justify-center">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onGoogleSignIn}
-              >
+            <div className="flex w-full justify-center">
+              <Button type="button" variant="outline" onClick={onGoogleSignIn}>
                 <span className="mr-2 inline-flex size-5 items-center justify-center">
                   <img
                     src={GoogleFaviconUrl}

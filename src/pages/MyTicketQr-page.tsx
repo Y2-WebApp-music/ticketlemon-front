@@ -27,7 +27,7 @@ export default function MyTicketQrPage({ ticketId }: { ticketId: string }) {
 
   return (
     <PageLayout>
-      <div className="mx-auto w-full max-w-[402px] px-4 pb-16 pt-4">
+      <div className="mx-auto w-full max-w-[402px] px-4 pt-4 pb-16">
         <Link
           to="/my-tickets/$ticketId"
           params={{ ticketId }}
@@ -38,7 +38,7 @@ export default function MyTicketQrPage({ ticketId }: { ticketId: string }) {
         </Link>
 
         <div className="mt-4 space-y-1">
-          <p className="text-base font-medium leading-6 text-foreground">
+          <p className="text-base leading-6 font-medium text-foreground">
             {detail.title}
           </p>
           <p className="text-base font-medium text-primary">{detail.date}</p>
@@ -58,9 +58,7 @@ export default function MyTicketQrPage({ ticketId }: { ticketId: string }) {
         <div className="mt-10 space-y-2">
           <p className="text-base font-medium text-primary">Ticket Type</p>
           <div className="space-y-1 text-sm">
-            <p className="text-foreground">
-              {ticketType?.title ?? "-"}
-            </p>
+            <p className="text-foreground">{ticketType?.title ?? "-"}</p>
             <p className="text-muted-foreground">
               {ticketType?.description ?? "-"}
             </p>
@@ -70,4 +68,3 @@ export default function MyTicketQrPage({ ticketId }: { ticketId: string }) {
     </PageLayout>
   )
 }
-

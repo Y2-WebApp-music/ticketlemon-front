@@ -39,4 +39,3 @@ export const myTicketDetailsById: Record<string, MyTicketDetail> = {
 export function getMyTicketDetail(ticketId: string) {
   return myTicketDetailsById[ticketId]
 }
-

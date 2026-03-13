@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { Link } from "@tanstack/react-router"
 import { MoonIcon, SunIcon } from "lucide-react"
 

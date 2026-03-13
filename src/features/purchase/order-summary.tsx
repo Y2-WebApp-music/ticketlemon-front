@@ -39,10 +39,7 @@ export function OrderSummary({
         <div className="border-t border-border" />
         <div className="divide-y divide-border">
           {orderItems.map((item, i) => (
-            <div
-              key={i}
-              className="flex flex-col gap-1 px-5 py-3 text-right"
-            >
+            <div key={i} className="flex flex-col gap-1 px-5 py-3 text-right">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1 text-left">
                   <p className="text-base text-muted-foreground">
@@ -101,9 +98,7 @@ export function OrderSummary({
                 onCheckedChange={(v) => onAcceptTermsChange(v === true)}
               />
               <div className="text-sm">
-                <span className="font-medium">
-                  Accept terms and condition
-                </span>
+                <span className="font-medium">Accept terms and condition</span>
                 <p className="text-muted-foreground">
                   I agree to Ticketlemon's Terms of Service and Event
                   Organizer's Disclaimer. I accept that the items in this order

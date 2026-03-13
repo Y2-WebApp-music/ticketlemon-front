@@ -191,9 +191,7 @@ export function PaymentChannel({
               How to pay with TrueMoney
             </h3>
             <ol className="mt-3 list-inside list-decimal space-y-2 text-sm text-muted-foreground">
-              <li>
-                Enter the phone number registered with TrueMoney Wallet
-              </li>
+              <li>Enter the phone number registered with TrueMoney Wallet</li>
               <li>Enter the OTP received through SMS</li>
               <li>Confirm the payment amount and Make payment</li>
             </ol>

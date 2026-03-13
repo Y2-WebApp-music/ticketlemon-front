@@ -114,9 +114,7 @@ export default function CreateEventPage() {
   }
   const toggleEventDateCollapse = (id: string) => {
     setEventDateEntries((prev) =>
-      prev.map((e) =>
-        e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e
-      )
+      prev.map((e) => (e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e))
     )
   }
 
@@ -146,9 +144,7 @@ export default function CreateEventPage() {
   }
   const toggleSaleDateCollapse = (id: string) => {
     setSaleDateEntries((prev) =>
-      prev.map((e) =>
-        e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e
-      )
+      prev.map((e) => (e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e))
     )
   }
 
@@ -210,16 +206,10 @@ export default function CreateEventPage() {
     if (description?.blocks && description.blocks.length > 0)
       ids.push("event-description")
     if (
-      eventDateEntries.some(
-        (e) => e.startDate && (e.startHour || e.startMin)
-      )
+      eventDateEntries.some((e) => e.startDate && (e.startHour || e.startMin))
     )
       ids.push("event-date-time")
-    if (
-      saleDateEntries.some(
-        (e) => e.startDate && (e.startHour || e.startMin)
-      )
-    )
+    if (saleDateEntries.some((e) => e.startDate && (e.startHour || e.startMin)))
       ids.push("sale-date-time")
     if (
       ticketTypes.some(

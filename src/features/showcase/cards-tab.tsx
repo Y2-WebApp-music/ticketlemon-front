@@ -18,9 +18,7 @@ export function CardsTab() {
           <Card>
             <CardHeader>
               <CardTitle>Card Title</CardTitle>
-              <CardDescription>
-                Card description goes here.
-              </CardDescription>
+              <CardDescription>Card description goes here.</CardDescription>
             </CardHeader>
             <CardContent>
               <p>Card content area. You can put any content inside.</p>

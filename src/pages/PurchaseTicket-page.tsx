@@ -44,8 +44,18 @@ export default function PurchaseTicketPage({
     const phoneOk = /^\d{1,13}$/.test(phoneTrim)
 
     return {
-      emailError: emailTrim.length === 0 ? "Email is required." : emailOk ? undefined : "Enter a valid email.",
-      phoneError: phoneTrim.length === 0 ? "Mobile Phone is required." : phoneOk ? undefined : "Phone number must be digits only (max 13).",
+      emailError:
+        emailTrim.length === 0
+          ? "Email is required."
+          : emailOk
+            ? undefined
+            : "Enter a valid email.",
+      phoneError:
+        phoneTrim.length === 0
+          ? "Mobile Phone is required."
+          : phoneOk
+            ? undefined
+            : "Phone number must be digits only (max 13).",
       canPay: emailOk && phoneOk && acceptTerms,
     }
   }, [acceptTerms, email, phone])
