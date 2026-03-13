@@ -1,21 +1,80 @@
-# React + TypeScript + Vite + shadcn/ui
+# TicketLemon Frontend
 
-This is a template for a new Vite project with React, TypeScript, and shadcn/ui.
+Frontend application for TicketLemon, built with React, TypeScript, Vite, and Bun.
 
-## Adding components
+## Tech Stack
 
-To add components to your app, run the following command:
+- React 19 + TypeScript
+- Vite 7
+- Tailwind CSS 4
+- TanStack Router
+- Bun (package manager + scripts)
+
+## Prerequisites
+
+- Bun 1.x
+- Node.js 20+ (recommended)
+- Docker (optional, for containerized build/run)
+
+## Getting Started
 
 ```bash
-npx shadcn@latest add button
+bun install
+bun run dev
 ```
 
-This will place the ui components in the `src/components` directory.
+The app will start with Vite dev server (default: `http://localhost:5173`).
 
-## Using components
+## Available Scripts
 
-To use the components in your app, import them as follows:
+- `bun run dev` - start local dev server
+- `bun run build` - create production build in `dist/`
+- `bun run preview` - preview the production build locally
+- `bun run lint` - run ESLint
+- `bun run typecheck` - run TypeScript type checking
+- `bun run format` - format `ts/tsx` files with Prettier
+- `bun run format:check` - verify Prettier formatting
+- `bun run test` - placeholder test script (currently prints "No tests configured")
 
-```tsx
-import { Button } from "@/components/ui/button"
+## Docker
+
+Build the image:
+
+```bash
+docker build -t ticketlemon-front .
 ```
+
+Run the container:
+
+```bash
+docker run --rm -p 8080:80 ticketlemon-front
+```
+
+Then open `http://localhost:8080`.
+
+Notes:
+- Multi-stage build: Bun builder -> Nginx runtime
+- SPA routing is handled with Nginx `try_files` fallback in `nginx.conf`
+
+## CI
+
+GitHub Actions workflow: `.github/workflows/ci.yml`
+
+It runs on push/PR for `main`, `master`, and `dev`, and checks:
+
+- formatting (`bun run format:check`)
+- lint (`bun run lint`)
+- typecheck (`bun run typecheck`)
+- test (`bun run test`)
+- app build (`bun run build`)
+- Docker build (`docker build -t ticketlemon-front:ci .`)
+
+## Project Structure
+
+- `src/pages` - page-level screens
+- `src/features` - feature modules
+- `src/components` - shared UI/layout components
+- `src/routes` - route definitions
+- `src/services` - API/http services
+- `src/mocks` - mock data
+
