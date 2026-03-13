@@ -11,13 +11,25 @@ import { Link, useNavigate } from "@tanstack/react-router"
 import { ChevronLeft, CircleX, QrCode } from "lucide-react"
 import * as React from "react"
 
+type DetectedBarcode = {
+  rawValue?: string
+}
+
+type BarcodeDetectorLike = {
+  detect: (source: ImageBitmapSource) => Promise<DetectedBarcode[]>
+}
+
+type BarcodeDetectorConstructor = new (options: {
+  formats: string[]
+}) => BarcodeDetectorLike
+
 export default function StaffScanPage({ eventId }: { eventId: string }) {
   type ScanResultType = "wrong" | "duplicate"
   const navigate = useNavigate()
   const event = getStaffEventById(eventId)
   const videoRef = React.useRef<HTMLVideoElement | null>(null)
   const streamRef = React.useRef<MediaStream | null>(null)
-  const detectorRef = React.useRef<any>(null)
+  const detectorRef = React.useRef<BarcodeDetectorLike | null>(null)
   const scanTimerRef = React.useRef<number | null>(null)
   const [status, setStatus] = React.useState<"idle" | "ready" | "error">("idle")
   const [errorMessage, setErrorMessage] = React.useState<string>("")
@@ -90,7 +102,11 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
         await video.play()
         setStatus("ready")
 
-        const BarcodeDetectorCtor = (window as any).BarcodeDetector
+        const BarcodeDetectorCtor = (
+          window as Window & {
+            BarcodeDetector?: BarcodeDetectorConstructor
+          }
+        ).BarcodeDetector
         if (!BarcodeDetectorCtor) return
         detectorRef.current = new BarcodeDetectorCtor({ formats: ["qr_code"] })
 
