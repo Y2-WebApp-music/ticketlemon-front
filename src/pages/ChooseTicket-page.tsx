@@ -58,7 +58,10 @@ export interface ChooseTicketPageProps {
 
 export default function ChooseTicketPage({ eventId }: ChooseTicketPageProps) {
   const event = getEventDetail(eventId)
-  const sessions = event ? buildSessionsFromTicketTypes(event.ticketTypes) : []
+  const sessions = useMemo(
+    () => (event ? buildSessionsFromTicketTypes(event.ticketTypes) : []),
+    [event]
+  )
 
   const [quantities, setQuantities] = useState<Record<string, number>>({})
   const updateQuantity = useCallback((ticketId: string, qty: number) => {

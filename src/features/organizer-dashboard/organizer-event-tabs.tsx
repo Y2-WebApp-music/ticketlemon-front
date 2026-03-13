@@ -15,7 +15,7 @@ import { TicketTypeCard } from "@/features/ticket-type"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import type { OutputData } from "@editorjs/editorjs"
 import { ChevronUp, Pencil, Save, Ticket } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 
 export interface OrganizerTicketTypeGroup {
   sessionLabel: string
@@ -76,16 +76,12 @@ export function OrganizerEventTabs({
   onDescriptionSave,
 }: OrganizerEventTabsProps) {
   const [isEditing, setIsEditing] = useState(false)
-  const [displayDescription, setDisplayDescription] =
+  const [editingDescription, setEditingDescription] =
     useState<OutputData>(description)
-
-  useEffect(() => {
-    if (!isEditing) setDisplayDescription(description)
-  }, [description, isEditing])
 
   const handleDescriptionSave = useCallback(
     (data: OutputData) => {
-      setDisplayDescription(data)
+      setEditingDescription(data)
       setIsEditing(false)
       onDescriptionSave?.(data)
     },
@@ -109,7 +105,10 @@ export function OrganizerEventTabs({
                     variant="outline"
                     size="sm"
                     className="gap-2 border-primary text-primary hover:bg-primary/10"
-                    onClick={() => setIsEditing(true)}
+                    onClick={() => {
+                      setEditingDescription(description)
+                      setIsEditing(true)
+                    }}
                   >
                     <Pencil className="size-4" aria-hidden />
                     Edit Description
@@ -118,7 +117,7 @@ export function OrganizerEventTabs({
                 <EditorJs
                   key={`organizer-desc-${eventId}-read`}
                   readOnly
-                  initialData={displayDescription}
+                  initialData={description}
                   tools={defaultEditorTools}
                   minHeight={200}
                   className="min-h-[200px]"
@@ -128,7 +127,7 @@ export function OrganizerEventTabs({
               <EditorJs
                 key={`organizer-desc-${eventId}-edit`}
                 readOnly={false}
-                initialData={displayDescription}
+                initialData={editingDescription}
                 tools={defaultEditorTools}
                 minHeight={200}
                 className="min-h-[200px]"

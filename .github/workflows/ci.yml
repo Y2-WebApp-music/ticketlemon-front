@@ -34,3 +34,6 @@ jobs:
 
       - name: Build
         run: bun run build
+
+      - name: Test Docker build
+        run: docker build -t ticketlemon-front:ci .
