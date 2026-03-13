@@ -13,4 +13,3 @@ function StaffScanRoute() {
   const { eventId } = Route.useSearch()
   return <StaffScanPage eventId={eventId} />
 }
-

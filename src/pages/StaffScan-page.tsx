@@ -22,7 +22,9 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
   const [status, setStatus] = React.useState<"idle" | "ready" | "error">("idle")
   const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [lastScan, setLastScan] = React.useState<string>("")
-  const [scanResult, setScanResult] = React.useState<ScanResultType | null>(null)
+  const [scanResult, setScanResult] = React.useState<ScanResultType | null>(
+    null
+  )
   const [cameraDialogOpen, setCameraDialogOpen] = React.useState(false)
   const [scanSession, setScanSession] = React.useState(0)
 
@@ -66,9 +68,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
       }
 
       stopScanning()
-      setScanResult(
-        code === STAFF_DUPLICATE_SCAN_CODE ? "duplicate" : "wrong"
-      )
+      setScanResult(code === STAFF_DUPLICATE_SCAN_CODE ? "duplicate" : "wrong")
     },
     [onValidCode, stopScanning]
   )
@@ -155,7 +155,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
           <p className="text-sm text-muted-foreground">{event.venue}</p>
         </div>
 
-        <div className="mt-6 ">
+        <div className="mt-6">
           <div className="relative mx-auto w-full max-w-[330px] overflow-hidden rounded-xl border-2 border-primary bg-background">
             <video
               ref={videoRef}
@@ -234,14 +234,15 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
       >
         <DialogContent
           showCloseButton={false}
-          className=" bg-card px-6 py-8 sm:px-12 sm:py-10"
+          className="bg-card px-6 py-8 sm:px-12 sm:py-10"
         >
-
           <div className="mx-auto flex flex-col items-center text-center">
-              <CircleX className="size-12 text-red-600"/>
+            <CircleX className="size-12 text-red-600" />
 
             <p className="mt-4 text-xl leading-tight font-medium text-red-600 sm:text-2xl">
-              {scanResult === "duplicate" ? "Duplicate Ticket" : "Wrong QR Code"}
+              {scanResult === "duplicate"
+                ? "Duplicate Ticket"
+                : "Wrong QR Code"}
             </p>
 
             {scanResult === "duplicate" ? (
@@ -305,9 +306,11 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
             </p>
             <div className="rounded-lg bg-muted p-3 text-sm text-muted-foreground">
               iPhone Safari: tap <span className="font-medium">aA</span> in the
-              address bar, open <span className="font-medium">Website Settings</span>
-              , set <span className="font-medium">Camera</span> to{" "}
-              <span className="font-medium">Allow</span>, then come back and retry.
+              address bar, open{" "}
+              <span className="font-medium">Website Settings</span>, set{" "}
+              <span className="font-medium">Camera</span> to{" "}
+              <span className="font-medium">Allow</span>, then come back and
+              retry.
             </div>
             <div className="flex justify-end gap-2 pt-1">
               <Button
@@ -327,4 +330,3 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
     </PageLayout>
   )
 }
-

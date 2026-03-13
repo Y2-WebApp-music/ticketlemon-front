@@ -14,4 +14,3 @@ function StaffScanSuccessRoute() {
   const { eventId, code } = Route.useSearch()
   return <StaffScanSuccessPage eventId={eventId} code={code} />
 }
-

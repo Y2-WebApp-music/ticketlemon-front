@@ -9,4 +9,3 @@ export const Route = createFileRoute("/staff/")({
 function StaffLandingRoute() {
   return <StaffLandingPage />
 }
-

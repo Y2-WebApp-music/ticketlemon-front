@@ -6,4 +6,3 @@ export interface StaffEvent {
   venue: string
   imageUrl: string
 }
-

@@ -38,4 +38,3 @@ export const STAFF_DUPLICATE_SCAN_CODE = "TICKETLEMON_STAFF_DUPLICATE_QR"
 export function getStaffEventById(eventId: string): StaffEvent | undefined {
   return STAFF_EVENTS.find((event) => event.id === eventId)
 }
-

@@ -161,7 +161,10 @@ export function DateRangeSection({
                           onUpdate(entry.id, {
                             startDate: nextStartDate,
                             endDate: shouldAdjustEndDate
-                              ? applyDateWithExistingTime(nextStartDate, entry.endDate)
+                              ? applyDateWithExistingTime(
+                                  nextStartDate,
+                                  entry.endDate
+                                )
                               : entry.endDate,
                           })
                         }}
@@ -247,7 +250,7 @@ export function DateRangeSection({
                           haveEndDate: checked === true,
                           endDate:
                             checked === true
-                              ? entry.endDate ?? entry.startDate
+                              ? (entry.endDate ?? entry.startDate)
                               : undefined,
                         })
                       }
@@ -273,7 +276,10 @@ export function DateRangeSection({
                                 d &&
                                 !isPastDate(d) &&
                                 (!entry.startDate ||
-                                  !isBefore(startOfDay(d), startOfDay(entry.startDate)))
+                                  !isBefore(
+                                    startOfDay(d),
+                                    startOfDay(entry.startDate)
+                                  ))
                                   ? applyDateWithExistingTime(d, entry.endDate)
                                   : undefined,
                             })
@@ -303,7 +309,9 @@ export function DateRangeSection({
                                 endDate: applyTime(
                                   entry.endDate,
                                   hour,
-                                  entry.endDate ? format(entry.endDate, "mm") : "00"
+                                  entry.endDate
+                                    ? format(entry.endDate, "mm")
+                                    : "00"
                                 ),
                               })
                             }
@@ -330,7 +338,9 @@ export function DateRangeSection({
                               onUpdate(entry.id, {
                                 endDate: applyTime(
                                   entry.endDate,
-                                  entry.endDate ? format(entry.endDate, "HH") : "00",
+                                  entry.endDate
+                                    ? format(entry.endDate, "HH")
+                                    : "00",
                                   minute
                                 ),
                               })

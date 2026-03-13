@@ -38,7 +38,11 @@ export default function StaffLandingPage() {
             <h2 className="text-base font-medium text-foreground">All Event</h2>
             <div className="flex flex-col gap-3">
               {STAFF_EVENTS.map((event) => (
-                <Link key={event.id} to="/staff/scan" search={{ eventId: event.id }}>
+                <Link
+                  key={event.id}
+                  to="/staff/scan"
+                  search={{ eventId: event.id }}
+                >
                   <StaffEventCard
                     title={event.title}
                     dateRange={event.dateRange}
@@ -55,4 +59,3 @@ export default function StaffLandingPage() {
     </PageLayout>
   )
 }
-

@@ -82,10 +82,7 @@ export default function CreateEventPage() {
   const addEventDateEntry = () => {
     setFormData((prev) => ({
       ...prev,
-      eventDateEntries: [
-        ...prev.eventDateEntries,
-        createEmptyDateRangeEntry(),
-      ],
+      eventDateEntries: [...prev.eventDateEntries, createEmptyDateRangeEntry()],
     }))
   }
   const removeEventDateEntry = (id: string) => {
@@ -114,10 +111,7 @@ export default function CreateEventPage() {
   const addSaleDateEntry = () => {
     setFormData((prev) => ({
       ...prev,
-      saleDateEntries: [
-        ...prev.saleDateEntries,
-        createEmptyDateRangeEntry(),
-      ],
+      saleDateEntries: [...prev.saleDateEntries, createEmptyDateRangeEntry()],
     }))
   }
   const removeSaleDateEntry = (id: string) => {
@@ -146,10 +140,7 @@ export default function CreateEventPage() {
   const addTicketType = () => {
     setFormData((prev) => ({
       ...prev,
-      ticketTypes: [
-        ...prev.ticketTypes,
-        createEmptyTicketTypeEntry(),
-      ],
+      ticketTypes: [...prev.ticketTypes, createEmptyTicketTypeEntry()],
     }))
   }
   const removeTicketType = (id: string) => {
@@ -178,10 +169,7 @@ export default function CreateEventPage() {
   const addStaffEntry = () => {
     setFormData((prev) => ({
       ...prev,
-      staffEntries: [
-        ...prev.staffEntries,
-        createEmptyStaffEntry(),
-      ],
+      staffEntries: [...prev.staffEntries, createEmptyStaffEntry()],
     }))
   }
   const removeStaffEntry = (id: string) => {

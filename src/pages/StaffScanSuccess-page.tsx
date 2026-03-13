@@ -32,7 +32,9 @@ export default function StaffScanSuccessPage({
             <p className="text-lg font-medium tracking-tight text-foreground">
               {event.title}
             </p>
-            <p className="text-base font-medium text-primary">{event.dateRange}</p>
+            <p className="text-base font-medium text-primary">
+              {event.dateRange}
+            </p>
             <p className="text-sm text-muted-foreground">{event.venue}</p>
           </div>
         )}
@@ -43,7 +45,7 @@ export default function StaffScanSuccessPage({
               Scan Result
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4 mt-2">
+          <CardContent className="mt-2 space-y-4">
             <div className="flex items-center gap-3 rounded-xl border border-green-500 p-4">
               <CheckCircle2 className="size-6 text-green-600" />
               <div>
@@ -74,13 +76,16 @@ export default function StaffScanSuccessPage({
               <p className="text-sm text-muted-foreground">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                 Maecenas mattis ut ex sed mattis. Nulla facilisi. Pellentesque
-                vitae imperdiet justo, id scelerisque mauris. Nunc in lorem eget sem
+                vitae imperdiet justo, id scelerisque mauris. Nunc in lorem eget
+                sem
               </p>
-              <p className="text-xs text-muted-foreground mt-2">QR: {code || "-"}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                QR: {code || "-"}
+              </p>
             </div>
 
-            <div className="pt-6 pb-2 flex justify-center">
-              <Button asChild size="lg" >
+            <div className="flex justify-center pt-6 pb-2">
+              <Button asChild size="lg">
                 <Link
                   to="/staff/scan"
                   search={{ eventId }}
@@ -97,4 +102,3 @@ export default function StaffScanSuccessPage({
     </PageLayout>
   )
 }
-
