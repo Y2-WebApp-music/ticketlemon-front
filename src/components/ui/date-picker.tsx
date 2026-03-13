@@ -1,4 +1,5 @@
 import { format } from "date-fns"
+import type { Matcher } from "react-day-picker"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -21,6 +22,7 @@ export interface DatePickerProps {
   /** Date format for displayed value. Default: "PPP" */
   dateFormat?: string
   captionLayout?: "dropdown" | "label" | "dropdown-months" | "dropdown-years"
+  disabledDates?: Matcher | Matcher[]
 }
 
 export function DatePicker({
@@ -33,6 +35,7 @@ export function DatePicker({
   disabled,
   dateFormat = "PPP",
   captionLayout = "dropdown",
+  disabledDates,
 }: DatePickerProps) {
   return (
     <Popover>
@@ -58,6 +61,7 @@ export function DatePicker({
           selected={value}
           onSelect={onSelect}
           captionLayout={captionLayout}
+          disabled={disabledDates}
         />
       </PopoverContent>
     </Popover>

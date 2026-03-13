@@ -27,6 +27,7 @@ export type { TicketTypeSectionProps } from "./ticket-type-section"
 
 export { createId, formatDateRangeLabel } from "@/types/create-event"
 export type {
+  CreateEventPayload,
   DateRangeEntry,
   StaffEntry,
   TicketTypeEntry,

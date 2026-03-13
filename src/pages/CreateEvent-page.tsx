@@ -9,69 +9,42 @@ import {
   StaffSection,
   TicketSettingSection,
   TicketTypeSection,
-  createId,
   type DateRangeEntry,
   type StaffEntry,
   type TicketTypeEntry,
 } from "@/features/create-event"
-import type { OutputData } from "@editorjs/editorjs"
 import { Link } from "@tanstack/react-router"
 import { ChevronLeft, Plus } from "lucide-react"
+import {
+  createEmptyDateRangeEntry,
+  createEmptyStaffEntry,
+  createEmptyTicketTypeEntry,
+  createInitialCreateEventPayload,
+  type CreateEventPayload,
+} from "@/types/create-event"
 import { useMemo, useRef, useState } from "react"
 
 export default function CreateEventPage() {
-  const [eventName, setEventName] = useState("")
-  const [category, setCategory] = useState("")
-  const [location, setLocation] = useState("")
-  const [impactGenre, setImpactGenre] = useState("")
-  const [ageRestriction, setAgeRestriction] = useState("No")
-  const [description, setDescription] = useState<OutputData | null>(null)
-  const [posterPreview, setPosterPreview] = useState<string | null>(null)
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null)
-  const [ticketMinPerOrder, setTicketMinPerOrder] = useState("")
-  const [ticketMaxPerOrder, setTicketMaxPerOrder] = useState("")
+  const [formData, setFormData] = useState<CreateEventPayload>(() =>
+    createInitialCreateEventPayload()
+  )
 
-  const [eventDateEntries, setEventDateEntries] = useState<DateRangeEntry[]>([
-    {
-      id: createId(),
-      startDate: undefined,
-      startHour: "",
-      startMin: "",
-      endDate: undefined,
-      endHour: "",
-      endMin: "",
-      haveEndDate: true,
-      isCollapsed: false,
-    },
-  ])
-  const [saleDateEntries, setSaleDateEntries] = useState<DateRangeEntry[]>([
-    {
-      id: createId(),
-      startDate: undefined,
-      startHour: "",
-      startMin: "",
-      endDate: undefined,
-      endHour: "",
-      endMin: "",
-      haveEndDate: true,
-      isCollapsed: false,
-    },
-  ])
-  const [ticketTypes, setTicketTypes] = useState<TicketTypeEntry[]>([
-    {
-      id: createId(),
-      name: "",
-      price: "",
-      quantity: "",
-      detail: "",
-      useForEventDateTime: "",
-      saleTicketOn: "",
-      isCollapsed: false,
-    },
-  ])
-  const [staffEntries, setStaffEntries] = useState<StaffEntry[]>([
-    { id: createId(), reserveCode: "", email: "" },
-  ])
+  const {
+    eventName,
+    category,
+    location,
+    impactGenre,
+    ageRestriction,
+    description,
+    posterPreview,
+    thumbnailPreview,
+    eventDateEntries,
+    saleDateEntries,
+    ticketTypes,
+    ticketMinPerOrder,
+    ticketMaxPerOrder,
+    staffEntries,
+  } = formData
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
 
@@ -81,115 +54,141 @@ export default function CreateEventPage() {
 
   const handlePosterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) setPosterPreview(URL.createObjectURL(file))
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        posterPreview: URL.createObjectURL(file),
+      }))
+    }
   }
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) setThumbnailPreview(URL.createObjectURL(file))
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        thumbnailPreview: URL.createObjectURL(file),
+      }))
+    }
   }
 
   const updateEventDateEntry = (id: string, patch: Partial<DateRangeEntry>) => {
-    setEventDateEntries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...patch } : e))
-    )
+    setFormData((prev) => ({
+      ...prev,
+      eventDateEntries: prev.eventDateEntries.map((e) =>
+        e.id === id ? { ...e, ...patch } : e
+      ),
+    }))
   }
   const addEventDateEntry = () => {
-    setEventDateEntries((prev) => [
+    setFormData((prev) => ({
       ...prev,
-      {
-        id: createId(),
-        startDate: undefined,
-        startHour: "",
-        startMin: "",
-        endDate: undefined,
-        endHour: "",
-        endMin: "",
-        haveEndDate: true,
-        isCollapsed: false,
-      },
-    ])
+      eventDateEntries: [
+        ...prev.eventDateEntries,
+        createEmptyDateRangeEntry(),
+      ],
+    }))
   }
   const removeEventDateEntry = (id: string) => {
-    setEventDateEntries((prev) => prev.filter((e) => e.id !== id))
+    setFormData((prev) => ({
+      ...prev,
+      eventDateEntries: prev.eventDateEntries.filter((e) => e.id !== id),
+    }))
   }
   const toggleEventDateCollapse = (id: string) => {
-    setEventDateEntries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e))
-    )
+    setFormData((prev) => ({
+      ...prev,
+      eventDateEntries: prev.eventDateEntries.map((e) =>
+        e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e
+      ),
+    }))
   }
 
   const updateSaleDateEntry = (id: string, patch: Partial<DateRangeEntry>) => {
-    setSaleDateEntries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...patch } : e))
-    )
+    setFormData((prev) => ({
+      ...prev,
+      saleDateEntries: prev.saleDateEntries.map((e) =>
+        e.id === id ? { ...e, ...patch } : e
+      ),
+    }))
   }
   const addSaleDateEntry = () => {
-    setSaleDateEntries((prev) => [
+    setFormData((prev) => ({
       ...prev,
-      {
-        id: createId(),
-        startDate: undefined,
-        startHour: "",
-        startMin: "",
-        endDate: undefined,
-        endHour: "",
-        endMin: "",
-        haveEndDate: true,
-        isCollapsed: false,
-      },
-    ])
+      saleDateEntries: [
+        ...prev.saleDateEntries,
+        createEmptyDateRangeEntry(),
+      ],
+    }))
   }
   const removeSaleDateEntry = (id: string) => {
-    setSaleDateEntries((prev) => prev.filter((e) => e.id !== id))
+    setFormData((prev) => ({
+      ...prev,
+      saleDateEntries: prev.saleDateEntries.filter((e) => e.id !== id),
+    }))
   }
   const toggleSaleDateCollapse = (id: string) => {
-    setSaleDateEntries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e))
-    )
+    setFormData((prev) => ({
+      ...prev,
+      saleDateEntries: prev.saleDateEntries.map((e) =>
+        e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e
+      ),
+    }))
   }
 
   const updateTicketType = (id: string, patch: Partial<TicketTypeEntry>) => {
-    setTicketTypes((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...patch } : t))
-    )
+    setFormData((prev) => ({
+      ...prev,
+      ticketTypes: prev.ticketTypes.map((t) =>
+        t.id === id ? { ...t, ...patch } : t
+      ),
+    }))
   }
   const addTicketType = () => {
-    setTicketTypes((prev) => [
+    setFormData((prev) => ({
       ...prev,
-      {
-        id: createId(),
-        name: "",
-        price: "",
-        quantity: "",
-        detail: "",
-        useForEventDateTime: "",
-        saleTicketOn: "",
-        isCollapsed: false,
-      },
-    ])
+      ticketTypes: [
+        ...prev.ticketTypes,
+        createEmptyTicketTypeEntry(),
+      ],
+    }))
   }
   const removeTicketType = (id: string) => {
-    setTicketTypes((prev) => prev.filter((t) => t.id !== id))
+    setFormData((prev) => ({
+      ...prev,
+      ticketTypes: prev.ticketTypes.filter((t) => t.id !== id),
+    }))
   }
   const toggleTicketCollapse = (id: string) => {
-    setTicketTypes((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, isCollapsed: !t.isCollapsed } : t))
-    )
+    setFormData((prev) => ({
+      ...prev,
+      ticketTypes: prev.ticketTypes.map((t) =>
+        t.id === id ? { ...t, isCollapsed: !t.isCollapsed } : t
+      ),
+    }))
   }
 
   const updateStaffEntry = (id: string, patch: Partial<StaffEntry>) => {
-    setStaffEntries((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, ...patch } : s))
-    )
+    setFormData((prev) => ({
+      ...prev,
+      staffEntries: prev.staffEntries.map((s) =>
+        s.id === id ? { ...s, ...patch } : s
+      ),
+    }))
   }
   const addStaffEntry = () => {
-    setStaffEntries((prev) => [
+    setFormData((prev) => ({
       ...prev,
-      { id: createId(), reserveCode: "", email: "" },
-    ])
+      staffEntries: [
+        ...prev.staffEntries,
+        createEmptyStaffEntry(),
+      ],
+    }))
   }
   const removeStaffEntry = (id: string) => {
-    setStaffEntries((prev) => prev.filter((s) => s.id !== id))
+    setFormData((prev) => ({
+      ...prev,
+      staffEntries: prev.staffEntries.filter((s) => s.id !== id),
+    }))
   }
 
   const completedSectionIds = useMemo(() => {
@@ -205,12 +204,8 @@ export default function CreateEventPage() {
     }
     if (description?.blocks && description.blocks.length > 0)
       ids.push("event-description")
-    if (
-      eventDateEntries.some((e) => e.startDate && (e.startHour || e.startMin))
-    )
-      ids.push("event-date-time")
-    if (saleDateEntries.some((e) => e.startDate && (e.startHour || e.startMin)))
-      ids.push("sale-date-time")
+    if (eventDateEntries.some((e) => e.startDate)) ids.push("event-date-time")
+    if (saleDateEntries.some((e) => e.startDate)) ids.push("sale-date-time")
     if (
       ticketTypes.some(
         (t) =>
@@ -229,20 +224,24 @@ export default function CreateEventPage() {
       ids.push("staff")
     return ids
   }, [
-    posterPreview,
-    thumbnailPreview,
-    eventName,
-    category,
-    location,
     ageRestriction,
+    category,
     description,
+    eventName,
     eventDateEntries,
+    location,
+    posterPreview,
     saleDateEntries,
-    ticketTypes,
-    ticketMinPerOrder,
-    ticketMaxPerOrder,
     staffEntries,
+    thumbnailPreview,
+    ticketMaxPerOrder,
+    ticketMinPerOrder,
+    ticketTypes,
   ])
+
+  const handleCreateEvent = () => {
+    console.log("create-event payload", formData)
+  }
 
   return (
     <PageLayout className="min-h-svh bg-muted/30">
@@ -282,11 +281,21 @@ export default function CreateEventPage() {
               location={location}
               impactGenre={impactGenre}
               ageRestriction={ageRestriction}
-              onEventNameChange={setEventName}
-              onCategoryChange={setCategory}
-              onLocationChange={setLocation}
-              onImpactGenreChange={setImpactGenre}
-              onAgeRestrictionChange={setAgeRestriction}
+              onEventNameChange={(value) =>
+                setFormData((prev) => ({ ...prev, eventName: value }))
+              }
+              onCategoryChange={(value) =>
+                setFormData((prev) => ({ ...prev, category: value }))
+              }
+              onLocationChange={(value) =>
+                setFormData((prev) => ({ ...prev, location: value }))
+              }
+              onImpactGenreChange={(value) =>
+                setFormData((prev) => ({ ...prev, impactGenre: value }))
+              }
+              onAgeRestrictionChange={(value) =>
+                setFormData((prev) => ({ ...prev, ageRestriction: value }))
+              }
             />
 
             <DateRangeSection
@@ -309,7 +318,9 @@ export default function CreateEventPage() {
                 sectionRefs.current["event-description"] = el
               }}
               value={description}
-              onChange={(data) => setDescription(data)}
+              onChange={(data) =>
+                setFormData((prev) => ({ ...prev, description: data }))
+              }
             />
 
             <DateRangeSection
@@ -346,8 +357,12 @@ export default function CreateEventPage() {
               }}
               ticketMinPerOrder={ticketMinPerOrder}
               ticketMaxPerOrder={ticketMaxPerOrder}
-              onTicketMinChange={setTicketMinPerOrder}
-              onTicketMaxChange={setTicketMaxPerOrder}
+              onTicketMinChange={(value) =>
+                setFormData((prev) => ({ ...prev, ticketMinPerOrder: value }))
+              }
+              onTicketMaxChange={(value) =>
+                setFormData((prev) => ({ ...prev, ticketMaxPerOrder: value }))
+              }
             />
 
             <StaffSection
@@ -361,7 +376,11 @@ export default function CreateEventPage() {
             />
 
             <div className="flex justify-end pb-8">
-              <Button size="lg" className="rounded-lg">
+              <Button
+                size="lg"
+                className="rounded-lg"
+                onClick={handleCreateEvent}
+              >
                 <Plus className="size-4" />
                 Create Event
               </Button>

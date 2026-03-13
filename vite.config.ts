@@ -4,10 +4,12 @@ import react from "@vitejs/plugin-react"
 import svgr from "vite-plugin-svgr"
 import { defineConfig } from "vite"
 import { tanstackRouter } from "@tanstack/router-plugin/vite"
+import basicSsl from "@vitejs/plugin-basic-ssl"
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    basicSsl(),
     svgr(),
     tanstackRouter({
       routesDirectory: "./src/routes",

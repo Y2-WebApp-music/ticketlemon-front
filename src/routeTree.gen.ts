@@ -9,14 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StaffRouteImport } from './routes/staff'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
 import { Route as OrganizerRouteImport } from './routes/organizer'
 import { Route as MyTicketsRouteImport } from './routes/my-tickets'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StaffIndexRouteImport } from './routes/staff/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as OrganizerIndexRouteImport } from './routes/organizer/index'
 import { Route as MyTicketsIndexRouteImport } from './routes/my-tickets/index'
+import { Route as StaffScanSuccessRouteImport } from './routes/staff/scan-success'
+import { Route as StaffScanRouteImport } from './routes/staff/scan'
 import { Route as OrganizerCreateRouteImport } from './routes/organizer/create'
 import { Route as MyTicketsTicketIdRouteImport } from './routes/my-tickets/$ticketId'
 import { Route as EventsEventIdRouteImport } from './routes/events/$eventId'
@@ -27,6 +31,11 @@ import { Route as MyTicketsTicketIdQrRouteImport } from './routes/my-tickets/$ti
 import { Route as EventsEventIdPurchaseRouteImport } from './routes/events/$eventId/purchase'
 import { Route as EventsEventIdChooseRouteImport } from './routes/events/$eventId/choose'
 
+const StaffRoute = StaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignInRoute = SignInRouteImport.update({
   id: '/sign-in',
   path: '/sign-in',
@@ -52,6 +61,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StaffIndexRoute = StaffIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StaffRoute,
+} as any)
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
   id: '/profile/',
   path: '/profile/',
@@ -66,6 +80,16 @@ const MyTicketsIndexRoute = MyTicketsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => MyTicketsRoute,
+} as any)
+const StaffScanSuccessRoute = StaffScanSuccessRouteImport.update({
+  id: '/scan-success',
+  path: '/scan-success',
+  getParentRoute: () => StaffRoute,
+} as any)
+const StaffScanRoute = StaffScanRouteImport.update({
+  id: '/scan',
+  path: '/scan',
+  getParentRoute: () => StaffRoute,
 } as any)
 const OrganizerCreateRoute = OrganizerCreateRouteImport.update({
   id: '/create',
@@ -119,12 +143,16 @@ export interface FileRoutesByFullPath {
   '/organizer': typeof OrganizerRouteWithChildren
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
+  '/staff': typeof StaffRouteWithChildren
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
   '/my-tickets/$ticketId': typeof MyTicketsTicketIdRouteWithChildren
   '/organizer/create': typeof OrganizerCreateRoute
+  '/staff/scan': typeof StaffScanRoute
+  '/staff/scan-success': typeof StaffScanSuccessRoute
   '/my-tickets/': typeof MyTicketsIndexRoute
   '/organizer/': typeof OrganizerIndexRoute
   '/profile/': typeof ProfileIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/events/$eventId/choose': typeof EventsEventIdChooseRoute
   '/events/$eventId/purchase': typeof EventsEventIdPurchaseRoute
   '/my-tickets/$ticketId/qr': typeof MyTicketsTicketIdQrRoute
@@ -137,9 +165,12 @@ export interface FileRoutesByTo {
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
   '/organizer/create': typeof OrganizerCreateRoute
+  '/staff/scan': typeof StaffScanRoute
+  '/staff/scan-success': typeof StaffScanSuccessRoute
   '/my-tickets': typeof MyTicketsIndexRoute
   '/organizer': typeof OrganizerIndexRoute
   '/profile': typeof ProfileIndexRoute
+  '/staff': typeof StaffIndexRoute
   '/events/$eventId/choose': typeof EventsEventIdChooseRoute
   '/events/$eventId/purchase': typeof EventsEventIdPurchaseRoute
   '/my-tickets/$ticketId/qr': typeof MyTicketsTicketIdQrRoute
@@ -154,12 +185,16 @@ export interface FileRoutesById {
   '/organizer': typeof OrganizerRouteWithChildren
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
+  '/staff': typeof StaffRouteWithChildren
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
   '/my-tickets/$ticketId': typeof MyTicketsTicketIdRouteWithChildren
   '/organizer/create': typeof OrganizerCreateRoute
+  '/staff/scan': typeof StaffScanRoute
+  '/staff/scan-success': typeof StaffScanSuccessRoute
   '/my-tickets/': typeof MyTicketsIndexRoute
   '/organizer/': typeof OrganizerIndexRoute
   '/profile/': typeof ProfileIndexRoute
+  '/staff/': typeof StaffIndexRoute
   '/events/$eventId/choose': typeof EventsEventIdChooseRoute
   '/events/$eventId/purchase': typeof EventsEventIdPurchaseRoute
   '/my-tickets/$ticketId/qr': typeof MyTicketsTicketIdQrRoute
@@ -175,12 +210,16 @@ export interface FileRouteTypes {
     | '/organizer'
     | '/showcase'
     | '/sign-in'
+    | '/staff'
     | '/events/$eventId'
     | '/my-tickets/$ticketId'
     | '/organizer/create'
+    | '/staff/scan'
+    | '/staff/scan-success'
     | '/my-tickets/'
     | '/organizer/'
     | '/profile/'
+    | '/staff/'
     | '/events/$eventId/choose'
     | '/events/$eventId/purchase'
     | '/my-tickets/$ticketId/qr'
@@ -193,9 +232,12 @@ export interface FileRouteTypes {
     | '/showcase'
     | '/sign-in'
     | '/organizer/create'
+    | '/staff/scan'
+    | '/staff/scan-success'
     | '/my-tickets'
     | '/organizer'
     | '/profile'
+    | '/staff'
     | '/events/$eventId/choose'
     | '/events/$eventId/purchase'
     | '/my-tickets/$ticketId/qr'
@@ -209,12 +251,16 @@ export interface FileRouteTypes {
     | '/organizer'
     | '/showcase'
     | '/sign-in'
+    | '/staff'
     | '/events/$eventId'
     | '/my-tickets/$ticketId'
     | '/organizer/create'
+    | '/staff/scan'
+    | '/staff/scan-success'
     | '/my-tickets/'
     | '/organizer/'
     | '/profile/'
+    | '/staff/'
     | '/events/$eventId/choose'
     | '/events/$eventId/purchase'
     | '/my-tickets/$ticketId/qr'
@@ -229,12 +275,20 @@ export interface RootRouteChildren {
   OrganizerRoute: typeof OrganizerRouteWithChildren
   ShowcaseRoute: typeof ShowcaseRoute
   SignInRoute: typeof SignInRoute
+  StaffRoute: typeof StaffRouteWithChildren
   EventsEventIdRoute: typeof EventsEventIdRouteWithChildren
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/staff': {
+      id: '/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sign-in': {
       id: '/sign-in'
       path: '/sign-in'
@@ -270,6 +324,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/staff/': {
+      id: '/staff/'
+      path: '/'
+      fullPath: '/staff/'
+      preLoaderRoute: typeof StaffIndexRouteImport
+      parentRoute: typeof StaffRoute
+    }
     '/profile/': {
       id: '/profile/'
       path: '/profile'
@@ -290,6 +351,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/my-tickets/'
       preLoaderRoute: typeof MyTicketsIndexRouteImport
       parentRoute: typeof MyTicketsRoute
+    }
+    '/staff/scan-success': {
+      id: '/staff/scan-success'
+      path: '/scan-success'
+      fullPath: '/staff/scan-success'
+      preLoaderRoute: typeof StaffScanSuccessRouteImport
+      parentRoute: typeof StaffRoute
+    }
+    '/staff/scan': {
+      id: '/staff/scan'
+      path: '/scan'
+      fullPath: '/staff/scan'
+      preLoaderRoute: typeof StaffScanRouteImport
+      parentRoute: typeof StaffRoute
     }
     '/organizer/create': {
       id: '/organizer/create'
@@ -400,6 +475,20 @@ const OrganizerRouteWithChildren = OrganizerRoute._addFileChildren(
   OrganizerRouteChildren,
 )
 
+interface StaffRouteChildren {
+  StaffScanRoute: typeof StaffScanRoute
+  StaffScanSuccessRoute: typeof StaffScanSuccessRoute
+  StaffIndexRoute: typeof StaffIndexRoute
+}
+
+const StaffRouteChildren: StaffRouteChildren = {
+  StaffScanRoute: StaffScanRoute,
+  StaffScanSuccessRoute: StaffScanSuccessRoute,
+  StaffIndexRoute: StaffIndexRoute,
+}
+
+const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
+
 interface EventsEventIdRouteChildren {
   EventsEventIdChooseRoute: typeof EventsEventIdChooseRoute
   EventsEventIdPurchaseRoute: typeof EventsEventIdPurchaseRoute
@@ -422,6 +511,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrganizerRoute: OrganizerRouteWithChildren,
   ShowcaseRoute: ShowcaseRoute,
   SignInRoute: SignInRoute,
+  StaffRoute: StaffRouteWithChildren,
   EventsEventIdRoute: EventsEventIdRouteWithChildren,
   ProfileIndexRoute: ProfileIndexRoute,
 }

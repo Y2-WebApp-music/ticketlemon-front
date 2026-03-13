@@ -61,6 +61,8 @@ export default function SignInPage() {
       })
       if (payload.role === "organizer" || payload.role === "admin") {
         navigate({ to: "/organizer" })
+      } else if (payload.role === "staff") {
+        navigate({ to: "/staff" })
       } else {
         navigate({ to: "/" })
       }
@@ -140,7 +142,7 @@ export default function SignInPage() {
           variant="outline"
           className="mt-8 border-orange-200 text-orange-600 hover:bg-orange-50/50"
           onClick={() => {
-            // TODO: event staff
+            navigate({ to: "/staff" })
           }}
         >
           Event Staff

@@ -1,7 +1,6 @@
 export type {
   EventListItem,
   EventTicketType,
-  EventTicketTypeVariant,
   EventDetail,
   ChooseTicketOption,
   ChooseTicketSession,
@@ -16,9 +15,11 @@ export type {
 export type { OrganizerEvent, OrganizerEventStatus } from "./organizer"
 export type { SignInResponse, UserRole, Permission } from "./auth"
 export type {
+  CreateEventPayload,
   DateRangeEntry,
   StaffEntry,
   TicketTypeEntry,
 } from "./create-event"
 export { createId, formatDateRangeLabel } from "./create-event"
+export type { StaffEvent } from "./staff"
 export type { SuccessResponse, ErrorResponseProps } from "./responseHandler"

@@ -3,7 +3,7 @@ import TicketlemonFull from "@/assets/ticketlemon-full.svg?react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import { Link, useRouterState } from "@tanstack/react-router"
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router"
 import { LogOut, Menu, Ticket, UserCircle, X } from "lucide-react"
 import * as React from "react"
 
@@ -24,9 +24,13 @@ export function PageLayout({ children, className }: PageLayoutProps) {
 function NavBar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isOrganizer = pathname.startsWith("/organizer")
+  const isStaff = pathname.startsWith("/staff")
 
   if (isOrganizer) {
     return <OrganizerNavBar />
+  }
+  if (isStaff) {
+    return <StaffNavBar />
   }
   return <CustomerNavBar />
 }
@@ -62,6 +66,90 @@ function OrganizerNavBar() {
         </div>
       </div>
     </header>
+  )
+}
+
+function StaffNavBar() {
+  const [menuOpen, setMenuOpen] = React.useState(false)
+  const navigate = useNavigate()
+
+  const handleSignOut = () => {
+    // Lazy import to avoid circular deps at module load
+    import("@/services/authService").then(({ signOut }) => {
+      signOut()
+      setMenuOpen(false)
+      navigate({ to: "/sign-in" })
+    })
+  }
+
+  const headerHeight = 70
+
+  return (
+    <>
+      <header className="sticky top-0 z-40 w-full border-b border-border bg-card">
+        <div className="mx-auto flex h-[70px] items-center justify-between gap-4 px-4 sm:px-6">
+          <Link
+            to="/staff"
+            className="flex shrink-0 items-center gap-1.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <TicketlemonFull
+              className="h-6 w-[159px] shrink-0 object-contain object-left"
+              aria-label="ticketlemon"
+            />
+          </Link>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="shrink-0 rounded-lg"
+            aria-label={menuOpen ? "Close staff menu" : "Open staff menu"}
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </Button>
+        </div>
+      </header>
+
+      {/* Mobile-like sheet, same pattern as customer navbar but staff-only content */}
+      <div
+        className={cn(
+          "fixed inset-0 z-40",
+          menuOpen ? "pointer-events-auto" : "pointer-events-none"
+        )}
+        aria-hidden={!menuOpen}
+      >
+        {/* Backdrop below header */}
+        <div
+          className={cn(
+            "fixed right-0 bottom-0 left-0 bg-black/50 transition-opacity duration-200",
+            menuOpen ? "opacity-100" : "opacity-0"
+          )}
+          style={{ top: headerHeight }}
+          onClick={() => setMenuOpen(false)}
+          aria-hidden
+        />
+        {/* Sheet panel with just Sign Out button */}
+        <div
+          className={cn(
+            "fixed right-0 left-0 border-t border-border bg-card shadow-lg transition-[opacity,transform] duration-200 ease-out",
+            menuOpen ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+          )}
+          style={{ top: headerHeight }}
+        >
+          <nav className="flex flex-col gap-3 px-4 py-4">
+            <Button
+              type="button"
+              variant="destructive"
+              className="w-full gap-2"
+              onClick={handleSignOut}
+            >
+              <LogOut className="size-4" />
+              Sign Out
+            </Button>
+          </nav>
+        </div>
+      </div>
+    </>
   )
 }
 
