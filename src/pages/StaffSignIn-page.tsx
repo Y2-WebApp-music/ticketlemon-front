@@ -38,7 +38,7 @@ export default function StaffSignInPage() {
           <InputOTP
             maxLength={6}
             value={staffCode}
-            onChange={(value) => setStaffCode(value)}
+            onChange={(value) => setStaffCode(value.toUpperCase())}
             containerClassName="mt-5"
           >
             <InputOTPGroup>

@@ -4,12 +4,12 @@ import {
   OrganizerEventTabs,
 } from "@/features/organizer-dashboard"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
-import { getEventDetail } from "@/mocks/event-detail"
+import { getOrganizerEventDetail } from "@/mocks/event-detail"
 import {
   DEFAULT_SELLING_TICKET_SELECTION,
   MOCK_SELLING_TABLE_RESPONSE,
 } from "@/mocks/organizer-event-selling"
-import type { EventTicketType } from "@/types/event"
+import type { EventTicketType, OrganizerEventDetail } from "@/types/event"
 import type { SellingTicketSelection } from "@/types/organizer"
 import { formatDateLabel } from "@/utils/formatDate"
 import type { OutputData } from "@editorjs/editorjs"
@@ -85,7 +85,10 @@ export interface OrganizerEventDetailPageProps {
 export default function OrganizerEventDetailPage({
   eventId,
 }: OrganizerEventDetailPageProps) {
-  const eventData = useMemo(() => getEventDetail(eventId), [eventId])
+  const eventData = useMemo<OrganizerEventDetail | undefined>(
+    () => getOrganizerEventDetail(eventId),
+    [eventId]
+  )
   const [openingSellingTicket, setOpeningSellingTicket] =
     useState<SellingTicketSelection | null>(null)
   const [descriptionOverrides, setDescriptionOverrides] = useState<

@@ -28,6 +28,7 @@ import { Route as EventsEventIdRouteImport } from './routes/events/$eventId'
 import { Route as MyTicketsTicketIdIndexRouteImport } from './routes/my-tickets/$ticketId/index'
 import { Route as EventsEventIdIndexRouteImport } from './routes/events/$eventId/index'
 import { Route as OrganizerEventsEventIdRouteImport } from './routes/organizer/events/$eventId'
+import { Route as OrganizerEditEventIdRouteImport } from './routes/organizer/edit/$eventId'
 import { Route as MyTicketsTicketIdQrRouteImport } from './routes/my-tickets/$ticketId/qr'
 import { Route as EventsEventIdPurchaseRouteImport } from './routes/events/$eventId/purchase'
 import { Route as EventsEventIdChooseRouteImport } from './routes/events/$eventId/choose'
@@ -127,6 +128,11 @@ const OrganizerEventsEventIdRoute = OrganizerEventsEventIdRouteImport.update({
   path: '/events/$eventId',
   getParentRoute: () => OrganizerRoute,
 } as any)
+const OrganizerEditEventIdRoute = OrganizerEditEventIdRouteImport.update({
+  id: '/edit/$eventId',
+  path: '/edit/$eventId',
+  getParentRoute: () => OrganizerRoute,
+} as any)
 const MyTicketsTicketIdQrRoute = MyTicketsTicketIdQrRouteImport.update({
   id: '/qr',
   path: '/qr',
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/events/$eventId/choose': typeof EventsEventIdChooseRoute
   '/events/$eventId/purchase': typeof EventsEventIdPurchaseRoute
   '/my-tickets/$ticketId/qr': typeof MyTicketsTicketIdQrRoute
+  '/organizer/edit/$eventId': typeof OrganizerEditEventIdRoute
   '/organizer/events/$eventId': typeof OrganizerEventsEventIdRoute
   '/events/$eventId/': typeof EventsEventIdIndexRoute
   '/my-tickets/$ticketId/': typeof MyTicketsTicketIdIndexRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/events/$eventId/choose': typeof EventsEventIdChooseRoute
   '/events/$eventId/purchase': typeof EventsEventIdPurchaseRoute
   '/my-tickets/$ticketId/qr': typeof MyTicketsTicketIdQrRoute
+  '/organizer/edit/$eventId': typeof OrganizerEditEventIdRoute
   '/organizer/events/$eventId': typeof OrganizerEventsEventIdRoute
   '/events/$eventId': typeof EventsEventIdIndexRoute
   '/my-tickets/$ticketId': typeof MyTicketsTicketIdIndexRoute
@@ -207,6 +215,7 @@ export interface FileRoutesById {
   '/events/$eventId/choose': typeof EventsEventIdChooseRoute
   '/events/$eventId/purchase': typeof EventsEventIdPurchaseRoute
   '/my-tickets/$ticketId/qr': typeof MyTicketsTicketIdQrRoute
+  '/organizer/edit/$eventId': typeof OrganizerEditEventIdRoute
   '/organizer/events/$eventId': typeof OrganizerEventsEventIdRoute
   '/events/$eventId/': typeof EventsEventIdIndexRoute
   '/my-tickets/$ticketId/': typeof MyTicketsTicketIdIndexRoute
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/events/$eventId/choose'
     | '/events/$eventId/purchase'
     | '/my-tickets/$ticketId/qr'
+    | '/organizer/edit/$eventId'
     | '/organizer/events/$eventId'
     | '/events/$eventId/'
     | '/my-tickets/$ticketId/'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/events/$eventId/choose'
     | '/events/$eventId/purchase'
     | '/my-tickets/$ticketId/qr'
+    | '/organizer/edit/$eventId'
     | '/organizer/events/$eventId'
     | '/events/$eventId'
     | '/my-tickets/$ticketId'
@@ -276,6 +287,7 @@ export interface FileRouteTypes {
     | '/events/$eventId/choose'
     | '/events/$eventId/purchase'
     | '/my-tickets/$ticketId/qr'
+    | '/organizer/edit/$eventId'
     | '/organizer/events/$eventId'
     | '/events/$eventId/'
     | '/my-tickets/$ticketId/'
@@ -428,6 +440,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OrganizerEventsEventIdRouteImport
       parentRoute: typeof OrganizerRoute
     }
+    '/organizer/edit/$eventId': {
+      id: '/organizer/edit/$eventId'
+      path: '/edit/$eventId'
+      fullPath: '/organizer/edit/$eventId'
+      preLoaderRoute: typeof OrganizerEditEventIdRouteImport
+      parentRoute: typeof OrganizerRoute
+    }
     '/my-tickets/$ticketId/qr': {
       id: '/my-tickets/$ticketId/qr'
       path: '/qr'
@@ -482,12 +501,14 @@ const MyTicketsRouteWithChildren = MyTicketsRoute._addFileChildren(
 interface OrganizerRouteChildren {
   OrganizerCreateRoute: typeof OrganizerCreateRoute
   OrganizerIndexRoute: typeof OrganizerIndexRoute
+  OrganizerEditEventIdRoute: typeof OrganizerEditEventIdRoute
   OrganizerEventsEventIdRoute: typeof OrganizerEventsEventIdRoute
 }
 
 const OrganizerRouteChildren: OrganizerRouteChildren = {
   OrganizerCreateRoute: OrganizerCreateRoute,
   OrganizerIndexRoute: OrganizerIndexRoute,
+  OrganizerEditEventIdRoute: OrganizerEditEventIdRoute,
   OrganizerEventsEventIdRoute: OrganizerEventsEventIdRoute,
 }
 

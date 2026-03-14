@@ -1,9 +1,9 @@
-import type { EventDetail } from "@/types/event"
+import type { EventDetail, OrganizerEventDetail } from "@/types/event"
 
 export const eventDetailImageUrl = "https://picsum.photos/400/600"
 
 /** Mock event detail by id (key = eventId from route) */
-export const eventDetailsById: Record<string, EventDetail> = {
+export const organizerEventDetailsById: Record<string, OrganizerEventDetail> = {
   "1": {
     id: "1",
     status_id: 2,
@@ -138,10 +138,16 @@ export const eventDetailsById: Record<string, EventDetail> = {
         sold_out_date: "2026-03-10T18:24:12",
       },
     ],
+    staff_entries: [{ id: "staff-1", reserve_code: "A1B2C3" }],
   },
 }
 
 /** Get event detail by id; returns undefined if not found */
 export function getEventDetail(eventId: string) {
-  return eventDetailsById[eventId]
+  return organizerEventDetailsById[eventId] as EventDetail | undefined
+}
+
+/** Get organizer event detail by id; includes staff_entries. */
+export function getOrganizerEventDetail(eventId: string) {
+  return organizerEventDetailsById[eventId]
 }

@@ -13,14 +13,16 @@ import {
   EventStatus,
   getEventStatusBadgeVariant,
 } from "@/constants/event-status.constant"
-import type { EventDetail, EventTicketType } from "@/types/event"
+import type { EventTicketType, OrganizerEventDetail } from "@/types/event"
 import {
   formatDateLabel,
   formatDuration,
   getElapsedMs,
   getRemainingMs,
 } from "@/utils/formatDate"
+import { Link } from "@tanstack/react-router"
 import dayjs from "dayjs"
+import { toast } from "sonner"
 import {
   CalendarRange,
   Focus,
@@ -35,7 +37,7 @@ import {
 import { useEffect, useMemo, useState } from "react"
 
 export interface OrganizerEventHeroProps {
-  event: EventDetail
+  event: OrganizerEventDetail
   onSeeSelling?: () => void
 }
 
@@ -141,6 +143,7 @@ export function OrganizerEventHero({
   onSeeSelling,
 }: OrganizerEventHeroProps) {
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
+  const [staffCodeDialogOpen, setStaffCodeDialogOpen] = useState(false)
   const [isPublished, setIsPublished] = useState(
     event.status_id !== EventStatus.DRAFT &&
       event.status_id !== EventStatus.SCHEDULED
@@ -328,7 +331,13 @@ export function OrganizerEventHero({
         type="button"
         variant={config.variant}
         className={config.variant === "outline" ? outlineClass : "gap-2"}
-        onClick={config.key === "see-selling" ? onSeeSelling : undefined}
+        onClick={
+          config.key === "see-selling"
+            ? onSeeSelling
+            : config.key === "staff"
+              ? () => setStaffCodeDialogOpen(true)
+              : undefined
+        }
       >
         {config.icon === "focus" && <Focus className={iconClass} aria-hidden />}
         {config.icon === "ticket" && (
@@ -395,9 +404,19 @@ export function OrganizerEventHero({
                         {statusActionLabel}
                       </Button>
                     )}
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Pencil className="size-4" aria-hidden />
-                      Edit Event
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                      asChild
+                    >
+                      <Link
+                        to="/organizer/edit/$eventId"
+                        params={{ eventId: event.id }}
+                      >
+                        <Pencil className="size-4" aria-hidden />
+                        Edit Event
+                      </Link>
                     </Button>
                   </div>
                 </div>
@@ -491,9 +510,51 @@ export function OrganizerEventHero({
               onClick={() => {
                 setIsPublished((prev) => !prev)
                 setStatusDialogOpen(false)
+                toast.success(
+                  isPublished
+                    ? "Event has been unpublished."
+                    : "Event has been published."
+                )
               }}
             >
               Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={staffCodeDialogOpen} onOpenChange={setStaffCodeDialogOpen}>
+        <DialogContent className="max-w-[420px] rounded-2xl py-8">
+          <DialogHeader className="items-center text-center">
+            <DialogTitle className="text-xl font-medium text-foreground">
+              Staff Code
+            </DialogTitle>
+            <DialogDescription className="text-base text-muted-foreground">
+              Use this code for staff sign in.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mx-auto w-full max-w-[320px] space-y-2">
+            {event.staff_entries.length > 0 ? (
+              event.staff_entries.map((staff) => (
+                <div
+                  key={staff.id}
+                  className="rounded-lg border border-border bg-muted/30 px-4 py-3 text-center text-lg font-medium tracking-wider text-foreground"
+                >
+                  {staff.reserve_code}
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-sm text-muted-foreground">
+                No staff code available.
+              </p>
+            )}
+          </div>
+          <DialogFooter className="mt-3 justify-center sm:justify-center">
+            <Button
+              type="button"
+              className="min-w-[140px]"
+              onClick={() => setStaffCodeDialogOpen(false)}
+            >
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
