@@ -6,7 +6,7 @@ export const eventDetailImageUrl = "https://picsum.photos/400/600"
 export const organizerEventDetailsById: Record<string, OrganizerEventDetail> = {
   "1": {
     id: "1",
-    status_id: 2,
+    status_id: 3,
     status_label: "On Sale",
     title: "2026 JOY ASIA TOUR 'JOY SPLASH' IN BANGKOK",
     poster_url: eventDetailImageUrl,

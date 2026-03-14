@@ -10,4 +10,9 @@ export type {
   RegisterStep2DataForm,
   RegisterStep2FormProps,
 } from "./register-step2-form"
+export { OrganizerRegisterForm } from "./organizer-register-form"
+export type {
+  OrganizerRegisterFormPayload,
+  OrganizerRegisterFormProps,
+} from "./organizer-register-form"
 export type { RegisterDataForm } from "./register-types"

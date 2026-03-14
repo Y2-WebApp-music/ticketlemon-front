@@ -24,6 +24,8 @@ export interface SignInFormProps {
   variant?: "mobile" | "desktop"
   signInLoading?: boolean
   signInError?: string | null
+  title?: string
+  showGoogleSignIn?: boolean
 }
 
 export function SignInForm({
@@ -39,6 +41,8 @@ export function SignInForm({
   variant = "mobile",
   signInLoading = false,
   signInError = null,
+  title = "Sign In",
+  showGoogleSignIn = true,
 }: SignInFormProps) {
   const [emailError, setEmailError] = React.useState("")
   const [passwordError, setPasswordError] = React.useState("")
@@ -76,13 +80,13 @@ export function SignInForm({
 
   return (
     <>
-      <h1 className={`w-full text-left ${headingClass}`}>Sign In</h1>
+      <h1 className={`w-full text-left ${headingClass}`}>{title}</h1>
       {signInError && (
         <p className="w-full text-sm text-destructive" role="alert">
           {signInError}
         </p>
       )}
-      {variant === "desktop" && (
+      {variant === "desktop" && showGoogleSignIn && (
         <>
           <Button
             type="button"
@@ -186,7 +190,7 @@ export function SignInForm({
         >
           {signInLoading ? "Signing in…" : "Sign In"}
         </Button>
-        {variant === "mobile" && (
+        {variant === "mobile" && showGoogleSignIn && (
           <>
             <div className="flex w-full items-center gap-3 pt-2">
               <div className="h-px flex-1 bg-border" />

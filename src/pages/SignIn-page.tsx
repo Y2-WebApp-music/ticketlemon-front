@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import TicketlemonFull from "@/assets/ticketlemon-full.svg?react"
 import WaifuMascot from "@/assets/waifu_mascot_charac.jpeg"
 import {
+  OrganizerRegisterForm,
   RegisterStep1Form,
   RegisterStep2Form,
   SignInForm,
@@ -30,6 +31,8 @@ const initialDataForm: RegisterDataForm = {
 export default function SignInPage() {
   const navigate = useNavigate()
   const [isRegister, setIsRegister] = React.useState(false)
+  const [isOrganizerSignIn, setIsOrganizerSignIn] = React.useState(false)
+  const [isOrganizerRegister, setIsOrganizerRegister] = React.useState(false)
   const [registerStep, setRegisterStep] = React.useState<1 | 2>(1)
   const [signInDataForm, setSignInDataForm] = React.useState<{
     email: string
@@ -41,11 +44,16 @@ export default function SignInPage() {
   const [signInError, setSignInError] = React.useState<string | null>(null)
 
   const goToRegister = () => {
+    if (isOrganizerSignIn) {
+      setIsOrganizerRegister(true)
+      return
+    }
     setIsRegister(true)
     setRegisterStep(1)
   }
   const goToSignIn = () => {
     setIsRegister(false)
+    setIsOrganizerRegister(false)
     setRegisterStep(1)
   }
   const goToRegisterStep2 = () => setRegisterStep(2)
@@ -167,8 +175,24 @@ export default function SignInPage() {
         <div className="relative bg-primary">
           <div className="mx-auto flex min-h-full w-full max-w-[756px] items-center justify-center px-6 py-10">
             <div className="w-full max-w-[653px] rounded-xl border border-border bg-card px-10 py-10 shadow-xs">
-              <div className="mx-auto flex w-full max-w-[360px] flex-col items-center gap-5">
-                {isRegister ? (
+              <div
+                className={`mx-auto flex w-full flex-col items-center gap-5 ${
+                  isOrganizerSignIn && isOrganizerRegister
+                    ? "max-w-[620px]"
+                    : "max-w-[360px]"
+                }`}
+              >
+                {isOrganizerSignIn && isOrganizerRegister ? (
+                  <OrganizerRegisterForm
+                    idPrefix="desktop"
+                    variant="desktop"
+                    customerEmail={signInDataForm.email}
+                    onSignIn={goToSignIn}
+                    onCreateOrganizer={() => {
+                      // TODO: organizer registration flow
+                    }}
+                  />
+                ) : isRegister ? (
                   registerStep === 1 ? (
                     <RegisterStep1Form
                       idPrefix="desktop"
@@ -195,6 +219,7 @@ export default function SignInPage() {
                   <SignInForm
                     idPrefix="desktop"
                     variant="desktop"
+                    title={isOrganizerSignIn ? "Organizer Sign In" : "Sign In"}
                     email={signInDataForm.email}
                     password={signInDataForm.password}
                     onEmailChange={(value) => {
@@ -211,6 +236,7 @@ export default function SignInPage() {
                     onSignIn={handleSignIn}
                     signInLoading={signInLoading}
                     signInError={signInError}
+                    showGoogleSignIn={!isOrganizerSignIn}
                     onGoogleSignIn={() => {
                       // TODO: google sign in
                     }}
@@ -228,10 +254,16 @@ export default function SignInPage() {
                   variant="outline"
                   className="border-orange-200 text-orange-600 hover:bg-orange-50/50"
                   onClick={() => {
-                    // TODO: organizer site
+                    setIsOrganizerSignIn((prev) => {
+                      const next = !prev
+                      setIsOrganizerRegister(false)
+                      setIsRegister(false)
+                      setRegisterStep(1)
+                      return next
+                    })
                   }}
                 >
-                  Organizer Site
+                  {isOrganizerSignIn ? "Audience Site" : "Organizer Site"}
                 </Button>
               </div>
             </div>
