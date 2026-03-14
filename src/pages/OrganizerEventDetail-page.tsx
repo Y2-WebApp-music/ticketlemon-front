@@ -9,10 +9,10 @@ import {
   DEFAULT_SELLING_TICKET_SELECTION,
   MOCK_SELLING_TABLE_RESPONSE,
 } from "@/mocks/organizer-event-selling"
-import type { OutputData } from "@editorjs/editorjs"
 import type { EventTicketType } from "@/types/event"
 import type { SellingTicketSelection } from "@/types/organizer"
 import { formatDateLabel } from "@/utils/formatDate"
+import type { OutputData } from "@editorjs/editorjs"
 import { Link } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
 
@@ -130,7 +130,7 @@ export default function OrganizerEventDetailPage({
           }
           ticketGroups={groupTicketTypesByEventDate(eventData.ticket_types)}
           sellingTableResponse={MOCK_SELLING_TABLE_RESPONSE}
-          showDateList={eventData.show_date_list}
+          showDateList={eventData.event_date_entries}
           ticketTypes={eventData.ticket_types}
           openingSellingTicket={openingSellingTicket}
           onDescriptionSave={(data) =>

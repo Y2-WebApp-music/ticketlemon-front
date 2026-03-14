@@ -10,7 +10,6 @@ import {
   TicketSettingSection,
   TicketTypeSection,
   type DateRangeEntry,
-  type StaffEntry,
   type TicketTypeEntry,
 } from "@/features/create-event"
 import { Link } from "@tanstack/react-router"
@@ -24,6 +23,9 @@ import {
 } from "@/types/create-event"
 import { useMemo, useRef, useState } from "react"
 import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant"
+import { toast } from "sonner"
+
+const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024
 
 export default function CreateEventPage() {
   const [formData, setFormData] = useState<CreateEventPayload>(() =>
@@ -33,7 +35,7 @@ export default function CreateEventPage() {
   const {
     event_name,
     category,
-    location,
+    venue,
     impact_genre,
     age_restriction,
     description,
@@ -56,23 +58,43 @@ export default function CreateEventPage() {
     window.scrollTo({ top, behavior: "smooth" })
   }
 
+  const validateImageSize = (file: File, label: "Poster" | "Thumbnail") => {
+    if (file.size <= MAX_IMAGE_SIZE_BYTES) return true
+    toast.error(`${label} image must be 10 MB or smaller.`)
+    return false
+  }
+
   const handlePosterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        poster_preview: URL.createObjectURL(file),
-      }))
+    if (!file) return
+    if (!validateImageSize(file, "Poster")) {
+      e.target.value = ""
+      return
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      poster_preview: URL.createObjectURL(file),
+    }))
   }
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (file) {
-      setFormData((prev) => ({
-        ...prev,
-        thumbnail_preview: URL.createObjectURL(file),
-      }))
+    if (!file) return
+    if (!validateImageSize(file, "Thumbnail")) {
+      e.target.value = ""
+      return
     }
+
+    setFormData((prev) => ({
+      ...prev,
+      thumbnail_preview: URL.createObjectURL(file),
+    }))
+  }
+  const handlePosterRemove = () => {
+    setFormData((prev) => ({ ...prev, poster_preview: null }))
+  }
+  const handleThumbnailRemove = () => {
+    setFormData((prev) => ({ ...prev, thumbnail_preview: null }))
   }
 
   const updateEventDateEntry = (id: string, patch: Partial<DateRangeEntry>) => {
@@ -168,24 +190,13 @@ export default function CreateEventPage() {
     }))
   }
 
-  const updateStaffEntry = (id: string, patch: Partial<StaffEntry>) => {
+  const updateStaffCode = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      staff_entries: prev.staff_entries.map((s) =>
-        s.id === id ? { ...s, ...patch } : s
-      ),
-    }))
-  }
-  const addStaffEntry = () => {
-    setFormData((prev) => ({
-      ...prev,
-      staff_entries: [...prev.staff_entries, createEmptyStaffEntry()],
-    }))
-  }
-  const removeStaffEntry = (id: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      staff_entries: prev.staff_entries.filter((s) => s.id !== id),
+      staff_entries: {
+        id: prev.staff_entries.id ?? createEmptyStaffEntry().id,
+        reserve_code: value,
+      },
     }))
   }
 
@@ -196,7 +207,7 @@ export default function CreateEventPage() {
     if (
       event_name.trim() !== "" &&
       category &&
-      location &&
+      venue &&
       age_restriction.trim() !== ""
     ) {
       ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[1].id)
@@ -218,11 +229,7 @@ export default function CreateEventPage() {
       ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[5].id)
     if (ticket_min_per_order && ticket_max_per_order)
       ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[6].id)
-    if (
-      staff_entries.some(
-        (s) => s.reserve_code.trim() !== "" && s.email.trim() !== ""
-      )
-    )
+    if ((staff_entries.reserve_code ?? "").trim() !== "")
       ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[7].id)
     return ids
   }, [
@@ -231,7 +238,7 @@ export default function CreateEventPage() {
     description,
     event_name,
     event_date_entries,
-    location,
+    venue,
     poster_preview,
     sale_date_entries,
     staff_entries,
@@ -244,6 +251,10 @@ export default function CreateEventPage() {
   const handleCreateEvent = () => {
     console.log("create-event payload", formData)
   }
+
+  const isCreateEventReady = CREATE_EVENT_SIDEBAR_SECTIONS.every((section) =>
+    completedSectionIds.includes(section.id)
+  )
 
   return (
     <PageLayout className="min-h-svh bg-muted/30">
@@ -271,6 +282,8 @@ export default function CreateEventPage() {
               thumbnailPreview={thumbnail_preview}
               onPosterChange={handlePosterChange}
               onThumbnailChange={handleThumbnailChange}
+              onPosterRemove={handlePosterRemove}
+              onThumbnailRemove={handleThumbnailRemove}
             />
 
             <EventDetailSection
@@ -279,7 +292,7 @@ export default function CreateEventPage() {
               }}
               eventName={event_name}
               category={category}
-              location={location}
+              venue={venue}
               impactGenre={impact_genre}
               ageRestriction={age_restriction}
               onEventNameChange={(value) =>
@@ -289,7 +302,7 @@ export default function CreateEventPage() {
                 setFormData((prev) => ({ ...prev, category: value }))
               }
               onLocationChange={(value) =>
-                setFormData((prev) => ({ ...prev, location: value }))
+                setFormData((prev) => ({ ...prev, venue: value }))
               }
               onImpactGenreChange={(value) =>
                 setFormData((prev) => ({ ...prev, impact_genre: value }))
@@ -376,10 +389,8 @@ export default function CreateEventPage() {
               sectionRef={(el) => {
                 sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[7].id] = el
               }}
-              staffEntries={staff_entries}
-              onUpdate={updateStaffEntry}
-              onAdd={addStaffEntry}
-              onRemove={removeStaffEntry}
+              staffCode={staff_entries.reserve_code ?? ""}
+              onStaffCodeChange={updateStaffCode}
             />
 
             <div className="flex justify-end pb-8">
@@ -387,6 +398,7 @@ export default function CreateEventPage() {
                 size="lg"
                 className="rounded-lg"
                 onClick={handleCreateEvent}
+                disabled={!isCreateEventReady}
               >
                 <Plus className="size-4" />
                 Create Event

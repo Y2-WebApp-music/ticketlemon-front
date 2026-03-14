@@ -11,7 +11,7 @@ export const eventDetailsById: Record<string, EventDetail> = {
     title: "2026 JOY ASIA TOUR 'JOY SPLASH' IN BANGKOK",
     poster_url: eventDetailImageUrl,
     thumbnail_url: eventDetailImageUrl,
-    show_date_list: [
+    event_date_entries: [
       "2026-03-29T17:00:00",
       "2026-03-29T20:00:00",
       "2026-03-30T17:00:00",
@@ -19,7 +19,7 @@ export const eventDetailsById: Record<string, EventDetail> = {
       "2026-03-31T17:00:00",
     ],
     // collect start sale date
-    sale_date_list: [
+    sale_date_entries: [
       new Date().toISOString(),
       new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString(),
     ],

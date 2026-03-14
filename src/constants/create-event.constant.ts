@@ -49,6 +49,6 @@ export const CREATE_EVENT_SIDEBAR_SECTIONS = [
   {
     id: "staff",
     label: "Staff",
-    description: "Add staff members with reserve codes and email.",
+    description: "Add staff members with reserve codes.",
   },
 ] as const

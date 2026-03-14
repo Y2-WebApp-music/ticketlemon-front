@@ -30,10 +30,10 @@ export interface EventDetail {
   title: string
   poster_url: string
   thumbnail_url: string
-  show_date_list: string[]
+  event_date_entries: string[]
   venue: string
   age_restriction: number | null
-  sale_date_list: string[]
+  sale_date_entries: string[]
   description: OutputData
   ticket_types: EventTicketType[]
 }

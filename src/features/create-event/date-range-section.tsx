@@ -21,6 +21,7 @@ import {
 } from "lucide-react"
 import { format, isBefore, startOfDay } from "date-fns"
 import type { DateRangeEntry } from "@/types/create-event"
+import { useState } from "react"
 
 export interface DateRangeSectionProps {
   sectionRef: (el: HTMLElement | null) => void
@@ -47,6 +48,10 @@ export function DateRangeSection({
   onRemove,
   onToggleCollapse,
 }: DateRangeSectionProps) {
+  const [fieldErrors, setFieldErrors] = useState<
+    Record<string, { start_date?: string; end_date?: string }>
+  >({})
+
   const today = startOfDay(new Date())
   const hourOptions = Array.from({ length: 24 }, (_, idx) =>
     idx.toString().padStart(2, "0")
@@ -82,6 +87,54 @@ export function DateRangeSection({
 
   const isPastDate = (date: Date): boolean => isBefore(startOfDay(date), today)
 
+  const setFieldError = (
+    entryId: string,
+    field: "start_date" | "end_date",
+    message?: string
+  ) => {
+    setFieldErrors((prev) => {
+      const current = prev[entryId] ?? {}
+      const nextForEntry = { ...current }
+
+      if (message) nextForEntry[field] = message
+      else delete nextForEntry[field]
+
+      if (!nextForEntry.start_date && !nextForEntry.end_date) {
+        const nextErrors = { ...prev }
+        delete nextErrors[entryId]
+        return nextErrors
+      }
+
+      return { ...prev, [entryId]: nextForEntry }
+    })
+  }
+
+  const validateBeforeSave = (entry: DateRangeEntry) => {
+    const errors: { start_date?: string; end_date?: string } = {}
+
+    if (!entry.start_date)
+      errors.start_date = "Start date and time is required."
+    if (entry.have_end_date && !entry.end_date) {
+      errors.end_date = "End date and time is required."
+    }
+
+    setFieldErrors((prev) => {
+      if (!errors.start_date && !errors.end_date) {
+        const nextErrors = { ...prev }
+        delete nextErrors[entry.id]
+        return nextErrors
+      }
+      return { ...prev, [entry.id]: errors }
+    })
+
+    return !errors.start_date && !errors.end_date
+  }
+
+  const handleSave = (entry: DateRangeEntry) => {
+    if (!validateBeforeSave(entry)) return
+    onUpdate(entry.id, { is_collapsed: true })
+  }
+
   return (
     <section ref={sectionRef} id={id} className="space-y-4">
       <Card size="sm" className="gap-0 py-0">
@@ -93,7 +146,7 @@ export function DateRangeSection({
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className="overflow-hidden rounded-xl border border-border bg-card p-5"
+              className="overflow-hidden rounded-xl border border-border bg-card p-4"
             >
               {entry.is_collapsed ? (
                 <div className="flex flex-wrap items-center gap-3">
@@ -104,12 +157,12 @@ export function DateRangeSection({
                     <CalendarRange className="size-6" />
                   </div>
                   <div className="min-w-0 flex-1 text-left">
-                    <p className="text-lg leading-7 font-medium text-foreground">
+                    <p className="text-lg text-foreground">
                       {entry.start_date
                         ? format(entry.start_date, "d MMM yyyy")
                         : "—"}
                     </p>
-                    <p className="text-base leading-6 text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       {entry.start_date
                         ? entry.have_end_date && entry.end_date
                           ? `${format(entry.start_date, "HH:mm")} - ${format(entry.end_date, "HH:mm")}`
@@ -177,6 +230,7 @@ export function DateRangeSection({
                                   )
                                 : entry.end_date,
                             })
+                            setFieldError(entry.id, "start_date")
                           }}
                           placeholder="Select date"
                           dateFormat="d MMM yyyy"
@@ -184,6 +238,11 @@ export function DateRangeSection({
                           triggerClassName="pl-9"
                         />
                       </div>
+                      {fieldErrors[entry.id]?.start_date && (
+                        <p className="text-sm text-destructive">
+                          {fieldErrors[entry.id]?.start_date}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>
@@ -259,7 +318,7 @@ export function DateRangeSection({
                     <Checkbox
                       id={`have-end-${entry.id}`}
                       checked={entry.have_end_date}
-                      onCheckedChange={(checked) =>
+                      onCheckedChange={(checked) => {
                         onUpdate(entry.id, {
                           have_end_date: checked === true,
                           end_date:
@@ -267,7 +326,9 @@ export function DateRangeSection({
                               ? (entry.end_date ?? entry.start_date)
                               : undefined,
                         })
-                      }
+                        if (checked !== true)
+                          setFieldError(entry.id, "end_date")
+                      }}
                     />
                     <Label
                       htmlFor={`have-end-${entry.id}`}
@@ -286,23 +347,24 @@ export function DateRangeSection({
                           <CalendarDays className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
                           <DatePicker
                             value={entry.end_date}
-                            onSelect={(d) =>
+                            onSelect={(d) => {
+                              const nextEndDate =
+                                d &&
+                                !isPastDate(d) &&
+                                (!entry.start_date ||
+                                  !isBefore(
+                                    startOfDay(d),
+                                    startOfDay(entry.start_date)
+                                  ))
+                                  ? applyDateWithExistingTime(d, entry.end_date)
+                                  : undefined
+
                               onUpdate(entry.id, {
-                                end_date:
-                                  d &&
-                                  !isPastDate(d) &&
-                                  (!entry.start_date ||
-                                    !isBefore(
-                                      startOfDay(d),
-                                      startOfDay(entry.start_date)
-                                    ))
-                                    ? applyDateWithExistingTime(
-                                        d,
-                                        entry.end_date
-                                      )
-                                    : undefined,
+                                end_date: nextEndDate,
                               })
-                            }
+                              if (nextEndDate)
+                                setFieldError(entry.id, "end_date")
+                            }}
                             placeholder="Select date"
                             dateFormat="d MMM yyyy"
                             disabledDates={
@@ -313,6 +375,11 @@ export function DateRangeSection({
                             triggerClassName="pl-9"
                           />
                         </div>
+                        {fieldErrors[entry.id]?.end_date && (
+                          <p className="text-sm text-destructive">
+                            {fieldErrors[entry.id]?.end_date}
+                          </p>
+                        )}
                       </div>
                       <div className="space-y-2">
                         <Label>
@@ -395,10 +462,7 @@ export function DateRangeSection({
                       <Trash2 className="size-4" />
                       Delete
                     </Button>
-                    <Button
-                      type="button"
-                      onClick={() => onUpdate(entry.id, { is_collapsed: true })}
-                    >
+                    <Button type="button" onClick={() => handleSave(entry)}>
                       <Save className="size-4" />
                       Save
                     </Button>

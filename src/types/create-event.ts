@@ -23,13 +23,12 @@ export interface TicketTypeEntry {
 export interface StaffEntry {
   id: string
   reserve_code: string
-  email: string
 }
 
 export interface CreateEventPayload {
   event_name: string
   category: string
-  location: string
+  venue: string
   impact_genre: string
   age_restriction: string
   description: OutputData | null
@@ -40,7 +39,7 @@ export interface CreateEventPayload {
   ticket_types: TicketTypeEntry[]
   ticket_min_per_order: string
   ticket_max_per_order: string
-  staff_entries: StaffEntry[]
+  staff_entries: StaffEntry
 }
 
 export function createId(): string {
@@ -71,16 +70,16 @@ export function createEmptyTicketTypeEntry(): TicketTypeEntry {
 }
 
 export function createEmptyStaffEntry(): StaffEntry {
-  return { id: createId(), reserve_code: "", email: "" }
+  return { id: createId(), reserve_code: "" }
 }
 
 export function createInitialCreateEventPayload(): CreateEventPayload {
   return {
     event_name: "",
     category: "",
-    location: "",
+    venue: "",
     impact_genre: "",
-    age_restriction: "No",
+    age_restriction: "0",
     description: null,
     poster_preview: null,
     thumbnail_preview: null,
@@ -89,7 +88,7 @@ export function createInitialCreateEventPayload(): CreateEventPayload {
     ticket_types: [createEmptyTicketTypeEntry()],
     ticket_min_per_order: "",
     ticket_max_per_order: "",
-    staff_entries: [createEmptyStaffEntry()],
+    staff_entries: { id: createId(), reserve_code: "" },
   }
 }
 
@@ -98,9 +97,7 @@ export function formatDateRangeLabel(
 ): string {
   if (!entry?.start_date) return "—"
   const start = format(entry.start_date, "d MMM yyyy, HH:mm")
-  const end =
-    entry.have_end_date && entry.end_date
-      ? format(entry.end_date, "d MMM yyyy, HH:mm")
-      : "—"
+  if (!entry.have_end_date || !entry.end_date) return start
+  const end = format(entry.end_date, "d MMM yyyy, HH:mm")
   return `${start} - ${end}`
 }

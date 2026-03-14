@@ -14,6 +14,7 @@ import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant
 import { Pencil, Plus, Save, Ticket, Trash2 } from "lucide-react"
 import type { DateRangeEntry, TicketTypeEntry } from "@/types/create-event"
 import { formatDateRangeLabel } from "@/types/create-event"
+import { useState } from "react"
 
 export interface TicketTypeSectionProps {
   sectionRef: (el: HTMLElement | null) => void
@@ -36,6 +37,75 @@ export function TicketTypeSection({
   onRemove,
   onToggleCollapse,
 }: TicketTypeSectionProps) {
+  type RequiredField =
+    | "name"
+    | "price"
+    | "quantity"
+    | "use_for_event_date_time"
+    | "sale_ticket_on"
+
+  const [fieldErrors, setFieldErrors] = useState<
+    Record<string, Partial<Record<RequiredField, string>>>
+  >({})
+
+  const formatNumericInput = (value: string) => {
+    const digitsOnly = value.replace(/\D/g, "")
+    if (!digitsOnly) return ""
+    return digitsOnly.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+  }
+
+  const setFieldError = (
+    ticketId: string,
+    field: RequiredField,
+    message?: string
+  ) => {
+    setFieldErrors((prev) => {
+      const current = prev[ticketId] ?? {}
+      const nextForTicket = { ...current }
+
+      if (message) nextForTicket[field] = message
+      else delete nextForTicket[field]
+
+      if (Object.keys(nextForTicket).length === 0) {
+        const nextErrors = { ...prev }
+        delete nextErrors[ticketId]
+        return nextErrors
+      }
+
+      return { ...prev, [ticketId]: nextForTicket }
+    })
+  }
+
+  const validateBeforeSave = (ticket: TicketTypeEntry) => {
+    const errors: Partial<Record<RequiredField, string>> = {}
+
+    if (!ticket.name.trim()) errors.name = "Ticket name is required."
+    if (!ticket.price.trim()) errors.price = "Ticket price is required."
+    if (!ticket.quantity.trim()) errors.quantity = "Quantity is required."
+    if (!ticket.use_for_event_date_time.trim()) {
+      errors.use_for_event_date_time = "Event date and time is required."
+    }
+    if (!ticket.sale_ticket_on.trim()) {
+      errors.sale_ticket_on = "Sale ticket date and time is required."
+    }
+
+    setFieldErrors((prev) => {
+      if (Object.keys(errors).length === 0) {
+        const nextErrors = { ...prev }
+        delete nextErrors[ticket.id]
+        return nextErrors
+      }
+      return { ...prev, [ticket.id]: errors }
+    })
+
+    return Object.keys(errors).length === 0
+  }
+
+  const handleSave = (ticket: TicketTypeEntry) => {
+    if (!validateBeforeSave(ticket)) return
+    onUpdate(ticket.id, { is_collapsed: true })
+  }
+
   return (
     <section
       ref={sectionRef}
@@ -53,7 +123,7 @@ export function TicketTypeSection({
           {ticketTypes.map((ticket) => (
             <div
               key={ticket.id}
-              className="overflow-hidden rounded-xl border border-border bg-card p-5"
+              className="overflow-hidden rounded-xl border border-border bg-card p-4"
             >
               {ticket.is_collapsed ? (
                 <div className="flex flex-wrap items-center gap-3">
@@ -64,11 +134,11 @@ export function TicketTypeSection({
                     <Ticket className="size-6" />
                   </div>
                   <div className="min-w-0 flex-1 text-left">
-                    <p className="text-lg leading-7 font-medium text-foreground">
+                    <p className="text-lg text-foreground">
                       {ticket.name || "—"}
                     </p>
-                    <p className="text-base leading-6 text-muted-foreground">
-                      for event:{" "}
+                    <p className="text-sm text-muted-foreground">
+                      Show:{" "}
                       {ticket.use_for_event_date_time
                         ? formatDateRangeLabel(
                             eventDateEntries.find(
@@ -78,9 +148,7 @@ export function TicketTypeSection({
                         : "—"}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {ticket.quantity
-                        ? `${Number(ticket.quantity).toLocaleString()} Ticket`
-                        : ""}
+                      {ticket.quantity ? `${ticket.quantity} Ticket` : ""}
                       {ticket.quantity && ticket.price && " | "}
                       {ticket.price ? `${ticket.price} THB per Ticket` : ""}
                     </p>
@@ -114,24 +182,51 @@ export function TicketTypeSection({
                       <Input
                         placeholder="VVIP + Soundcheck"
                         value={ticket.name}
-                        onChange={(e) =>
-                          onUpdate(ticket.id, { name: e.target.value })
+                        onChange={(e) => {
+                          const value = e.target.value
+                          onUpdate(ticket.id, { name: value })
+                          if (value.trim()) setFieldError(ticket.id, "name")
+                        }}
+                        aria-invalid={
+                          fieldErrors[ticket.id]?.name ? true : undefined
                         }
                         className="rounded-lg"
                       />
+                      {fieldErrors[ticket.id]?.name && (
+                        <p className="text-sm text-destructive">
+                          {fieldErrors[ticket.id]?.name}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>
                         Ticket Price <span className="text-destructive">*</span>
                       </Label>
-                      <Input
-                        placeholder="350 THB"
-                        value={ticket.price}
-                        onChange={(e) =>
-                          onUpdate(ticket.id, { price: e.target.value })
-                        }
-                        className="rounded-lg"
-                      />
+                      <div className="relative">
+                        <Input
+                          placeholder="350"
+                          value={ticket.price}
+                          onChange={(e) => {
+                            const value = formatNumericInput(e.target.value)
+                            onUpdate(ticket.id, { price: value })
+                            if (value.trim()) setFieldError(ticket.id, "price")
+                          }}
+                          aria-invalid={
+                            fieldErrors[ticket.id]?.price ? true : undefined
+                          }
+                          inputMode="numeric"
+                          pattern="\d*"
+                          className="rounded-lg pr-12"
+                        />
+                        <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-muted-foreground">
+                          THB
+                        </span>
+                      </div>
+                      {fieldErrors[ticket.id]?.price && (
+                        <p className="text-sm text-destructive">
+                          {fieldErrors[ticket.id]?.price}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>
@@ -140,11 +235,23 @@ export function TicketTypeSection({
                       <Input
                         placeholder="23,000"
                         value={ticket.quantity}
-                        onChange={(e) =>
-                          onUpdate(ticket.id, { quantity: e.target.value })
+                        onChange={(e) => {
+                          const value = formatNumericInput(e.target.value)
+                          onUpdate(ticket.id, { quantity: value })
+                          if (value.trim()) setFieldError(ticket.id, "quantity")
+                        }}
+                        aria-invalid={
+                          fieldErrors[ticket.id]?.quantity ? true : undefined
                         }
+                        inputMode="numeric"
+                        pattern="\d*"
                         className="rounded-lg"
                       />
+                      {fieldErrors[ticket.id]?.quantity && (
+                        <p className="text-sm text-destructive">
+                          {fieldErrors[ticket.id]?.quantity}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="space-y-2">
@@ -166,11 +273,21 @@ export function TicketTypeSection({
                       </Label>
                       <Select
                         value={ticket.use_for_event_date_time}
-                        onValueChange={(v) =>
+                        onValueChange={(v) => {
                           onUpdate(ticket.id, { use_for_event_date_time: v })
-                        }
+                          if (v.trim()) {
+                            setFieldError(ticket.id, "use_for_event_date_time")
+                          }
+                        }}
                       >
-                        <SelectTrigger className="w-full rounded-lg">
+                        <SelectTrigger
+                          className="w-full rounded-lg"
+                          aria-invalid={
+                            fieldErrors[ticket.id]?.use_for_event_date_time
+                              ? true
+                              : undefined
+                          }
+                        >
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
@@ -181,6 +298,11 @@ export function TicketTypeSection({
                           ))}
                         </SelectContent>
                       </Select>
+                      {fieldErrors[ticket.id]?.use_for_event_date_time && (
+                        <p className="text-sm text-destructive">
+                          {fieldErrors[ticket.id]?.use_for_event_date_time}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label>
@@ -189,11 +311,20 @@ export function TicketTypeSection({
                       </Label>
                       <Select
                         value={ticket.sale_ticket_on}
-                        onValueChange={(v) =>
+                        onValueChange={(v) => {
                           onUpdate(ticket.id, { sale_ticket_on: v })
-                        }
+                          if (v.trim())
+                            setFieldError(ticket.id, "sale_ticket_on")
+                        }}
                       >
-                        <SelectTrigger className="w-full rounded-lg">
+                        <SelectTrigger
+                          className="w-full rounded-lg"
+                          aria-invalid={
+                            fieldErrors[ticket.id]?.sale_ticket_on
+                              ? true
+                              : undefined
+                          }
+                        >
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
@@ -204,6 +335,11 @@ export function TicketTypeSection({
                           ))}
                         </SelectContent>
                       </Select>
+                      {fieldErrors[ticket.id]?.sale_ticket_on && (
+                        <p className="text-sm text-destructive">
+                          {fieldErrors[ticket.id]?.sale_ticket_on}
+                        </p>
+                      )}
                     </div>
                   </div>
                   <div className="flex justify-end gap-2">
@@ -216,12 +352,7 @@ export function TicketTypeSection({
                       <Trash2 className="size-4" />
                       Delete
                     </Button>
-                    <Button
-                      type="button"
-                      onClick={() =>
-                        onUpdate(ticket.id, { is_collapsed: true })
-                      }
-                    >
+                    <Button type="button" onClick={() => handleSave(ticket)}>
                       <Save className="size-4" />
                       Save
                     </Button>

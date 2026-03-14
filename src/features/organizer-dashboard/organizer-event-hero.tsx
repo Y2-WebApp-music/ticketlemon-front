@@ -20,6 +20,7 @@ import {
   getElapsedMs,
   getRemainingMs,
 } from "@/utils/formatDate"
+import dayjs from "dayjs"
 import {
   CalendarRange,
   Focus,
@@ -32,7 +33,6 @@ import {
   Users,
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
-import dayjs from "dayjs"
 
 export interface OrganizerEventHeroProps {
   event: EventDetail
@@ -62,7 +62,7 @@ function getNearestSaleFromNow(
   return { date: nearest, label: future.length ? "First Sale" : "First Sale" }
 }
 
-/** For On Sale: sum remaining and total for ticket types whose start_sale_date is in sale_date_list and that sale date < now. */
+/** For On Sale: sum remaining and total for ticket types whose start_sale_date is in sale_date_entries and that sale date < now. */
 function getOnSaleRemaining(
   saleDateList: string[],
   ticketTypes: EventTicketType[]
@@ -84,7 +84,7 @@ function getOnSaleRemaining(
   return { remaining, total }
 }
 
-/** For On Sale: start of current sale period = max(sale_date_list < now). */
+/** For On Sale: start of current sale period = max(sale_date_entries < now). */
 function getTimeUseStart(saleDateList: string[]): string | null {
   const now = dayjs()
   const past = saleDateList
@@ -145,7 +145,9 @@ export function OrganizerEventHero({
     event.status_id !== EventStatus.DRAFT &&
       event.status_id !== EventStatus.SCHEDULED
   )
-  const formattedDates = event.show_date_list.map((iso) => formatDateLabel(iso))
+  const formattedDates = event.event_date_entries.map((iso) =>
+    formatDateLabel(iso)
+  )
   const statusBadgeVariant = getEventStatusBadgeVariant(event.status_id)
   const showLiveTime =
     event.status_id === EventStatus.ON_SALE ||
@@ -157,8 +159,8 @@ export function OrganizerEventHero({
     const statusId = event.status_id
     if (statusId === EventStatus.CANCELLED) return null
 
-    const saleDateList = event.sale_date_list ?? []
-    const showDateList = event.show_date_list ?? []
+    const saleDateList = event.sale_date_entries ?? []
+    const showDateList = event.event_date_entries ?? []
     const ticketTypes = event.ticket_types ?? []
 
     type Block = { key: string; label: string; value: string; subtext?: string }

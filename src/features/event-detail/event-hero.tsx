@@ -5,7 +5,7 @@ import { CalendarRange, MapPin, Ticket, Users } from "lucide-react"
 export interface EventHeroProps {
   title: string
   imageUrl: string
-  show_date_list: string[]
+  event_date_entries: string[]
   venue: string
   onBuyTickets?: () => void
 }
@@ -13,11 +13,11 @@ export interface EventHeroProps {
 export function EventHero({
   title,
   imageUrl,
-  show_date_list,
+  event_date_entries,
   venue,
   onBuyTickets,
 }: EventHeroProps) {
-  const formattedDates = show_date_list.map((iso) => formatDateLabel(iso))
+  const formattedDates = event_date_entries.map((iso) => formatDateLabel(iso))
   return (
     <>
       <div

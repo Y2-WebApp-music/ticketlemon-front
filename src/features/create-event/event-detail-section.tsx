@@ -18,7 +18,7 @@ export interface EventDetailSectionProps {
   sectionRef: (el: HTMLElement | null) => void
   eventName: string
   category: string
-  location: string
+  venue: string
   impactGenre: string
   ageRestriction: string
   onEventNameChange: (value: string) => void
@@ -32,7 +32,7 @@ export function EventDetailSection({
   sectionRef,
   eventName,
   category,
-  location,
+  venue,
   impactGenre,
   ageRestriction,
   onEventNameChange,
@@ -91,7 +91,7 @@ export function EventDetailSection({
               </Label>
               <Input
                 placeholder="Bangkok"
-                value={location}
+                value={venue}
                 onChange={(e) => onLocationChange(e.target.value)}
                 className="rounded-lg"
               />
@@ -116,12 +116,21 @@ export function EventDetailSection({
             <Label>
               Age Restriction <span className="text-destructive">*</span>
             </Label>
-            <Input
-              placeholder="No"
-              value={ageRestriction}
-              onChange={(e) => onAgeRestrictionChange(e.target.value)}
-              className="rounded-lg"
-            />
+            <div className="relative">
+              <Input
+                placeholder="0"
+                value={ageRestriction}
+                onChange={(e) =>
+                  onAgeRestrictionChange(e.target.value.replace(/\D/g, ""))
+                }
+                inputMode="numeric"
+                pattern="\d*"
+                className="rounded-lg pr-14"
+              />
+              <span className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm text-muted-foreground">
+                year
+              </span>
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -5,10 +5,10 @@ import {
   EventTabs,
   type TicketTypeGroup,
 } from "@/features/event-detail"
-import type { PurchaseOrderItem } from "@/types/purchase"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import { getEventDetail } from "@/mocks/event-detail"
 import type { EventDetail, EventTicketType } from "@/types/event"
+import type { PurchaseOrderItem } from "@/types/purchase"
 import { formatDateLabel } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
@@ -189,7 +189,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
           <EventHero
             title={event.title}
             imageUrl={event.poster_url}
-            show_date_list={event.show_date_list}
+            event_date_entries={event.event_date_entries}
             venue={event.venue}
             onBuyTickets={() => setStep("choose")}
           />
