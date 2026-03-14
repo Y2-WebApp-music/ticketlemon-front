@@ -11,9 +11,7 @@ import {
 } from "@/mocks/organizer-event-selling"
 import type { OutputData } from "@editorjs/editorjs"
 import type { EventTicketType } from "@/types/event"
-import type {
-  SellingTicketSelection,
-} from "@/types/organizer"
+import type { SellingTicketSelection } from "@/types/organizer"
 import { formatDateLabel } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
@@ -127,14 +125,19 @@ export default function OrganizerEventDetailPage({
         />
         <OrganizerEventTabs
           eventId={eventData.id}
-          description={descriptionOverrides[eventData.id] ?? eventData.description}
+          description={
+            descriptionOverrides[eventData.id] ?? eventData.description
+          }
           ticketGroups={groupTicketTypesByEventDate(eventData.ticket_types)}
           sellingTableResponse={MOCK_SELLING_TABLE_RESPONSE}
           showDateList={eventData.show_date_list}
           ticketTypes={eventData.ticket_types}
           openingSellingTicket={openingSellingTicket}
           onDescriptionSave={(data) =>
-            setDescriptionOverrides((prev) => ({ ...prev, [eventData.id]: data }))
+            setDescriptionOverrides((prev) => ({
+              ...prev,
+              [eventData.id]: data,
+            }))
           }
         />
       </div>
