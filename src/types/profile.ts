@@ -1,10 +1,10 @@
 /** User profile API response */
 export interface UserProfile {
-  imageUrl?: string
-  firstName: string
-  lastName: string
+  image_url?: string
+  first_name: string
+  last_name: string
   email: string
-  phoneCountryCode: string
+  phone_country_code: string
   phone: string
   bio: string
 }
@@ -14,7 +14,7 @@ export interface PaymentMethod {
   id: string
   brand: "Visa" | "Mastercard" | "JCB" | "Amex"
   last4: string
-  expMonth: number
-  expYear: number
-  isDefault?: boolean
+  exp_month: number
+  exp_year: number
+  is_default?: boolean
 }

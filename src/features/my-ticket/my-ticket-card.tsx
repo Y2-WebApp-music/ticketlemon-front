@@ -5,7 +5,7 @@ import { DollarSign, Ticket } from "lucide-react"
 
 export interface MyTicketCardProps {
   /** Event image URL */
-  imageUrl: string
+  image_url: string
   /** Event title */
   title: string
   /** Date range e.g. "8 Mar - 10 Mar" */
@@ -13,15 +13,15 @@ export interface MyTicketCardProps {
   /** Venue name */
   venue: string
   /** Label above ticket lines e.g. "Your Ticket Type" or "Your select ticket" */
-  ticketTypeLabel?: string
+  ticket_type_label?: string
   /** Ticket line items e.g. "x2 VVIP + Soundcheck (29 Mar 2026, 17:00)" */
-  ticketLines?: string[]
+  ticket_lines?: string[]
   /** Unpaid: show countdown and Purchase button. Omit for paid (View Ticket only) */
-  minutesLeft?: number
+  minutes_left?: number
   /** Route path for View Ticket (e.g. /my-tickets/123). When set, card is a link (paid). */
-  viewTo?: string
+  view_to?: string
   /** Route path for Purchase button (unpaid only) */
-  purchaseTo?: string
+  purchase_to?: string
   className?: string
 }
 
@@ -31,18 +31,18 @@ export interface MyTicketCardProps {
  * - Mobile: compact image, condensed text, same actions
  */
 export function MyTicketCard({
-  imageUrl,
+  image_url,
   title,
   date,
   venue,
-  ticketTypeLabel = "Your Ticket Type",
-  ticketLines = [],
-  minutesLeft,
-  viewTo,
-  purchaseTo,
+  ticket_type_label = "Your Ticket Type",
+  ticket_lines = [],
+  minutes_left,
+  view_to,
+  purchase_to,
   className,
 }: MyTicketCardProps) {
-  const isUnpaid = minutesLeft != null
+  const isUnpaid = minutes_left != null
   const cardContent = (
     <>
       {/* Image: smaller on mobile + desktop */}
@@ -52,7 +52,7 @@ export function MyTicketCard({
           "h-[180px] w-full rounded-t-xl sm:h-[240px] sm:w-[180px] sm:rounded-t-none sm:rounded-l-xl"
         )}
       >
-        <img src={imageUrl} alt="" className="size-full object-cover" />
+        <img src={image_url} alt="" className="size-full object-cover" />
       </div>
       {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col gap-2 p-3 sm:p-3.5">
@@ -68,20 +68,20 @@ export function MyTicketCard({
           </p>
         </div>
         {/* Ticket type + lines: hidden on mobile in compact variant; we show on both for usability */}
-        {(ticketTypeLabel || ticketLines.length > 0) && (
+        {(ticket_type_label || ticket_lines.length > 0) && (
           <div className="space-y-1">
-            {ticketTypeLabel && (
+            {ticket_type_label && (
               <div className="flex items-center gap-1.5">
                 <Ticket
                   className="size-4 shrink-0 text-primary sm:size-5"
                   aria-hidden
                 />
                 <span className="text-xs font-medium text-primary sm:text-sm">
-                  {ticketTypeLabel}
+                  {ticket_type_label}
                 </span>
               </div>
             )}
-            {ticketLines.map((line, i) => (
+            {ticket_lines.map((line, i) => (
               <p
                 key={i}
                 className="text-xs leading-[14px] font-medium text-foreground sm:text-xs"
@@ -95,25 +95,25 @@ export function MyTicketCard({
         <div className="mt-auto flex flex-wrap items-center justify-end gap-2 pt-2">
           {isUnpaid && (
             <span className="text-xs font-medium text-muted-foreground sm:text-sm">
-              {minutesLeft} minute{minutesLeft !== 1 ? "s" : ""} left
+              {minutes_left} minute{minutes_left !== 1 ? "s" : ""} left
             </span>
           )}
-          {isUnpaid && purchaseTo && (
+          {isUnpaid && purchase_to && (
             <Button asChild size="sm" className="shrink-0">
-              <Link to={purchaseTo}>
+              <Link to={purchase_to}>
                 <DollarSign className="size-4" aria-hidden />
                 Purchase
               </Link>
             </Button>
           )}
-          {!isUnpaid && viewTo && (
+          {!isUnpaid && view_to && (
             <Button
               asChild
               variant="outline"
               size="sm"
               className="shrink-0 border-primary/50 text-primary hover:bg-primary/10"
             >
-              <Link to={viewTo}>
+              <Link to={view_to}>
                 <Ticket className="size-4" aria-hidden />
                 View Ticket
               </Link>
@@ -131,9 +131,9 @@ export function MyTicketCard({
     className
   )
 
-  if (viewTo && !isUnpaid) {
+  if (view_to && !isUnpaid) {
     return (
-      <Link to={viewTo} className={cardClass}>
+      <Link to={view_to} className={cardClass}>
         {cardContent}
       </Link>
     )

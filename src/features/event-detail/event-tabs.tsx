@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TicketTypeCard } from "@/features/ticket-type"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import type { OutputData } from "@editorjs/editorjs"
-import { Link } from "@tanstack/react-router"
 import { ChevronUp, Ticket } from "lucide-react"
 
 export interface TicketTypeGroup {
@@ -17,16 +16,16 @@ export interface TicketTypeGroup {
 }
 
 export interface EventTabsProps {
-  eventId: string
   description: OutputData
   /** Ticket types grouped by event_date (collapsible per group) */
   ticketGroups: TicketTypeGroup[]
+  onChooseTickets?: () => void
 }
 
 export function EventTabs({
-  eventId,
   description,
   ticketGroups,
+  onChooseTickets,
 }: EventTabsProps) {
   return (
     <div className="mx-auto mt-6 w-full max-w-[1280px] px-4 pb-16 sm:px-6">
@@ -38,7 +37,7 @@ export function EventTabs({
         <TabsContent value="description" className="mt-0">
           <div className="p-4 sm:p-6">
             <EditorJs
-              key={`event-desc-${eventId}`}
+              key="event-desc"
               readOnly
               initialData={description}
               tools={defaultEditorTools}
@@ -62,14 +61,14 @@ export function EventTabs({
               <CollapsibleContent className="space-y-3">
                 {group.tickets.map((ticket, i) =>
                   ticket.variant === "available" ? (
-                    <Link
+                    <button
+                      type="button"
                       key={i}
-                      to="/events/$eventId/choose"
-                      params={{ eventId }}
-                      className="block cursor-pointer [&>div]:transition-colors [&>div]:hover:bg-muted/50"
+                      className="block w-full cursor-pointer text-left [&>div]:transition-colors [&>div]:hover:bg-muted/50"
+                      onClick={onChooseTickets}
                     >
                       <TicketTypeCard {...ticket} />
-                    </Link>
+                    </button>
                   ) : (
                     <TicketTypeCard key={i} {...ticket} />
                   )

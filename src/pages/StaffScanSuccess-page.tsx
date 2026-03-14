@@ -33,7 +33,7 @@ export default function StaffScanSuccessPage({
               {event.title}
             </p>
             <p className="text-base font-medium text-primary">
-              {event.dateRange}
+              {event.date_range}
             </p>
             <p className="text-sm text-muted-foreground">{event.venue}</p>
           </div>

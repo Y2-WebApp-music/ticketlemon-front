@@ -1,13 +1,12 @@
 import { EventCard } from "@/features/event-card"
+import type { EventListItem } from "@/types"
 import { Link } from "@tanstack/react-router"
-import type { LandingEventItem } from "./recommended-events-section"
 
 export interface AllEventsSectionProps {
-  events: LandingEventItem[]
-  imageUrl: string
+  events: EventListItem[]
 }
 
-export function AllEventsSection({ events, imageUrl }: AllEventsSectionProps) {
+export function AllEventsSection({ events }: AllEventsSectionProps) {
   return (
     <section className="space-y-4">
       <h2 className="text-xl leading-7 font-normal text-foreground">
@@ -24,7 +23,7 @@ export function AllEventsSection({ events, imageUrl }: AllEventsSectionProps) {
             >
               <EventCard
                 variant="thumbnail"
-                imageUrl={imageUrl}
+                imageUrl={event.poster_url}
                 imageAlt=""
                 date={event.date}
                 title={event.title}
@@ -35,7 +34,7 @@ export function AllEventsSection({ events, imageUrl }: AllEventsSectionProps) {
             <EventCard
               key={i}
               variant="thumbnail"
-              imageUrl={imageUrl}
+              imageUrl={event.poster_url}
               imageAlt=""
               date={event.date}
               title={event.title}

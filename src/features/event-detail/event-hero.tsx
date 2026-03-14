@@ -1,22 +1,21 @@
 import { Button } from "@/components/ui/button"
 import { formatDateLabel } from "@/utils/formatDate"
 import { CalendarRange, MapPin, Ticket, Users } from "lucide-react"
-import { Link } from "@tanstack/react-router"
 
 export interface EventHeroProps {
-  eventId: string
   title: string
   imageUrl: string
   show_date_list: string[]
   venue: string
+  onBuyTickets?: () => void
 }
 
 export function EventHero({
-  eventId,
   title,
   imageUrl,
   show_date_list,
   venue,
+  onBuyTickets,
 }: EventHeroProps) {
   const formattedDates = show_date_list.map((iso) => formatDateLabel(iso))
   return (
@@ -78,11 +77,14 @@ export function EventHero({
                   </span>
                 </div>
               </div>
-              <Button asChild className="w-full" size="lg">
-                <Link to="/events/$eventId/choose" params={{ eventId }}>
-                  <Ticket className="size-5" aria-hidden />
-                  Buy Tickets
-                </Link>
+              <Button
+                type="button"
+                className="w-full"
+                size="lg"
+                onClick={onBuyTickets}
+              >
+                <Ticket className="size-5" aria-hidden />
+                Buy Tickets
               </Button>
             </div>
           </div>

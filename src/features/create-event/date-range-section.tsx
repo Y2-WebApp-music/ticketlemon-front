@@ -10,7 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { CalendarRange, Pencil, Plus, Save, Trash2 } from "lucide-react"
+import {
+  CalendarDays,
+  CalendarRange,
+  Clock3,
+  Pencil,
+  Plus,
+  Save,
+  Trash2,
+} from "lucide-react"
 import { format, isBefore, startOfDay } from "date-fns"
 import type { DateRangeEntry } from "@/types/create-event"
 
@@ -75,7 +83,7 @@ export function DateRangeSection({
   const isPastDate = (date: Date): boolean => isBefore(startOfDay(date), today)
 
   return (
-    <section ref={sectionRef} id={id}>
+    <section ref={sectionRef} id={id} className="space-y-4">
       <Card size="sm" className="gap-0 py-0">
         <CardHeader>
           <CardTitle>{title}</CardTitle>
@@ -87,7 +95,7 @@ export function DateRangeSection({
               key={entry.id}
               className="overflow-hidden rounded-xl border border-border bg-card p-5"
             >
-              {entry.isCollapsed ? (
+              {entry.is_collapsed ? (
                 <div className="flex flex-wrap items-center gap-3">
                   <div
                     className="flex size-[52px] shrink-0 items-center justify-center rounded-lg border border-primary bg-primary/10 text-primary"
@@ -97,15 +105,15 @@ export function DateRangeSection({
                   </div>
                   <div className="min-w-0 flex-1 text-left">
                     <p className="text-lg leading-7 font-medium text-foreground">
-                      {entry.startDate
-                        ? format(entry.startDate, "d MMM yyyy")
+                      {entry.start_date
+                        ? format(entry.start_date, "d MMM yyyy")
                         : "—"}
                     </p>
                     <p className="text-base leading-6 text-muted-foreground">
-                      {entry.startDate
-                        ? entry.haveEndDate && entry.endDate
-                          ? `${format(entry.startDate, "HH:mm")} - ${format(entry.endDate, "HH:mm")}`
-                          : format(entry.startDate, "HH:mm")
+                      {entry.start_date
+                        ? entry.have_end_date && entry.end_date
+                          ? `${format(entry.start_date, "HH:mm")} - ${format(entry.end_date, "HH:mm")}`
+                          : format(entry.start_date, "HH:mm")
                         : "—"}
                     </p>
                   </div>
@@ -135,43 +143,47 @@ export function DateRangeSection({
                       <Label>
                         Start Date <span className="text-destructive">*</span>
                       </Label>
-                      <DatePicker
-                        value={entry.startDate}
-                        onSelect={(d) => {
-                          if (!d || isPastDate(d)) {
-                            onUpdate(entry.id, { startDate: undefined })
-                            return
-                          }
-                          const nextStartDate = applyDateWithExistingTime(
-                            d,
-                            entry.startDate
-                          )
-                          if (!nextStartDate) {
-                            onUpdate(entry.id, { startDate: undefined })
-                            return
-                          }
-                          const shouldAdjustEndDate =
-                            entry.haveEndDate &&
-                            entry.endDate &&
-                            isBefore(
-                              startOfDay(entry.endDate),
-                              startOfDay(nextStartDate)
+                      <div className="relative">
+                        <CalendarDays className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
+                        <DatePicker
+                          value={entry.start_date}
+                          onSelect={(d) => {
+                            if (!d || isPastDate(d)) {
+                              onUpdate(entry.id, { start_date: undefined })
+                              return
+                            }
+                            const nextStartDate = applyDateWithExistingTime(
+                              d,
+                              entry.start_date
                             )
+                            if (!nextStartDate) {
+                              onUpdate(entry.id, { start_date: undefined })
+                              return
+                            }
+                            const shouldAdjustEndDate =
+                              entry.have_end_date &&
+                              entry.end_date &&
+                              isBefore(
+                                startOfDay(entry.end_date),
+                                startOfDay(nextStartDate)
+                              )
 
-                          onUpdate(entry.id, {
-                            startDate: nextStartDate,
-                            endDate: shouldAdjustEndDate
-                              ? applyDateWithExistingTime(
-                                  nextStartDate,
-                                  entry.endDate
-                                )
-                              : entry.endDate,
-                          })
-                        }}
-                        placeholder="Select date"
-                        dateFormat="d MMM yyyy"
-                        disabledDates={{ before: today }}
-                      />
+                            onUpdate(entry.id, {
+                              start_date: nextStartDate,
+                              end_date: shouldAdjustEndDate
+                                ? applyDateWithExistingTime(
+                                    nextStartDate,
+                                    entry.end_date
+                                  )
+                                : entry.end_date,
+                            })
+                          }}
+                          placeholder="Select date"
+                          dateFormat="d MMM yyyy"
+                          disabledDates={{ before: today }}
+                          triggerClassName="pl-9"
+                        />
+                      </div>
                     </div>
                     <div className="space-y-2">
                       <Label>
@@ -180,24 +192,25 @@ export function DateRangeSection({
                       <div className="flex gap-2">
                         <Select
                           value={
-                            entry.startDate
-                              ? format(entry.startDate, "HH")
+                            entry.start_date
+                              ? format(entry.start_date, "HH")
                               : undefined
                           }
                           onValueChange={(hour) =>
                             onUpdate(entry.id, {
-                              startDate: applyTime(
-                                entry.startDate,
+                              start_date: applyTime(
+                                entry.start_date,
                                 hour,
-                                entry.startDate
-                                  ? format(entry.startDate, "mm")
+                                entry.start_date
+                                  ? format(entry.start_date, "mm")
                                   : "00"
                               ),
                             })
                           }
-                          disabled={!entry.startDate}
+                          disabled={!entry.start_date}
                         >
                           <SelectTrigger className="w-full rounded-lg">
+                            <Clock3 className="size-4 text-muted-foreground" />
                             <SelectValue placeholder="HH" />
                           </SelectTrigger>
                           <SelectContent>
@@ -210,24 +223,25 @@ export function DateRangeSection({
                         </Select>
                         <Select
                           value={
-                            entry.startDate
-                              ? format(entry.startDate, "mm")
+                            entry.start_date
+                              ? format(entry.start_date, "mm")
                               : undefined
                           }
                           onValueChange={(minute) =>
                             onUpdate(entry.id, {
-                              startDate: applyTime(
-                                entry.startDate,
-                                entry.startDate
-                                  ? format(entry.startDate, "HH")
+                              start_date: applyTime(
+                                entry.start_date,
+                                entry.start_date
+                                  ? format(entry.start_date, "HH")
                                   : "00",
                                 minute
                               ),
                             })
                           }
-                          disabled={!entry.startDate}
+                          disabled={!entry.start_date}
                         >
                           <SelectTrigger className="w-full rounded-lg">
+                            <Clock3 className="size-4 text-muted-foreground" />
                             <SelectValue placeholder="MM" />
                           </SelectTrigger>
                           <SelectContent>
@@ -244,13 +258,13 @@ export function DateRangeSection({
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id={`have-end-${entry.id}`}
-                      checked={entry.haveEndDate}
+                      checked={entry.have_end_date}
                       onCheckedChange={(checked) =>
                         onUpdate(entry.id, {
-                          haveEndDate: checked === true,
-                          endDate:
+                          have_end_date: checked === true,
+                          end_date:
                             checked === true
-                              ? (entry.endDate ?? entry.startDate)
+                              ? (entry.end_date ?? entry.start_date)
                               : undefined,
                         })
                       }
@@ -262,36 +276,40 @@ export function DateRangeSection({
                       Have End Date?
                     </Label>
                   </div>
-                  {entry.haveEndDate && (
+                  {entry.have_end_date && (
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div className="space-y-2">
                         <Label>
                           End Date <span className="text-destructive">*</span>
                         </Label>
-                        <DatePicker
-                          value={entry.endDate}
-                          onSelect={(d) =>
-                            onUpdate(entry.id, {
-                              endDate:
-                                d &&
-                                !isPastDate(d) &&
-                                (!entry.startDate ||
-                                  !isBefore(
-                                    startOfDay(d),
-                                    startOfDay(entry.startDate)
-                                  ))
-                                  ? applyDateWithExistingTime(d, entry.endDate)
-                                  : undefined,
-                            })
-                          }
-                          placeholder="Select date"
-                          dateFormat="d MMM yyyy"
-                          disabledDates={
-                            entry.startDate
-                              ? { before: startOfDay(entry.startDate) }
-                              : { before: today }
-                          }
-                        />
+                        <div className="relative">
+                          <CalendarDays className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
+                          <DatePicker
+                            value={entry.end_date}
+                            onSelect={(d) =>
+                              onUpdate(entry.id, {
+                                end_date:
+                                  d &&
+                                  !isPastDate(d) &&
+                                  (!entry.start_date ||
+                                    !isBefore(
+                                      startOfDay(d),
+                                      startOfDay(entry.start_date)
+                                    ))
+                                    ? applyDateWithExistingTime(d, entry.end_date)
+                                    : undefined,
+                              })
+                            }
+                            placeholder="Select date"
+                            dateFormat="d MMM yyyy"
+                            disabledDates={
+                              entry.start_date
+                                ? { before: startOfDay(entry.start_date) }
+                                : { before: today }
+                            }
+                            triggerClassName="pl-9"
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label>
@@ -300,24 +318,25 @@ export function DateRangeSection({
                         <div className="flex gap-2">
                           <Select
                             value={
-                              entry.endDate
-                                ? format(entry.endDate, "HH")
+                              entry.end_date
+                                ? format(entry.end_date, "HH")
                                 : undefined
                             }
                             onValueChange={(hour) =>
                               onUpdate(entry.id, {
-                                endDate: applyTime(
-                                  entry.endDate,
+                                end_date: applyTime(
+                                  entry.end_date,
                                   hour,
-                                  entry.endDate
-                                    ? format(entry.endDate, "mm")
+                                  entry.end_date
+                                    ? format(entry.end_date, "mm")
                                     : "00"
                                 ),
                               })
                             }
-                            disabled={!entry.endDate}
+                            disabled={!entry.end_date}
                           >
                             <SelectTrigger className="w-full rounded-lg">
+                              <Clock3 className="size-4 text-muted-foreground" />
                               <SelectValue placeholder="HH" />
                             </SelectTrigger>
                             <SelectContent>
@@ -330,24 +349,25 @@ export function DateRangeSection({
                           </Select>
                           <Select
                             value={
-                              entry.endDate
-                                ? format(entry.endDate, "mm")
+                              entry.end_date
+                                ? format(entry.end_date, "mm")
                                 : undefined
                             }
                             onValueChange={(minute) =>
                               onUpdate(entry.id, {
-                                endDate: applyTime(
-                                  entry.endDate,
-                                  entry.endDate
-                                    ? format(entry.endDate, "HH")
+                                end_date: applyTime(
+                                  entry.end_date,
+                                  entry.end_date
+                                    ? format(entry.end_date, "HH")
                                     : "00",
                                   minute
                                 ),
                               })
                             }
-                            disabled={!entry.endDate}
+                            disabled={!entry.end_date}
                           >
                             <SelectTrigger className="w-full rounded-lg">
+                              <Clock3 className="size-4 text-muted-foreground" />
                               <SelectValue placeholder="MM" />
                             </SelectTrigger>
                             <SelectContent>
@@ -374,7 +394,7 @@ export function DateRangeSection({
                     </Button>
                     <Button
                       type="button"
-                      onClick={() => onUpdate(entry.id, { isCollapsed: true })}
+                      onClick={() => onUpdate(entry.id, { is_collapsed: true })}
                     >
                       <Save className="size-4" />
                       Save

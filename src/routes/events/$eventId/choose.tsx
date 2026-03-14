@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router"
-import ChooseTicketPage from "@/pages/ChooseTicket-page"
+import { Navigate } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/events/$eventId/choose")({
   component: ChooseTicketRoute,
@@ -7,5 +7,5 @@ export const Route = createFileRoute("/events/$eventId/choose")({
 
 function ChooseTicketRoute() {
   const { eventId } = Route.useParams()
-  return <ChooseTicketPage eventId={eventId} />
+  return <Navigate to="/events/$eventId" params={{ eventId }} />
 }

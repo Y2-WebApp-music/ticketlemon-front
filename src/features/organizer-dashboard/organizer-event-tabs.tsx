@@ -11,11 +11,15 @@ import {
 } from "@/components/editor-js"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  OrganizerEventSellingTable,
+  type OrganizerSellingTicketSelection,
+} from "./organizer-event-selling-table"
 import { TicketTypeCard } from "@/features/ticket-type"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import type { OutputData } from "@editorjs/editorjs"
 import { ChevronUp, Pencil, Save, Ticket } from "lucide-react"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 
 export interface OrganizerTicketTypeGroup {
   sessionLabel: string
@@ -27,6 +31,8 @@ export interface OrganizerEventTabsProps {
   description: OutputData
   /** Ticket types grouped by event_date (collapsible per group); variants: notOnSale, available, saleEnd */
   ticketGroups: OrganizerTicketTypeGroup[]
+  /** Open selling table from external trigger (e.g. hero See Selling button). */
+  openingSellingTicket?: OrganizerSellingTicketSelection | null
   /** Called when description is saved (e.g. after Save button); omit to only allow in-place editing */
   onDescriptionSave?: (data: OutputData) => void
 }
@@ -73,11 +79,17 @@ export function OrganizerEventTabs({
   eventId,
   description,
   ticketGroups,
+  openingSellingTicket,
   onDescriptionSave,
 }: OrganizerEventTabsProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editingDescription, setEditingDescription] =
     useState<OutputData>(description)
+  const [activeTab, setActiveTab] = useState<"description" | "ticket-type">(
+    "description"
+  )
+  const [selectedSellingTicket, setSelectedSellingTicket] =
+    useState<OrganizerSellingTicketSelection | null>(null)
 
   const handleDescriptionSave = useCallback(
     (data: OutputData) => {
@@ -88,9 +100,22 @@ export function OrganizerEventTabs({
     [onDescriptionSave]
   )
 
+  useEffect(() => {
+    if (!openingSellingTicket) return
+    const timerId = window.setTimeout(() => {
+      setActiveTab("ticket-type")
+      setSelectedSellingTicket(openingSellingTicket)
+    }, 0)
+    return () => window.clearTimeout(timerId)
+  }, [openingSellingTicket])
+
   return (
     <div className="mx-auto mt-6 w-full max-w-[1280px] px-4 pb-16 sm:px-6">
-      <Tabs defaultValue="description" className="w-full">
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as "description" | "ticket-type")}
+        className="w-full"
+      >
         <TabsList>
           <TabsTrigger value="description">Description</TabsTrigger>
           <TabsTrigger value="ticket-type">Ticket Type</TabsTrigger>
@@ -117,7 +142,7 @@ export function OrganizerEventTabs({
                 <EditorJs
                   key={`organizer-desc-${eventId}-read`}
                   readOnly
-                  initialData={description}
+                  initialData={editingDescription}
                   tools={defaultEditorTools}
                   minHeight={200}
                   className="min-h-[200px]"
@@ -141,24 +166,63 @@ export function OrganizerEventTabs({
           </div>
         </TabsContent>
         <TabsContent value="ticket-type" className="mt-0 space-y-3">
-          {ticketGroups.map((group, groupIndex) => (
-            <Collapsible key={groupIndex} defaultOpen className="space-y-3">
-              <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 rounded-xl bg-primary px-5 py-4 text-left text-white transition-opacity hover:opacity-95">
-                <div className="flex items-center gap-2">
-                  <Ticket className="size-6 shrink-0" aria-hidden />
-                  <span className="text-lg font-medium">
-                    {group.sessionLabel}
-                  </span>
-                </div>
-                <ChevronUp className="size-6 shrink-0" aria-hidden />
-              </CollapsibleTrigger>
-              <CollapsibleContent className="space-y-3">
-                {group.tickets.map((ticket, i) => (
-                  <TicketTypeCard key={i} {...ticket} />
-                ))}
-              </CollapsibleContent>
-            </Collapsible>
-          ))}
+          {selectedSellingTicket ? (
+            <OrganizerEventSellingTable
+              selectedTicket={selectedSellingTicket}
+              onBack={() => setSelectedSellingTicket(null)}
+            />
+          ) : (
+            ticketGroups.map((group, groupIndex) => (
+              <Collapsible key={groupIndex} defaultOpen className="space-y-3">
+                <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 rounded-xl bg-primary px-5 py-4 text-left text-white transition-opacity hover:opacity-95">
+                  <div className="flex items-center gap-2">
+                    <Ticket className="size-6 shrink-0" aria-hidden />
+                    <span className="text-lg font-medium">
+                      {group.sessionLabel}
+                    </span>
+                  </div>
+                  <ChevronUp className="size-6 shrink-0" aria-hidden />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-3">
+                  {group.tickets.map((ticket, i) => {
+                    const isOpenable = ticket.variant !== "saleEnd"
+                    return (
+                      <div
+                        key={i}
+                        role={isOpenable ? "button" : undefined}
+                        tabIndex={isOpenable ? 0 : undefined}
+                        className={isOpenable ? "cursor-pointer" : undefined}
+                        onClick={
+                          isOpenable
+                            ? () =>
+                                setSelectedSellingTicket({
+                                  sessionLabel: group.sessionLabel,
+                                  title: ticket.title,
+                                })
+                            : undefined
+                        }
+                        onKeyDown={
+                          isOpenable
+                            ? (e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault()
+                                  setSelectedSellingTicket({
+                                    sessionLabel: group.sessionLabel,
+                                    title: ticket.title,
+                                  })
+                                }
+                              }
+                            : undefined
+                        }
+                      >
+                        <TicketTypeCard {...ticket} />
+                      </div>
+                    )
+                  })}
+                </CollapsibleContent>
+              </Collapsible>
+            ))
+          )}
         </TabsContent>
       </Tabs>
     </div>

@@ -11,27 +11,27 @@ export interface MyTicketTicketType {
 /** My ticket detail API response */
 export interface MyTicketDetail {
   id: string
-  heroImageUrl: string
+  hero_image_url: string
   title: string
   date: string
   venue: string
-  descriptionTitle: string
+  description_title: string
   description: string
-  ticketTitle: string
-  ticketTypes: MyTicketTicketType[]
+  ticket_title: string
+  ticket_types: MyTicketTicketType[]
 }
 
 /** My ticket list item API response (one card in "my tickets" list) */
 export interface MyTicketItem {
-  imageUrl: string
+  image_url: string
   title: string
   date: string
   venue: string
-  ticketLines?: string[]
-  ticketTypeLabel?: string
+  ticket_lines?: string[]
+  ticket_type_label?: string
   /** When set, show unpaid state with countdown and purchase link */
-  minutesLeft?: number
-  purchaseTo?: string
+  minutes_left?: number
+  purchase_to?: string
   /** When set, show paid state with view ticket link */
-  viewTo?: string
+  view_to?: string
 }

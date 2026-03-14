@@ -52,7 +52,7 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
       {/* Mobile hero image */}
       <div className="relative sm:hidden">
         <img
-          src={detail.heroImageUrl}
+          src={detail.hero_image_url}
           alt=""
           className="h-[125px] w-full object-cover"
         />
@@ -83,7 +83,7 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
             {/* Desktop hero image */}
             <div className="hidden overflow-hidden rounded-xl sm:block">
               <img
-                src={detail.heroImageUrl}
+                src={detail.hero_image_url}
                 alt=""
                 className="h-[220px] w-full object-cover"
               />
@@ -103,7 +103,7 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
             {/* Description (desktop only per Figma layout) */}
             <div className="hidden space-y-2 sm:block">
               <p className="text-xl leading-7 font-medium text-foreground">
-                {detail.descriptionTitle}
+                {detail.description_title}
               </p>
               <div className="text-base leading-6 whitespace-pre-wrap text-foreground">
                 {detail.description}
@@ -114,10 +114,10 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
           {/* Right column: tickets (desktop sticky), mobile: appears below header */}
           <div className="space-y-4 lg:sticky lg:top-24">
             <p className="text-lg font-medium text-primary sm:text-xl sm:leading-7 sm:tracking-tight">
-              {detail.ticketTitle}
+              {detail.ticket_title}
             </p>
             <div className="space-y-4">
-              {detail.ticketTypes.map((t, i) => (
+              {detail.ticket_types.map((t, i) => (
                 <TicketTypeCard
                   key={i}
                   {...t}

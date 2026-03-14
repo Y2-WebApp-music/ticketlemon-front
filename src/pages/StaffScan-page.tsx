@@ -167,7 +167,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
           <p className="text-lg font-medium tracking-tight text-foreground">
             {event.title}
           </p>
-          <p className="text-lg font-medium text-primary">{event.dateRange}</p>
+          <p className="text-lg font-medium text-primary">{event.date_range}</p>
           <p className="text-sm text-muted-foreground">{event.venue}</p>
         </div>
 
@@ -320,14 +320,6 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
             <p className="text-sm text-muted-foreground">
               To scan tickets, please allow camera permission for this website.
             </p>
-            <div className="rounded-lg bg-muted p-3 text-sm text-muted-foreground">
-              iPhone Safari: tap <span className="font-medium">aA</span> in the
-              address bar, open{" "}
-              <span className="font-medium">Website Settings</span>, set{" "}
-              <span className="font-medium">Camera</span> to{" "}
-              <span className="font-medium">Allow</span>, then come back and
-              retry.
-            </div>
             <div className="flex justify-end gap-2 pt-1">
               <Button
                 type="button"

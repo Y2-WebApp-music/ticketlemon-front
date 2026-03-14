@@ -2,77 +2,49 @@ import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Radio, Target, Ticket, Timer } from "lucide-react"
 import { Link } from "@tanstack/react-router"
-import { EventStatus } from "@/constants/event-status.constant"
-
-/** Status badge variant: pass (green), warning (yellow), or use default/outline for On Sale / Sold Out etc. */
-export type OrganizerEventStatus =
-  | "show" // pass (green)
-  | "scheduled" // warning (yellow)
-  | "on_sale" // primary
-  | "sold_out" // outline
-  | "draft" // secondary
-  | "event_end" // secondary/muted
-  | "cancel" // destructive
+import {
+  EventStatus,
+  getEventStatusBadgeVariant,
+} from "@/constants/event-status.constant"
 
 export interface OrganizerEventCardProps {
-  eventId: string
-  imageUrl: string
-  imageAlt?: string
+  event_id: string
+  image_url: string
+  image_alt?: string
   date: string
   title: string
   venue: string
-  status: OrganizerEventStatus
+  status_id: number
+  status_label: string
   /** Bottom line e.g. "Show begin 17:00", "33,333 Remaining", "Start Sale 18 Feb 26, 15:00" */
-  bottomLine: string
-}
-
-const statusToBadgeVariant: Record<
-  OrganizerEventStatus,
-  "pass" | "warning" | "default" | "outline" | "secondary" | "destructive"
-> = {
-  show: "pass",
-  scheduled: "warning",
-  on_sale: "default",
-  sold_out: "outline",
-  draft: "secondary",
-  event_end: "secondary",
-  cancel: "destructive",
-}
-
-const statusLabel: Record<OrganizerEventStatus, string> = {
-  show: "Show",
-  scheduled: "Scheduled",
-  on_sale: "On Sale",
-  sold_out: "Sold Out",
-  draft: "Draft",
-  event_end: "Event End",
-  cancel: "Cancel",
+  bottom_line: string
 }
 
 export function OrganizerEventCard({
-  eventId,
-  imageUrl,
-  imageAlt = "",
+  event_id,
+  image_url,
+  image_alt = "",
   date,
   title,
   venue,
-  status,
-  bottomLine,
+  status_id,
+  status_label,
+  bottom_line,
 }: OrganizerEventCardProps) {
-  const badgeVariant = statusToBadgeVariant[status]
-  const label = statusLabel[status]
+  const badgeVariant = getEventStatusBadgeVariant(status_id)
+  const label = status_label
 
   return (
     <Link
       to="/organizer/events/$eventId"
-      params={{ eventId }}
+      params={{ eventId: event_id }}
       className="block h-full"
     >
       <Card className="flex h-full flex-col gap-0 overflow-hidden rounded-xl border border-border bg-card py-0 shadow-sm transition-shadow hover:shadow-md">
         <div className="relative aspect-240/320 w-full shrink-0 overflow-hidden bg-muted">
           <img
-            src={imageUrl}
-            alt={imageAlt}
+            src={image_url}
+            alt={image_alt}
             className="size-full object-cover"
           />
           <div className="absolute top-2 right-2">
@@ -91,20 +63,20 @@ export function OrganizerEventCard({
           </p>
           {/* Dynamic Info */}
           <div className="mt-auto flex items-center gap-1 rounded-full border border-primary px-3 py-1.5 text-xs font-medium text-primary">
-            {status == EventStatus.SHOW ? (
+            {status_id === EventStatus.SHOW ? (
               <Target className="size-4 shrink-0" aria-hidden />
-            ) : status == EventStatus.ON_SALE ? (
+            ) : status_id === EventStatus.ON_SALE ? (
               <Ticket className="size-4 shrink-0" aria-hidden />
-            ) : status == EventStatus.SOLD_OUT ? (
+            ) : status_id === EventStatus.SOLD_OUT ? (
               <Radio className="size-4 shrink-0" aria-hidden />
-            ) : status == EventStatus.SCHEDULED ? (
+            ) : status_id === EventStatus.SCHEDULED ? (
               <Timer className="size-4 shrink-0" aria-hidden />
-            ) : status == EventStatus.END ? (
+            ) : status_id === EventStatus.END ? (
               <Target className="size-4 shrink-0" aria-hidden />
             ) : (
               <Ticket className="size-4 shrink-0" aria-hidden />
             )}
-            {bottomLine}
+            {bottom_line}
           </div>
         </div>
       </Card>

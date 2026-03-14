@@ -25,9 +25,9 @@ export default function StaffLandingPage() {
                   key={current.id}
                   highlight
                   title={current.title}
-                  dateRange={current.dateRange}
+                  date_range={current.date_range}
                   venue={current.venue}
-                  imageUrl={current.imageUrl}
+                  image_url={current.image_url}
                   className="cursor-pointer"
                 />
               </Link>
@@ -45,9 +45,9 @@ export default function StaffLandingPage() {
                 >
                   <StaffEventCard
                     title={event.title}
-                    dateRange={event.dateRange}
+                    date_range={event.date_range}
                     venue={event.venue}
-                    imageUrl={event.imageUrl}
+                    image_url={event.image_url}
                     className="cursor-pointer"
                   />
                 </Link>

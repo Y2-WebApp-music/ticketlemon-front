@@ -1,7 +1,4 @@
-export {
-  CreateEventSidebar,
-  CREATE_EVENT_SIDEBAR_SECTIONS,
-} from "./create-event-sidebar"
+export { CreateEventSidebar } from "./create-event-sidebar"
 export type { CreateEventSidebarProps } from "./create-event-sidebar"
 
 export { DateRangeSection } from "./date-range-section"

@@ -23,6 +23,7 @@ import {
   type CreateEventPayload,
 } from "@/types/create-event"
 import { useMemo, useRef, useState } from "react"
+import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant"
 
 export default function CreateEventPage() {
   const [formData, setFormData] = useState<CreateEventPayload>(() =>
@@ -30,26 +31,29 @@ export default function CreateEventPage() {
   )
 
   const {
-    eventName,
+    event_name,
     category,
     location,
-    impactGenre,
-    ageRestriction,
+    impact_genre,
+    age_restriction,
     description,
-    posterPreview,
-    thumbnailPreview,
-    eventDateEntries,
-    saleDateEntries,
-    ticketTypes,
-    ticketMinPerOrder,
-    ticketMaxPerOrder,
-    staffEntries,
+    poster_preview,
+    thumbnail_preview,
+    event_date_entries,
+    sale_date_entries,
+    ticket_types,
+    ticket_min_per_order,
+    ticket_max_per_order,
+    staff_entries,
   } = formData
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
 
   const scrollToSection = (id: string) => {
-    sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth" })
+    const target = sectionRefs.current[id]
+    if (!target) return
+    const top = target.getBoundingClientRect().top + window.scrollY - 100
+    window.scrollTo({ top, behavior: "smooth" })
   }
 
   const handlePosterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +61,7 @@ export default function CreateEventPage() {
     if (file) {
       setFormData((prev) => ({
         ...prev,
-        posterPreview: URL.createObjectURL(file),
+        poster_preview: URL.createObjectURL(file),
       }))
     }
   }
@@ -66,7 +70,7 @@ export default function CreateEventPage() {
     if (file) {
       setFormData((prev) => ({
         ...prev,
-        thumbnailPreview: URL.createObjectURL(file),
+        thumbnail_preview: URL.createObjectURL(file),
       }))
     }
   }
@@ -74,7 +78,7 @@ export default function CreateEventPage() {
   const updateEventDateEntry = (id: string, patch: Partial<DateRangeEntry>) => {
     setFormData((prev) => ({
       ...prev,
-      eventDateEntries: prev.eventDateEntries.map((e) =>
+      event_date_entries: prev.event_date_entries.map((e) =>
         e.id === id ? { ...e, ...patch } : e
       ),
     }))
@@ -82,20 +86,23 @@ export default function CreateEventPage() {
   const addEventDateEntry = () => {
     setFormData((prev) => ({
       ...prev,
-      eventDateEntries: [...prev.eventDateEntries, createEmptyDateRangeEntry()],
+      event_date_entries: [
+        ...prev.event_date_entries,
+        createEmptyDateRangeEntry(),
+      ],
     }))
   }
   const removeEventDateEntry = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      eventDateEntries: prev.eventDateEntries.filter((e) => e.id !== id),
+      event_date_entries: prev.event_date_entries.filter((e) => e.id !== id),
     }))
   }
   const toggleEventDateCollapse = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      eventDateEntries: prev.eventDateEntries.map((e) =>
-        e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e
+      event_date_entries: prev.event_date_entries.map((e) =>
+        e.id === id ? { ...e, is_collapsed: !e.is_collapsed } : e
       ),
     }))
   }
@@ -103,7 +110,7 @@ export default function CreateEventPage() {
   const updateSaleDateEntry = (id: string, patch: Partial<DateRangeEntry>) => {
     setFormData((prev) => ({
       ...prev,
-      saleDateEntries: prev.saleDateEntries.map((e) =>
+      sale_date_entries: prev.sale_date_entries.map((e) =>
         e.id === id ? { ...e, ...patch } : e
       ),
     }))
@@ -111,20 +118,20 @@ export default function CreateEventPage() {
   const addSaleDateEntry = () => {
     setFormData((prev) => ({
       ...prev,
-      saleDateEntries: [...prev.saleDateEntries, createEmptyDateRangeEntry()],
+      sale_date_entries: [...prev.sale_date_entries, createEmptyDateRangeEntry()],
     }))
   }
   const removeSaleDateEntry = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      saleDateEntries: prev.saleDateEntries.filter((e) => e.id !== id),
+      sale_date_entries: prev.sale_date_entries.filter((e) => e.id !== id),
     }))
   }
   const toggleSaleDateCollapse = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      saleDateEntries: prev.saleDateEntries.map((e) =>
-        e.id === id ? { ...e, isCollapsed: !e.isCollapsed } : e
+      sale_date_entries: prev.sale_date_entries.map((e) =>
+        e.id === id ? { ...e, is_collapsed: !e.is_collapsed } : e
       ),
     }))
   }
@@ -132,7 +139,7 @@ export default function CreateEventPage() {
   const updateTicketType = (id: string, patch: Partial<TicketTypeEntry>) => {
     setFormData((prev) => ({
       ...prev,
-      ticketTypes: prev.ticketTypes.map((t) =>
+      ticket_types: prev.ticket_types.map((t) =>
         t.id === id ? { ...t, ...patch } : t
       ),
     }))
@@ -140,20 +147,20 @@ export default function CreateEventPage() {
   const addTicketType = () => {
     setFormData((prev) => ({
       ...prev,
-      ticketTypes: [...prev.ticketTypes, createEmptyTicketTypeEntry()],
+      ticket_types: [...prev.ticket_types, createEmptyTicketTypeEntry()],
     }))
   }
   const removeTicketType = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      ticketTypes: prev.ticketTypes.filter((t) => t.id !== id),
+      ticket_types: prev.ticket_types.filter((t) => t.id !== id),
     }))
   }
   const toggleTicketCollapse = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      ticketTypes: prev.ticketTypes.map((t) =>
-        t.id === id ? { ...t, isCollapsed: !t.isCollapsed } : t
+      ticket_types: prev.ticket_types.map((t) =>
+        t.id === id ? { ...t, is_collapsed: !t.is_collapsed } : t
       ),
     }))
   }
@@ -161,7 +168,7 @@ export default function CreateEventPage() {
   const updateStaffEntry = (id: string, patch: Partial<StaffEntry>) => {
     setFormData((prev) => ({
       ...prev,
-      staffEntries: prev.staffEntries.map((s) =>
+      staff_entries: prev.staff_entries.map((s) =>
         s.id === id ? { ...s, ...patch } : s
       ),
     }))
@@ -169,62 +176,66 @@ export default function CreateEventPage() {
   const addStaffEntry = () => {
     setFormData((prev) => ({
       ...prev,
-      staffEntries: [...prev.staffEntries, createEmptyStaffEntry()],
+      staff_entries: [...prev.staff_entries, createEmptyStaffEntry()],
     }))
   }
   const removeStaffEntry = (id: string) => {
     setFormData((prev) => ({
       ...prev,
-      staffEntries: prev.staffEntries.filter((s) => s.id !== id),
+      staff_entries: prev.staff_entries.filter((s) => s.id !== id),
     }))
   }
 
   const completedSectionIds = useMemo(() => {
     const ids: string[] = []
-    if (posterPreview || thumbnailPreview) ids.push("event-cover")
+    if (poster_preview || thumbnail_preview)
+      ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[0].id)
     if (
-      eventName.trim() !== "" &&
+      event_name.trim() !== "" &&
       category &&
       location &&
-      ageRestriction.trim() !== ""
+      age_restriction.trim() !== ""
     ) {
-      ids.push("event-name", "event-category")
+      ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[1].id)
     }
     if (description?.blocks && description.blocks.length > 0)
-      ids.push("event-description")
-    if (eventDateEntries.some((e) => e.startDate)) ids.push("event-date-time")
-    if (saleDateEntries.some((e) => e.startDate)) ids.push("sale-date-time")
+      ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[3].id)
+    if (event_date_entries.some((e) => e.start_date))
+      ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[2].id)
+    if (sale_date_entries.some((e) => e.start_date))
+      ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[4].id)
     if (
-      ticketTypes.some(
+      ticket_types.some(
         (t) =>
           t.name.trim() !== "" &&
           t.price.trim() !== "" &&
           t.quantity.trim() !== ""
       )
     )
-      ids.push("ticket-type")
-    if (ticketMinPerOrder && ticketMaxPerOrder) ids.push("ticket-setting")
+      ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[5].id)
+    if (ticket_min_per_order && ticket_max_per_order)
+      ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[6].id)
     if (
-      staffEntries.some(
-        (s) => s.reserveCode.trim() !== "" && s.email.trim() !== ""
+      staff_entries.some(
+        (s) => s.reserve_code.trim() !== "" && s.email.trim() !== ""
       )
     )
-      ids.push("staff")
+      ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[7].id)
     return ids
   }, [
-    ageRestriction,
+    age_restriction,
     category,
     description,
-    eventName,
-    eventDateEntries,
+    event_name,
+    event_date_entries,
     location,
-    posterPreview,
-    saleDateEntries,
-    staffEntries,
-    thumbnailPreview,
-    ticketMaxPerOrder,
-    ticketMinPerOrder,
-    ticketTypes,
+    poster_preview,
+    sale_date_entries,
+    staff_entries,
+    thumbnail_preview,
+    ticket_max_per_order,
+    ticket_min_per_order,
+    ticket_types,
   ])
 
   const handleCreateEvent = () => {
@@ -251,26 +262,25 @@ export default function CreateEventPage() {
 
             <EventCoverSection
               sectionRef={(el) => {
-                sectionRefs.current["event-cover"] = el
+                sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[0].id] = el
               }}
-              posterPreview={posterPreview}
-              thumbnailPreview={thumbnailPreview}
+              posterPreview={poster_preview}
+              thumbnailPreview={thumbnail_preview}
               onPosterChange={handlePosterChange}
               onThumbnailChange={handleThumbnailChange}
             />
 
             <EventDetailSection
               sectionRef={(el) => {
-                sectionRefs.current["event-name"] = el
-                sectionRefs.current["event-category"] = el
+                sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[1].id] = el
               }}
-              eventName={eventName}
+              eventName={event_name}
               category={category}
               location={location}
-              impactGenre={impactGenre}
-              ageRestriction={ageRestriction}
+              impactGenre={impact_genre}
+              ageRestriction={age_restriction}
               onEventNameChange={(value) =>
-                setFormData((prev) => ({ ...prev, eventName: value }))
+                setFormData((prev) => ({ ...prev, event_name: value }))
               }
               onCategoryChange={(value) =>
                 setFormData((prev) => ({ ...prev, category: value }))
@@ -279,22 +289,22 @@ export default function CreateEventPage() {
                 setFormData((prev) => ({ ...prev, location: value }))
               }
               onImpactGenreChange={(value) =>
-                setFormData((prev) => ({ ...prev, impactGenre: value }))
+                setFormData((prev) => ({ ...prev, impact_genre: value }))
               }
               onAgeRestrictionChange={(value) =>
-                setFormData((prev) => ({ ...prev, ageRestriction: value }))
+                setFormData((prev) => ({ ...prev, age_restriction: value }))
               }
             />
 
             <DateRangeSection
               sectionRef={(el) => {
-                sectionRefs.current["event-date-time"] = el
+                sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[2].id] = el
               }}
-              id="event-date-time"
+              id={CREATE_EVENT_SIDEBAR_SECTIONS[2].id}
               title="Event Date and Time"
               description="Set when your event starts and ends."
               addButtonLabel="Add Date and Time"
-              entries={eventDateEntries}
+              entries={event_date_entries}
               onUpdate={updateEventDateEntry}
               onAdd={addEventDateEntry}
               onRemove={removeEventDateEntry}
@@ -303,7 +313,7 @@ export default function CreateEventPage() {
 
             <DescriptionSection
               sectionRef={(el) => {
-                sectionRefs.current["event-description"] = el
+                sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[3].id] = el
               }}
               value={description}
               onChange={(data) =>
@@ -313,13 +323,13 @@ export default function CreateEventPage() {
 
             <DateRangeSection
               sectionRef={(el) => {
-                sectionRefs.current["sale-date-time"] = el
+                sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[4].id] = el
               }}
-              id="sale-date-time"
+              id={CREATE_EVENT_SIDEBAR_SECTIONS[4].id}
               title="Sale Ticket Date and Time"
               description="Set when tickets go on sale and when sales end."
               addButtonLabel="Add Sale Date and Time"
-              entries={saleDateEntries}
+              entries={sale_date_entries}
               onUpdate={updateSaleDateEntry}
               onAdd={addSaleDateEntry}
               onRemove={removeSaleDateEntry}
@@ -328,11 +338,11 @@ export default function CreateEventPage() {
 
             <TicketTypeSection
               sectionRef={(el) => {
-                sectionRefs.current["ticket-type"] = el
+                sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[5].id] = el
               }}
-              ticketTypes={ticketTypes}
-              eventDateEntries={eventDateEntries}
-              saleDateEntries={saleDateEntries}
+              ticketTypes={ticket_types}
+              eventDateEntries={event_date_entries}
+              saleDateEntries={sale_date_entries}
               onUpdate={updateTicketType}
               onAdd={addTicketType}
               onRemove={removeTicketType}
@@ -341,23 +351,23 @@ export default function CreateEventPage() {
 
             <TicketSettingSection
               sectionRef={(el) => {
-                sectionRefs.current["ticket-setting"] = el
+                sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[6].id] = el
               }}
-              ticketMinPerOrder={ticketMinPerOrder}
-              ticketMaxPerOrder={ticketMaxPerOrder}
+              ticketMinPerOrder={ticket_min_per_order}
+              ticketMaxPerOrder={ticket_max_per_order}
               onTicketMinChange={(value) =>
-                setFormData((prev) => ({ ...prev, ticketMinPerOrder: value }))
+                setFormData((prev) => ({ ...prev, ticket_min_per_order: value }))
               }
               onTicketMaxChange={(value) =>
-                setFormData((prev) => ({ ...prev, ticketMaxPerOrder: value }))
+                setFormData((prev) => ({ ...prev, ticket_max_per_order: value }))
               }
             />
 
             <StaffSection
               sectionRef={(el) => {
-                sectionRefs.current["staff"] = el
+                sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[7].id] = el
               }}
-              staffEntries={staffEntries}
+              staffEntries={staff_entries}
               onUpdate={updateStaffEntry}
               onAdd={addStaffEntry}
               onRemove={removeStaffEntry}

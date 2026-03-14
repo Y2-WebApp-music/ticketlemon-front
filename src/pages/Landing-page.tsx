@@ -6,16 +6,19 @@ import {
   LandingHeroSection,
   RecommendedEventsSection,
 } from "@/features/landing"
-import { allEvents, eventImageUrl, recommendedEvents } from "@/mocks/landing"
-import * as React from "react"
+import type { EventListItem } from "@/types"
+import { allEvents, recommendedEvents } from "@/mocks/landing"
+import { useEffect, useState } from "react"
 
 const AUTO_SCROLL_DELAY_MS = 4000
 
 export default function LandingPage() {
-  const [recommendedApi, setRecommendedApi] =
-    React.useState<CarouselApi | null>(null)
+  const [recommendedApi, setRecommendedApi] = useState<CarouselApi | null>(null)
+  const [recommendedEventsState] =
+    useState<EventListItem[]>(recommendedEvents)
+  const [allEventsState] = useState<EventListItem[]>(allEvents)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!recommendedApi) return
     const interval = setInterval(() => {
       recommendedApi.scrollNext()
@@ -29,11 +32,10 @@ export default function LandingPage() {
 
       <div className="relative mx-auto -mt-[220px] max-w-[1280px] min-w-0 space-y-10 px-4 pb-16 sm:px-6">
         <RecommendedEventsSection
-          events={[...recommendedEvents, ...recommendedEvents]}
-          imageUrl={eventImageUrl}
+          events={[...recommendedEventsState, ...recommendedEventsState]}
           onCarouselApiChange={setRecommendedApi}
         />
-        <AllEventsSection events={allEvents} imageUrl={eventImageUrl} />
+        <AllEventsSection events={allEventsState} />
       </div>
 
       <LandingFooter />

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
+import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant"
 import {
   Select,
   SelectContent,
@@ -24,7 +25,11 @@ export function TicketSettingSection({
   onTicketMaxChange,
 }: TicketSettingSectionProps) {
   return (
-    <section ref={sectionRef} id="ticket-setting">
+    <section
+      ref={sectionRef}
+      id={CREATE_EVENT_SIDEBAR_SECTIONS[6].id}
+      className="space-y-4"
+    >
       <Card size="sm" className="gap-0 py-0">
         <CardHeader>
           <CardTitle>Ticket Setting</CardTitle>

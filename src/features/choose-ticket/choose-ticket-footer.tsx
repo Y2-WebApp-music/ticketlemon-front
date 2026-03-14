@@ -10,6 +10,7 @@ export interface ChooseTicketFooterProps {
   totalTickets: number
   summaryLines: string[]
   orderItems: PurchaseOrderItem[]
+  buyDisabled?: boolean
 }
 
 export function ChooseTicketFooter({
@@ -18,6 +19,7 @@ export function ChooseTicketFooter({
   totalTickets,
   summaryLines,
   orderItems,
+  buyDisabled = false,
 }: ChooseTicketFooterProps) {
   return (
     <footer
@@ -54,26 +56,41 @@ export function ChooseTicketFooter({
             </div>
           )}
         </div>
-        <Button
-          asChild
-          size="lg"
-          className={cn(
-            "shrink-0 bg-white text-primary hover:bg-white/90",
-            "border border-primary/30"
-          )}
-        >
-          <Link
-            to="/events/$eventId/purchase"
-            params={{ eventId }}
-            state={
-              // @ts-expect-error -- router state typed as history; we pass cart for purchase page
-              { orderItems, total, totalTickets }
-            }
+        {buyDisabled ? (
+          <Button
+            type="button"
+            size="lg"
+            disabled
+            className={cn(
+              "shrink-0 bg-white text-primary",
+              "border border-primary/30 opacity-70"
+            )}
           >
             <Ticket className="size-5" aria-hidden />
             Buy Tickets
-          </Link>
-        </Button>
+          </Button>
+        ) : (
+          <Button
+            asChild
+            size="lg"
+            className={cn(
+              "shrink-0 bg-white text-primary hover:bg-white/90",
+              "border border-primary/30"
+            )}
+          >
+            <Link
+              to="/events/$eventId/purchase"
+              params={{ eventId }}
+              state={
+                // @ts-expect-error -- router state typed as history; we pass cart for purchase page
+                { order_items: orderItems, total, total_tickets: totalTickets }
+              }
+            >
+              <Ticket className="size-5" aria-hidden />
+              Buy Tickets
+            </Link>
+          </Button>
+        )}
       </div>
     </footer>
   )

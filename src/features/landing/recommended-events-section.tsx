@@ -5,24 +5,16 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel"
 import { EventCard } from "@/features/event-card"
+import type { EventListItem } from "@/types"
 import { Link } from "@tanstack/react-router"
 
-export interface LandingEventItem {
-  id?: string
-  date: string
-  title: string
-  venue: string
-}
-
 export interface RecommendedEventsSectionProps {
-  events: LandingEventItem[]
-  imageUrl: string
+  events: EventListItem[]
   onCarouselApiChange: (api: CarouselApi | null) => void
 }
 
 export function RecommendedEventsSection({
   events,
-  imageUrl,
   onCarouselApiChange,
 }: RecommendedEventsSectionProps) {
   return (
@@ -49,7 +41,7 @@ export function RecommendedEventsSection({
                 >
                   <EventCard
                     variant="thumbnail"
-                    imageUrl={imageUrl}
+                    imageUrl={event.poster_url}
                     imageAlt=""
                     date={event.date}
                     title={event.title}
@@ -60,7 +52,7 @@ export function RecommendedEventsSection({
               ) : (
                 <EventCard
                   variant="thumbnail"
-                  imageUrl={imageUrl}
+                  imageUrl={event.poster_url}
                   imageAlt=""
                   date={event.date}
                   title={event.title}

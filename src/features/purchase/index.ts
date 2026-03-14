@@ -9,4 +9,4 @@ export type {
   PurchaseOrderItem,
   PurchaseCartState,
   PaymentMethodId,
-} from "./types"
+} from "@/types/purchase"

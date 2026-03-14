@@ -23,7 +23,7 @@ export default function MyTicketQrPage({ ticketId }: { ticketId: string }) {
     )
   }
 
-  const ticketType = detail.ticketTypes.find((t) => t.variant === "unused")
+  const ticketType = detail.ticket_types.find((t) => t.variant === "unused")
 
   return (
     <PageLayout>

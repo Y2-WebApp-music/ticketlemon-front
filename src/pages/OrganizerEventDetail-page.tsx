@@ -5,9 +5,11 @@ import {
 } from "@/features/organizer-dashboard"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import { getEventDetail } from "@/mocks/event-detail"
-import type { EventTicketType } from "@/types/event"
+import { DEFAULT_SELLING_TICKET_SELECTION } from "@/mocks/organizer-event-selling"
+import type { EventDetail, EventTicketType } from "@/types/event"
 import { formatDateLabel } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
+import { useEffect, useState } from "react"
 
 /** Organizer: notOnSale = now < start_sale_date; available = remaining > 0 && now > start_sale_date; saleEnd = remaining === 0 */
 function mapOrganizerTicketTypesToCardProps(
@@ -78,9 +80,17 @@ export interface OrganizerEventDetailPageProps {
 export default function OrganizerEventDetailPage({
   eventId,
 }: OrganizerEventDetailPageProps) {
-  const event = getEventDetail(eventId)
+  const [eventData, setEventData] = useState<EventDetail>()
+  const [openingSellingTicket, setOpeningSellingTicket] = useState<
+    typeof DEFAULT_SELLING_TICKET_SELECTION | null
+  >(null)
 
-  if (!event) {
+  useEffect(() => {
+    // Placeholder for future API fetch.
+    setEventData(getEventDetail(eventId))
+  }, [eventId])
+
+  if (!eventData) {
     return (
       <PageLayout>
         <main className="flex min-h-[50vh] flex-col items-center justify-center px-4">
@@ -105,11 +115,20 @@ export default function OrganizerEventDetailPage({
             Back
           </Link>
         </div> */}
-        <OrganizerEventHero event={event} />
+        <OrganizerEventHero
+          event={eventData}
+          onSeeSelling={() =>
+            setOpeningSellingTicket({ ...DEFAULT_SELLING_TICKET_SELECTION })
+          }
+        />
         <OrganizerEventTabs
-          eventId={event.id}
-          description={event.description}
-          ticketGroups={groupTicketTypesByEventDate(event.ticketTypes)}
+          eventId={eventData.id}
+          description={eventData.description}
+          ticketGroups={groupTicketTypesByEventDate(eventData.ticket_types)}
+          openingSellingTicket={openingSellingTicket}
+          onDescriptionSave={(data) =>
+            setEventData((prev) => (prev ? { ...prev, description: data } : prev))
+          }
         />
       </div>
     </PageLayout>

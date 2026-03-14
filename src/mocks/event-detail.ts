@@ -21,7 +21,7 @@ export const eventDetailsById: Record<string, EventDetail> = {
       new Date(new Date().getTime() + 1000 * 60 * 60 * 24).toISOString(),
     ],
     venue: "Phenix Grand Ballroom",
-    age_restriction: null,
+    age_restriction: 12,
     description: {
       time: Date.now(),
       blocks: [
@@ -61,7 +61,7 @@ export const eventDetailsById: Record<string, EventDetail> = {
       ],
       version: "2.31.4",
     },
-    ticketTypes: [
+    ticket_types: [
       {
         id: "tt-1",
         title: "Standard Entry",

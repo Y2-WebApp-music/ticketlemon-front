@@ -3,10 +3,10 @@ import type { OutputData } from "@editorjs/editorjs"
 
 export interface DateRangeEntry {
   id: string
-  startDate: Date | undefined
-  endDate: Date | undefined
-  haveEndDate: boolean
-  isCollapsed: boolean
+  start_date: Date | undefined
+  end_date: Date | undefined
+  have_end_date: boolean
+  is_collapsed: boolean
 }
 
 export interface TicketTypeEntry {
@@ -15,32 +15,32 @@ export interface TicketTypeEntry {
   price: string
   quantity: string
   detail: string
-  useForEventDateTime: string
-  saleTicketOn: string
-  isCollapsed: boolean
+  use_for_event_date_time: string
+  sale_ticket_on: string
+  is_collapsed: boolean
 }
 
 export interface StaffEntry {
   id: string
-  reserveCode: string
+  reserve_code: string
   email: string
 }
 
 export interface CreateEventPayload {
-  eventName: string
+  event_name: string
   category: string
   location: string
-  impactGenre: string
-  ageRestriction: string
+  impact_genre: string
+  age_restriction: string
   description: OutputData | null
-  posterPreview: string | null
-  thumbnailPreview: string | null
-  eventDateEntries: DateRangeEntry[]
-  saleDateEntries: DateRangeEntry[]
-  ticketTypes: TicketTypeEntry[]
-  ticketMinPerOrder: string
-  ticketMaxPerOrder: string
-  staffEntries: StaffEntry[]
+  poster_preview: string | null
+  thumbnail_preview: string | null
+  event_date_entries: DateRangeEntry[]
+  sale_date_entries: DateRangeEntry[]
+  ticket_types: TicketTypeEntry[]
+  ticket_min_per_order: string
+  ticket_max_per_order: string
+  staff_entries: StaffEntry[]
 }
 
 export function createId(): string {
@@ -50,10 +50,10 @@ export function createId(): string {
 export function createEmptyDateRangeEntry(): DateRangeEntry {
   return {
     id: createId(),
-    startDate: undefined,
-    endDate: undefined,
-    haveEndDate: false,
-    isCollapsed: false,
+    start_date: undefined,
+    end_date: undefined,
+    have_end_date: false,
+    is_collapsed: false,
   }
 }
 
@@ -64,43 +64,43 @@ export function createEmptyTicketTypeEntry(): TicketTypeEntry {
     price: "",
     quantity: "",
     detail: "",
-    useForEventDateTime: "",
-    saleTicketOn: "",
-    isCollapsed: false,
+    use_for_event_date_time: "",
+    sale_ticket_on: "",
+    is_collapsed: false,
   }
 }
 
 export function createEmptyStaffEntry(): StaffEntry {
-  return { id: createId(), reserveCode: "", email: "" }
+  return { id: createId(), reserve_code: "", email: "" }
 }
 
 export function createInitialCreateEventPayload(): CreateEventPayload {
   return {
-    eventName: "",
+    event_name: "",
     category: "",
     location: "",
-    impactGenre: "",
-    ageRestriction: "No",
+    impact_genre: "",
+    age_restriction: "No",
     description: null,
-    posterPreview: null,
-    thumbnailPreview: null,
-    eventDateEntries: [createEmptyDateRangeEntry()],
-    saleDateEntries: [createEmptyDateRangeEntry()],
-    ticketTypes: [createEmptyTicketTypeEntry()],
-    ticketMinPerOrder: "",
-    ticketMaxPerOrder: "",
-    staffEntries: [createEmptyStaffEntry()],
+    poster_preview: null,
+    thumbnail_preview: null,
+    event_date_entries: [createEmptyDateRangeEntry()],
+    sale_date_entries: [createEmptyDateRangeEntry()],
+    ticket_types: [createEmptyTicketTypeEntry()],
+    ticket_min_per_order: "",
+    ticket_max_per_order: "",
+    staff_entries: [createEmptyStaffEntry()],
   }
 }
 
 export function formatDateRangeLabel(
   entry: Partial<DateRangeEntry> | undefined
 ): string {
-  if (!entry?.startDate) return "—"
-  const start = format(entry.startDate, "d MMM yyyy, HH:mm")
+  if (!entry?.start_date) return "—"
+  const start = format(entry.start_date, "d MMM yyyy, HH:mm")
   const end =
-    entry.haveEndDate && entry.endDate
-      ? format(entry.endDate, "d MMM yyyy, HH:mm")
+    entry.have_end_date && entry.end_date
+      ? format(entry.end_date, "d MMM yyyy, HH:mm")
       : "—"
   return `${start} - ${end}`
 }

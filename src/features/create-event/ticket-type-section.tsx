@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant"
 import { Pencil, Plus, Save, Ticket, Trash2 } from "lucide-react"
 import type { DateRangeEntry, TicketTypeEntry } from "@/types/create-event"
 import { formatDateRangeLabel } from "@/types/create-event"
@@ -36,7 +37,11 @@ export function TicketTypeSection({
   onToggleCollapse,
 }: TicketTypeSectionProps) {
   return (
-    <section ref={sectionRef} id="ticket-type">
+    <section
+      ref={sectionRef}
+      id={CREATE_EVENT_SIDEBAR_SECTIONS[5].id}
+      className="space-y-4"
+    >
       <Card size="sm" className="gap-0 py-0">
         <CardHeader>
           <CardTitle>Ticket Type</CardTitle>
@@ -50,7 +55,7 @@ export function TicketTypeSection({
               key={ticket.id}
               className="overflow-hidden rounded-xl border border-border bg-card p-5"
             >
-              {ticket.isCollapsed ? (
+              {ticket.is_collapsed ? (
                 <div className="flex flex-wrap items-center gap-3">
                   <div
                     className="flex size-[52px] shrink-0 items-center justify-center rounded-lg border border-primary bg-primary/10 text-primary"
@@ -64,10 +69,10 @@ export function TicketTypeSection({
                     </p>
                     <p className="text-base leading-6 text-muted-foreground">
                       for event:{" "}
-                      {ticket.useForEventDateTime
+                      {ticket.use_for_event_date_time
                         ? formatDateRangeLabel(
                             eventDateEntries.find(
-                              (e) => e.id === ticket.useForEventDateTime
+                              (e) => e.id === ticket.use_for_event_date_time
                             ) ?? undefined
                           )
                         : "—"}
@@ -160,9 +165,9 @@ export function TicketTypeSection({
                         <span className="text-destructive">*</span>
                       </Label>
                       <Select
-                        value={ticket.useForEventDateTime}
+                        value={ticket.use_for_event_date_time}
                         onValueChange={(v) =>
-                          onUpdate(ticket.id, { useForEventDateTime: v })
+                          onUpdate(ticket.id, { use_for_event_date_time: v })
                         }
                       >
                         <SelectTrigger className="w-full rounded-lg">
@@ -183,9 +188,9 @@ export function TicketTypeSection({
                         <span className="text-destructive">*</span>
                       </Label>
                       <Select
-                        value={ticket.saleTicketOn}
+                        value={ticket.sale_ticket_on}
                         onValueChange={(v) =>
-                          onUpdate(ticket.id, { saleTicketOn: v })
+                          onUpdate(ticket.id, { sale_ticket_on: v })
                         }
                       >
                         <SelectTrigger className="w-full rounded-lg">
@@ -213,7 +218,7 @@ export function TicketTypeSection({
                     </Button>
                     <Button
                       type="button"
-                      onClick={() => onUpdate(ticket.id, { isCollapsed: true })}
+                      onClick={() => onUpdate(ticket.id, { is_collapsed: true })}
                     >
                       <Save className="size-4" />
                       Save

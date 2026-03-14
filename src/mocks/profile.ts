@@ -1,11 +1,11 @@
 import type { UserProfile, PaymentMethod } from "@/types/profile"
 
 export const userProfileMock: UserProfile = {
-  imageUrl: "",
-  firstName: "Nut",
-  lastName: "Somwang",
+  image_url: "",
+  first_name: "Nut",
+  last_name: "Somwang",
   email: "nut@example.com",
-  phoneCountryCode: "+66",
+  phone_country_code: "+66",
   phone: "",
   bio: "",
 }
@@ -15,15 +15,15 @@ export const paymentMethodsMock: PaymentMethod[] = [
     id: "pm_1",
     brand: "Visa",
     last4: "4242",
-    expMonth: 12,
-    expYear: 2028,
-    isDefault: true,
+    exp_month: 12,
+    exp_year: 2028,
+    is_default: true,
   },
   {
     id: "pm_2",
     brand: "Mastercard",
     last4: "4444",
-    expMonth: 6,
-    expYear: 2027,
+    exp_month: 6,
+    exp_year: 2027,
   },
 ]

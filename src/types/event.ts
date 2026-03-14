@@ -6,6 +6,7 @@ export interface EventListItem {
   date: string
   title: string
   venue: string
+  poster_url: string
 }
 
 export interface EventTicketType {
@@ -34,7 +35,7 @@ export interface EventDetail {
   age_restriction: number | null
   sale_date_list: string[]
   description: OutputData
-  ticketTypes: EventTicketType[]
+  ticket_types: EventTicketType[]
 }
 
 /** Ticket option for choose-ticket (per session) */
@@ -44,11 +45,11 @@ export interface ChooseTicketOption {
   description?: string
   price: string
   /** Numeric value for total calculation (e.g. THB) */
-  priceValue: number
+  price_value: number
 }
 
 /** Session (date/time) with list of ticket types for choose-ticket API */
 export interface ChooseTicketSession {
-  sessionLabel: string
+  session_label: string
   tickets: ChooseTicketOption[]
 }

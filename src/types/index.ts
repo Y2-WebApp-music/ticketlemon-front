@@ -12,7 +12,7 @@ export type {
   MyTicketTicketTypeVariant,
   MyTicketItem,
 } from "./my-ticket"
-export type { OrganizerEvent, OrganizerEventStatus } from "./organizer"
+export type { OrganizerEvent } from "./organizer"
 export type { SignInResponse, UserRole, Permission } from "./auth"
 export type {
   CreateEventPayload,
@@ -22,4 +22,9 @@ export type {
 } from "./create-event"
 export { createId, formatDateRangeLabel } from "./create-event"
 export type { StaffEvent } from "./staff"
+export type {
+  PurchaseOrderItem,
+  PurchaseCartState,
+  PaymentMethodId,
+} from "./purchase"
 export type { SuccessResponse, ErrorResponseProps } from "./responseHandler"

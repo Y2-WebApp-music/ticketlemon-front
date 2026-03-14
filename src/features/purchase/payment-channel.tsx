@@ -1,7 +1,7 @@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { PaymentMethodId } from "./types"
+import type { PaymentMethodId } from "@/types/purchase"
 import { CreditCard, QrCode, Wallet, WalletCards } from "lucide-react"
 import { cn } from "@/lib/utils"
 

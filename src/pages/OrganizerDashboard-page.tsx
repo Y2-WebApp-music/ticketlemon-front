@@ -13,14 +13,20 @@ import { PageLayout } from "@/components/layouts/page-layout"
 import { OrganizerEventCard } from "@/features/organizer-dashboard"
 import { ORGANIZER_EVENT_STATUS_FILTER_OPTIONS } from "@/constants/event-status.constant"
 import { ORGANIZER_EVENT_SORT_OPTIONS } from "@/constants/organizer-event-sort.constant"
+import type { OrganizerEvent } from "@/types"
 import {
   comingEvents,
   allEvents,
   ORGANIZER_NAME,
 } from "@/mocks/organizer-dashboard"
 import { Plus } from "lucide-react"
+import { useState } from "react"
 
 export default function OrganizerDashboardPage() {
+  const [comingEventsState] = useState<OrganizerEvent[]>(comingEvents)
+  const [allEventsState] = useState<OrganizerEvent[]>(allEvents)
+  const [organizerNameState] = useState(ORGANIZER_NAME)
+
   return (
     <PageLayout className="min-h-svh bg-muted/30">
       <main className="mx-auto max-w-[1264px] px-4 py-8 sm:px-6">
@@ -37,7 +43,7 @@ export default function OrganizerDashboardPage() {
                 </Link>
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground">{ORGANIZER_NAME}</p>
+            <p className="text-sm text-muted-foreground">{organizerNameState}</p>
           </div>
 
           {/* Filters */}
@@ -66,7 +72,7 @@ export default function OrganizerDashboardPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {ORGANIZER_EVENT_STATUS_FILTER_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={opt.value}>
+                    <SelectItem key={opt.value} value={String(opt.value)}>
                       {opt.label}
                     </SelectItem>
                   ))}
@@ -101,8 +107,8 @@ export default function OrganizerDashboardPage() {
               Coming Event
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {comingEvents.map((ev) => (
-                <OrganizerEventCard key={ev.eventId} {...ev} />
+              {comingEventsState.map((ev) => (
+                <OrganizerEventCard key={ev.event_id} {...ev} />
               ))}
             </div>
           </section>
@@ -113,8 +119,8 @@ export default function OrganizerDashboardPage() {
               All Events
             </h2>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {allEvents.map((ev) => (
-                <OrganizerEventCard key={ev.eventId} {...ev} />
+              {allEventsState.map((ev) => (
+                <OrganizerEventCard key={ev.event_id} {...ev} />
               ))}
             </div>
           </section>

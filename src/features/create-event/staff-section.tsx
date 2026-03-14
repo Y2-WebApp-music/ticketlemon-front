@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant"
 import { Plus, Save, Trash2 } from "lucide-react"
 import type { StaffEntry } from "@/types/create-event"
 
@@ -21,7 +22,11 @@ export function StaffSection({
   onRemove,
 }: StaffSectionProps) {
   return (
-    <section ref={sectionRef} id="staff">
+    <section
+      ref={sectionRef}
+      id={CREATE_EVENT_SIDEBAR_SECTIONS[7].id}
+      className="space-y-4"
+    >
       <Card size="sm" className="gap-0 py-0">
         <CardHeader>
           <CardTitle>Staff</CardTitle>
@@ -45,10 +50,10 @@ export function StaffSection({
                     <div className="flex gap-2">
                       <Input
                         placeholder="Enter code."
-                        value={staff.reserveCode}
+                        value={staff.reserve_code}
                         onChange={(e) =>
                           onUpdate(staff.id, {
-                            reserveCode: e.target.value,
+                            reserve_code: e.target.value,
                           })
                         }
                         className="rounded-lg"

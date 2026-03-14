@@ -31,27 +31,18 @@ import {
   formatPhoneRegionLabel,
 } from "@/constants/phone-region.constant"
 import { cn } from "@/lib/utils"
-
-export interface ProfileFormValues {
-  imageUrl?: string
-  firstName: string
-  lastName: string
-  email: string
-  phoneCountryCode: string
-  phone: string
-  bio: string
-}
+import type { UserProfile } from "@/types"
 
 export interface ProfileFormProps {
-  initialValues: ProfileFormValues
+  initialValues: UserProfile
 }
 
 export function ProfileForm({ initialValues }: ProfileFormProps) {
-  const [values, setValues] = React.useState<ProfileFormValues>(initialValues)
+  const [values, setValues] = React.useState<UserProfile>(initialValues)
   const [saving, setSaving] = React.useState(false)
 
-  const firstNameTrim = values.firstName.trim()
-  const lastNameTrim = values.lastName.trim()
+  const firstNameTrim = values.first_name.trim()
+  const lastNameTrim = values.last_name.trim()
   const emailTrim = values.email.trim()
   const phoneTrim = values.phone.trim()
 
@@ -75,14 +66,14 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
   const canSave =
     !firstNameError && !lastNameError && !emailError && !phoneError
 
-  const update = <K extends keyof ProfileFormValues>(
+  const update = <K extends keyof UserProfile>(
     key: K,
-    value: ProfileFormValues[K]
+    value: UserProfile[K]
   ) => setValues((prev) => ({ ...prev, [key]: value }))
 
   const fileInputId = "profile-image"
   const safeDialCode = ensureDialCode(
-    values.phoneCountryCode,
+    values.phone_country_code,
     DEFAULT_PHONE_REGION
   )
 
@@ -95,9 +86,9 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
         {/* Profile image */}
         <div className="flex items-center gap-4">
           <div className="relative size-16 overflow-hidden rounded-full border border-border bg-muted">
-            {values.imageUrl ? (
+            {values.image_url ? (
               <img
-                src={values.imageUrl}
+                src={values.image_url}
                 alt=""
                 className="size-full object-cover"
               />
@@ -119,22 +110,22 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
                 if (!file) return
                 const reader = new FileReader()
                 reader.onload = () => {
-                  update("imageUrl", String(reader.result ?? ""))
+                  update("image_url", String(reader.result ?? ""))
                 }
                 reader.readAsDataURL(file)
               }}
             />
             <Button asChild variant="outline" size="sm">
               <label htmlFor={fileInputId} className="cursor-pointer">
-                {values.imageUrl ? "Change photo" : "Upload photo"}
+                {values.image_url ? "Change photo" : "Upload photo"}
               </label>
             </Button>
-            {values.imageUrl && (
+            {values.image_url && (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => update("imageUrl", "")}
+                onClick={() => update("image_url", "")}
               >
                 Remove
               </Button>
@@ -152,8 +143,8 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
             </Label>
             <Input
               id="profile-firstname"
-              value={values.firstName}
-              onChange={(e) => update("firstName", e.target.value)}
+              value={values.first_name}
+              onChange={(e) => update("first_name", e.target.value)}
               placeholder="First name"
               required
               aria-invalid={firstNameError ? true : undefined}
@@ -169,8 +160,8 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
             </Label>
             <Input
               id="profile-lastname"
-              value={values.lastName}
-              onChange={(e) => update("lastName", e.target.value)}
+              value={values.last_name}
+              onChange={(e) => update("last_name", e.target.value)}
               placeholder="Last name"
               required
               aria-invalid={lastNameError ? true : undefined}
@@ -205,7 +196,7 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
             <InputGroupAddon align="inline-start" className="px-1.5">
               <Select
                 value={safeDialCode}
-                onValueChange={(v) => update("phoneCountryCode", v)}
+                onValueChange={(v) => update("phone_country_code", v)}
               >
                 <SelectTrigger
                   size="sm"

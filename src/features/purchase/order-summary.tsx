@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import type { PurchaseOrderItem } from "./types"
+import type { PurchaseOrderItem } from "@/types/purchase"
 
 export interface OrderSummaryProps {
   eventTitle: string
@@ -43,7 +43,7 @@ export function OrderSummary({
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0 flex-1 text-left">
                   <p className="text-base text-muted-foreground">
-                    {item.title} ({item.sessionLabel})
+                    {item.title} ({item.session_label})
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {item.price} per ticket
@@ -52,7 +52,7 @@ export function OrderSummary({
                 <span className="shrink-0 font-medium">x{item.qty}</span>
               </div>
               <p className="font-medium">
-                {item.lineTotal.toLocaleString("en-US", {
+                {item.line_total.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                 })}{" "}
                 THB

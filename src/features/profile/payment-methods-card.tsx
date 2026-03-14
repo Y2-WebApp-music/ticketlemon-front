@@ -18,10 +18,10 @@ export function PaymentMethodsCard({
 }) {
   const [methods, setMethods] = React.useState<PaymentMethod[]>(initialMethods)
 
-  const defaultId = methods.find((m) => m.isDefault)?.id ?? null
+  const defaultId = methods.find((m) => m.is_default)?.id ?? null
 
   const setDefault = (id: string) => {
-    setMethods((prev) => prev.map((m) => ({ ...m, isDefault: m.id === id })))
+    setMethods((prev) => prev.map((m) => ({ ...m, is_default: m.id === id })))
     toast.success("Default payment method updated")
   }
 
@@ -29,8 +29,8 @@ export function PaymentMethodsCard({
     setMethods((prev) => {
       const next = prev.filter((m) => m.id !== id)
       if (!next.length) return next
-      if (!next.some((m) => m.isDefault)) {
-        next[0] = { ...next[0], isDefault: true }
+      if (!next.some((m) => m.is_default)) {
+        next[0] = { ...next[0], is_default: true }
       }
       return next
     })
@@ -72,7 +72,7 @@ export function PaymentMethodsCard({
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Exp {String(m.expMonth).padStart(2, "0")}/{m.expYear}
+                      Exp {String(m.exp_month).padStart(2, "0")}/{m.exp_year}
                     </p>
                   </div>
 

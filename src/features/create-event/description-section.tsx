@@ -1,5 +1,6 @@
 import { EditorJs, defaultEditorTools } from "@/components/editor-js"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant"
 import type { OutputData } from "@editorjs/editorjs"
 
 export interface DescriptionSectionProps {
@@ -14,7 +15,11 @@ export function DescriptionSection({
   onChange,
 }: DescriptionSectionProps) {
   return (
-    <section ref={sectionRef} id="event-description">
+    <section
+      ref={sectionRef}
+      id={CREATE_EVENT_SIDEBAR_SECTIONS[3].id}
+      className="space-y-4"
+    >
       <Card size="sm" className="gap-0 py-0">
         <CardHeader>
           <CardTitle>Description</CardTitle>

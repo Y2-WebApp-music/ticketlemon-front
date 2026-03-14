@@ -26,6 +26,7 @@ import dayjs from "dayjs"
 
 export interface OrganizerEventHeroProps {
   event: EventDetail
+  onSeeSelling?: () => void
 }
 
 /** Returns current time, re-renders every intervalMs (for live countdown/duration). */
@@ -125,7 +126,10 @@ function InfoBlock({
   )
 }
 
-export function OrganizerEventHero({ event }: OrganizerEventHeroProps) {
+export function OrganizerEventHero({
+  event,
+  onSeeSelling,
+}: OrganizerEventHeroProps) {
   const formattedDates = event.show_date_list.map((iso) => formatDateLabel(iso))
   const statusBadgeVariant = getEventStatusBadgeVariant(event.status_id)
   const showLiveTime =
@@ -140,7 +144,7 @@ export function OrganizerEventHero({ event }: OrganizerEventHeroProps) {
 
     const saleDateList = event.sale_date_list ?? []
     const showDateList = event.show_date_list ?? []
-    const ticketTypes = event.ticketTypes ?? []
+    const ticketTypes = event.ticket_types ?? []
 
     type Block = { key: string; label: string; value: string; subtext?: string }
     type ButtonConfig = {
@@ -304,8 +308,10 @@ export function OrganizerEventHero({ event }: OrganizerEventHeroProps) {
     return (
       <Button
         key={config.key}
+        type="button"
         variant={config.variant}
         className={config.variant === "outline" ? outlineClass : "gap-2"}
+        onClick={config.key === "see-selling" ? onSeeSelling : undefined}
       >
         {config.icon === "focus" && <Focus className={iconClass} aria-hidden />}
         {config.icon === "ticket" && (
@@ -393,7 +399,7 @@ export function OrganizerEventHero({ event }: OrganizerEventHeroProps) {
                       aria-hidden
                     />
                     <span className="text-sm text-muted-foreground">
-                      No age restriction
+                      {event.age_restriction != null ? `Age ${event.age_restriction}+` : "No age restriction"}
                     </span>
                   </div>
                 </div>

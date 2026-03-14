@@ -1,54 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant"
 import { cn } from "@/lib/utils"
-
-export const CREATE_EVENT_SIDEBAR_SECTIONS = [
-  {
-    id: "event-cover",
-    label: "Event Cover",
-    description: "Upload poster and thumbnail images for your event.",
-  },
-  {
-    id: "event-name",
-    label: "Event Name",
-    description:
-      "Basic event information: name, category, location, and age restriction.",
-  },
-  {
-    id: "event-category",
-    label: "Event Category",
-    description: "Category and location for your event listing.",
-  },
-  {
-    id: "event-description",
-    label: "Event Description",
-    description: "Add a description to help attendees understand your event.",
-  },
-  {
-    id: "event-date-time",
-    label: "Event Date and Time",
-    description: "Set when your event starts and ends.",
-  },
-  {
-    id: "sale-date-time",
-    label: "Sale Ticket Date and Time",
-    description: "Set when tickets go on sale and when sales end.",
-  },
-  {
-    id: "ticket-type",
-    label: "Ticket Type",
-    description: "Add ticket types with name, price, and quantity.",
-  },
-  {
-    id: "ticket-setting",
-    label: "Ticket Setting",
-    description: "Limit how many tickets can be bought per order.",
-  },
-  {
-    id: "staff",
-    label: "Staff",
-    description: "Add staff members with reserve codes and email.",
-  },
-] as const
 
 export interface CreateEventSidebarProps {
   onScrollToSection: (id: string) => void
@@ -96,15 +48,25 @@ export function CreateEventSidebar({
                       type="button"
                       onClick={() => onScrollToSection(id)}
                       className={cn(
-                        "min-w-0 flex-1 rounded-md px-2 py-2 text-left transition-colors",
+                        "min-w-0 flex-1 rounded-md px-2 pb-2 text-left transition-colors",
                         "hover:bg-muted/60",
                         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                       )}
                     >
-                      <div className="text-sm font-medium text-foreground">
+                      <div
+                        className={cn(
+                          "text-sm font-medium text-foreground",
+                          !isComplete && "opacity-50"
+                        )}
+                      >
                         {label}
                       </div>
-                      <div className="mt-0.5 text-xs leading-snug text-muted-foreground">
+                      <div
+                        className={cn(
+                          "mt-0.5 text-xs leading-snug text-muted-foreground",
+                          !isComplete && "opacity-50"
+                        )}
+                      >
                         {description}
                       </div>
                     </button>

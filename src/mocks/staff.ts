@@ -7,27 +7,27 @@ export const STAFF_EVENTS: StaffEvent[] = [
     id: "1",
     title:
       "UltraV presents LEE DONG WOOK 2025-2026 FANMEETING TOUR [MY SWEET HOME] in Bangkok 2026",
-    dateRange: "8 Mar - 10 Mar",
+    date_range: "8 Mar - 10 Mar",
     venue: "Phenix Grand Ballroom",
-    imageUrl:
+    image_url:
       "https://images.pexels.com/photos/3755021/pexels-photo-3755021.jpeg?auto=compress&cs=tinysrgb&w=640",
   },
   {
     id: "2",
     title:
       "UltraV presents LEE DONG WOOK 2025-2026 FANMEETING TOUR [MY SWEET HOME] in Bangkok 2026",
-    dateRange: "15 Mar - 17 Mar",
+    date_range: "15 Mar - 17 Mar",
     venue: "Phenix Grand Ballroom",
-    imageUrl:
+    image_url:
       "https://images.pexels.com/photos/3755021/pexels-photo-3755021.jpeg?auto=compress&cs=tinysrgb&w=640",
   },
   {
     id: "3",
     title:
       "UltraV presents LEE DONG WOOK 2025-2026 FANMEETING TOUR [MY SWEET HOME] in Bangkok 2026",
-    dateRange: "22 Mar - 24 Mar",
+    date_range: "22 Mar - 24 Mar",
     venue: "Phenix Grand Ballroom",
-    imageUrl:
+    image_url:
       "https://images.pexels.com/photos/3755021/pexels-photo-3755021.jpeg?auto=compress&cs=tinysrgb&w=640",
   },
 ]

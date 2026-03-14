@@ -1,9 +1,6 @@
 export { LandingHeroSection } from "./hero-section"
 export { RecommendedEventsSection } from "./recommended-events-section"
-export type {
-  RecommendedEventsSectionProps,
-  LandingEventItem,
-} from "./recommended-events-section"
+export type { RecommendedEventsSectionProps } from "./recommended-events-section"
 export { AllEventsSection } from "./all-events-section"
 export type { AllEventsSectionProps } from "./all-events-section"
 export { LandingFooter } from "./landing-footer"

@@ -8,6 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  CREATE_EVENT_CATEGORY_OPTIONS,
+  CREATE_EVENT_IMPACT_GENRE_OPTIONS,
+  CREATE_EVENT_SIDEBAR_SECTIONS,
+} from "@/constants/create-event.constant"
 
 export interface EventDetailSectionProps {
   sectionRef: (el: HTMLElement | null) => void
@@ -37,7 +42,11 @@ export function EventDetailSection({
   onAgeRestrictionChange,
 }: EventDetailSectionProps) {
   return (
-    <section ref={sectionRef} id="event-name">
+    <section
+      ref={sectionRef}
+      id={CREATE_EVENT_SIDEBAR_SECTIONS[1].id}
+      className="space-y-4"
+    >
       <Card size="sm" className="gap-0 py-0">
         <CardHeader>
           <CardTitle>Event Detail</CardTitle>
@@ -68,25 +77,24 @@ export function EventDetailSection({
                   <SelectValue placeholder="-" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="concert">Concert</SelectItem>
-                  <SelectItem value="meetup">Meetup</SelectItem>
-                  <SelectItem value="conference">Conference</SelectItem>
+                  {CREATE_EVENT_CATEGORY_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
               <Label>
-                Location <span className="text-destructive">*</span>
+                Venue <span className="text-destructive">*</span>
               </Label>
-              <Select value={location} onValueChange={onLocationChange}>
-                <SelectTrigger className="w-full rounded-lg">
-                  <SelectValue placeholder="-" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bangkok">Bangkok</SelectItem>
-                  <SelectItem value="chiang-mai">Chiang Mai</SelectItem>
-                </SelectContent>
-              </Select>
+              <Input
+                placeholder="Bangkok"
+                value={location}
+                onChange={(e) => onLocationChange(e.target.value)}
+                className="rounded-lg"
+              />
             </div>
           </div>
           <div className="space-y-2">
@@ -96,8 +104,11 @@ export function EventDetailSection({
                 <SelectValue placeholder="KPOP, Korea" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="kpop">KPOP, Korea</SelectItem>
-                <SelectItem value="pop">Pop</SelectItem>
+                {CREATE_EVENT_IMPACT_GENRE_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

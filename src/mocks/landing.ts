@@ -9,30 +9,35 @@ export const recommendedEvents: EventListItem[] = [
     date: "10 Feb - 15 Mar",
     title: "Sunset by NEON: Upperground",
     venue: "Genting Highlands, Malaysia",
+    poster_url: eventImageUrl,
   },
   {
     id: "1",
     date: "28 Mar - 29 Mar",
     title: "2026 JOY ASIA TOUR 'JOY SPLASH' IN BANGKOK",
     venue: "Phenix Grand Ballroom",
+    poster_url: eventImageUrl,
   },
   {
     id: "3",
     date: "8 Mar - 10 Mar",
     title: "UltraV presents LEE DONG WOOK 2025-2026 FAN MEETING",
     venue: "Phenix Grand Ballroom",
+    poster_url: eventImageUrl,
   },
   {
     id: "4",
     date: "8 Mar - 10 Mar",
     title: "UltraV presents",
     venue: "Phenix Grand Ballroom",
+    poster_url: eventImageUrl,
   },
   {
     id: "5",
     date: "8 Mar - 10 Mar",
     title: "UltraV presents LEE DONG WOOK 2025-2026 FAN MEETING",
     venue: "Phenix Grand Ballroom",
+    poster_url: eventImageUrl,
   },
 ]
 
