@@ -127,7 +127,9 @@ export default function OrganizerEventDetailPage({
           ticketGroups={groupTicketTypesByEventDate(eventData.ticket_types)}
           openingSellingTicket={openingSellingTicket}
           onDescriptionSave={(data) =>
-            setEventData((prev) => (prev ? { ...prev, description: data } : prev))
+            setEventData((prev) =>
+              prev ? { ...prev, description: data } : prev
+            )
           }
         />
       </div>

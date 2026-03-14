@@ -66,10 +66,8 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
   const canSave =
     !firstNameError && !lastNameError && !emailError && !phoneError
 
-  const update = <K extends keyof UserProfile>(
-    key: K,
-    value: UserProfile[K]
-  ) => setValues((prev) => ({ ...prev, [key]: value }))
+  const update = <K extends keyof UserProfile>(key: K, value: UserProfile[K]) =>
+    setValues((prev) => ({ ...prev, [key]: value }))
 
   const fileInputId = "profile-image"
   const safeDialCode = ensureDialCode(

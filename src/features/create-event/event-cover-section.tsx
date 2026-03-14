@@ -20,7 +20,11 @@ export function EventCoverSection({
   onThumbnailChange,
 }: EventCoverSectionProps) {
   return (
-    <section ref={sectionRef} id={CREATE_EVENT_SIDEBAR_SECTIONS[0].id} className="space-y-4">
+    <section
+      ref={sectionRef}
+      id={CREATE_EVENT_SIDEBAR_SECTIONS[0].id}
+      className="space-y-4"
+    >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label className="text-sm">

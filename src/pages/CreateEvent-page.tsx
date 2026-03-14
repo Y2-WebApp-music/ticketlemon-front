@@ -118,7 +118,10 @@ export default function CreateEventPage() {
   const addSaleDateEntry = () => {
     setFormData((prev) => ({
       ...prev,
-      sale_date_entries: [...prev.sale_date_entries, createEmptyDateRangeEntry()],
+      sale_date_entries: [
+        ...prev.sale_date_entries,
+        createEmptyDateRangeEntry(),
+      ],
     }))
   }
   const removeSaleDateEntry = (id: string) => {
@@ -356,10 +359,16 @@ export default function CreateEventPage() {
               ticketMinPerOrder={ticket_min_per_order}
               ticketMaxPerOrder={ticket_max_per_order}
               onTicketMinChange={(value) =>
-                setFormData((prev) => ({ ...prev, ticket_min_per_order: value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  ticket_min_per_order: value,
+                }))
               }
               onTicketMaxChange={(value) =>
-                setFormData((prev) => ({ ...prev, ticket_max_per_order: value }))
+                setFormData((prev) => ({
+                  ...prev,
+                  ticket_max_per_order: value,
+                }))
               }
             />
 

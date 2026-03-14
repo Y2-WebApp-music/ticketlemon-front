@@ -14,8 +14,7 @@ const AUTO_SCROLL_DELAY_MS = 4000
 
 export default function LandingPage() {
   const [recommendedApi, setRecommendedApi] = useState<CarouselApi | null>(null)
-  const [recommendedEventsState] =
-    useState<EventListItem[]>(recommendedEvents)
+  const [recommendedEventsState] = useState<EventListItem[]>(recommendedEvents)
   const [allEventsState] = useState<EventListItem[]>(allEvents)
 
   useEffect(() => {

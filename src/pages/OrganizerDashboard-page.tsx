@@ -43,7 +43,9 @@ export default function OrganizerDashboardPage() {
                 </Link>
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground">{organizerNameState}</p>
+            <p className="text-sm text-muted-foreground">
+              {organizerNameState}
+            </p>
           </div>
 
           {/* Filters */}

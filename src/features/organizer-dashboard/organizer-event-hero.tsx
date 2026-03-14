@@ -399,7 +399,9 @@ export function OrganizerEventHero({
                       aria-hidden
                     />
                     <span className="text-sm text-muted-foreground">
-                      {event.age_restriction != null ? `Age ${event.age_restriction}+` : "No age restriction"}
+                      {event.age_restriction != null
+                        ? `Age ${event.age_restriction}+`
+                        : "No age restriction"}
                     </span>
                   </div>
                 </div>

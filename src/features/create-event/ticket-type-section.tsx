@@ -218,7 +218,9 @@ export function TicketTypeSection({
                     </Button>
                     <Button
                       type="button"
-                      onClick={() => onUpdate(ticket.id, { is_collapsed: true })}
+                      onClick={() =>
+                        onUpdate(ticket.id, { is_collapsed: true })
+                      }
                     >
                       <Save className="size-4" />
                       Save

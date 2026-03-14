@@ -296,7 +296,10 @@ export function DateRangeSection({
                                       startOfDay(d),
                                       startOfDay(entry.start_date)
                                     ))
-                                    ? applyDateWithExistingTime(d, entry.end_date)
+                                    ? applyDateWithExistingTime(
+                                        d,
+                                        entry.end_date
+                                      )
                                     : undefined,
                               })
                             }

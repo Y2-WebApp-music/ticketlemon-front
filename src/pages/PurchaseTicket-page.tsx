@@ -120,7 +120,10 @@ export default function PurchaseTicketPage({
               <PaymentChannel
                 paymentMethod={formPayload.payment_method}
                 onPaymentMethodChange={(method) =>
-                  setFormPayload((prev) => ({ ...prev, payment_method: method }))
+                  setFormPayload((prev) => ({
+                    ...prev,
+                    payment_method: method,
+                  }))
                 }
               />
               <PurchaseImportant />
