@@ -1,6 +1,11 @@
 import { PageLayout } from "@/components/layouts/page-layout"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Spinner } from "@/components/ui/spinner"
 import {
   getStaffEventById,
@@ -8,6 +13,7 @@ import {
   STAFF_VALID_SCAN_CODE,
 } from "@/mocks/staff"
 import { Link, useNavigate } from "@tanstack/react-router"
+import jsQR from "jsqr"
 import { ChevronLeft, CircleX, QrCode } from "lucide-react"
 import * as React from "react"
 
@@ -29,6 +35,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
   const event = getStaffEventById(eventId)
   const videoRef = React.useRef<HTMLVideoElement | null>(null)
   const streamRef = React.useRef<MediaStream | null>(null)
+  const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
   const detectorRef = React.useRef<BarcodeDetectorLike | null>(null)
   const scanTimerRef = React.useRef<number | null>(null)
   const [status, setStatus] = React.useState<"idle" | "ready" | "error">("idle")
@@ -45,6 +52,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
       window.clearInterval(scanTimerRef.current)
       scanTimerRef.current = null
     }
+    canvasRef.current = null
     streamRef.current?.getTracks().forEach((track) => track.stop())
     streamRef.current = null
   }, [])
@@ -107,15 +115,46 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
             BarcodeDetector?: BarcodeDetectorConstructor
           }
         ).BarcodeDetector
-        if (!BarcodeDetectorCtor) return
-        detectorRef.current = new BarcodeDetectorCtor({ formats: ["qr_code"] })
+        detectorRef.current = BarcodeDetectorCtor
+          ? new BarcodeDetectorCtor({ formats: ["qr_code"] })
+          : null
 
         scanTimerRef.current = window.setInterval(async () => {
-          if (!videoRef.current || !detectorRef.current) return
+          const videoElement = videoRef.current
+          if (!videoElement) return
+
           try {
-            const results = await detectorRef.current.detect(videoRef.current)
-            if (!Array.isArray(results) || results.length === 0) return
-            const rawValue = String(results[0]?.rawValue ?? "").trim()
+            let rawValue = ""
+
+            if (detectorRef.current) {
+              const results = await detectorRef.current.detect(videoElement)
+              if (!Array.isArray(results) || results.length === 0) return
+              rawValue = String(results[0]?.rawValue ?? "").trim()
+            } else {
+              const width = videoElement.videoWidth
+              const height = videoElement.videoHeight
+              if (width <= 0 || height <= 0) return
+
+              if (!canvasRef.current) {
+                canvasRef.current = document.createElement("canvas")
+              }
+
+              const canvas = canvasRef.current
+              canvas.width = width
+              canvas.height = height
+              const context = canvas.getContext("2d", {
+                willReadFrequently: true,
+              })
+              if (!context) return
+
+              context.drawImage(videoElement, 0, 0, width, height)
+              const imageData = context.getImageData(0, 0, width, height)
+              const decoded = jsQR(imageData.data, width, height, {
+                inversionAttempts: "dontInvert",
+              })
+              rawValue = String(decoded?.data ?? "").trim()
+            }
+
             if (!rawValue) return
             setLastScan(rawValue)
             onScanCode(rawValue)
@@ -213,15 +252,6 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
               variant="outline"
               type="button"
               className="text-xs"
-              onClick={() => onScanCode(STAFF_DUPLICATE_SCAN_CODE)}
-            >
-              Dev: Duplicate
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              type="button"
-              className="text-xs"
               onClick={() => {
                 stopScanning()
                 setScanResult("duplicate")
@@ -252,6 +282,14 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
           showCloseButton={false}
           className="bg-card px-6 py-8 sm:px-12 sm:py-10"
         >
+          <DialogTitle className="sr-only">
+            {scanResult === "duplicate" ? "Duplicate Ticket" : "Wrong QR Code"}
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            {scanResult === "duplicate"
+              ? "The ticket has already been used for check in."
+              : "The scanned QR code does not match a valid ticket."}
+          </DialogDescription>
           <div className="mx-auto flex flex-col items-center text-center">
             <CircleX className="size-12 text-red-600" />
 
@@ -313,6 +351,10 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
         }}
       >
         <DialogContent className="">
+          <DialogTitle className="sr-only">Allow camera access</DialogTitle>
+          <DialogDescription className="sr-only">
+            Allow camera permission in your browser settings to scan tickets.
+          </DialogDescription>
           <div className="space-y-3">
             <p className="text-lg font-medium text-foreground">
               Allow camera access

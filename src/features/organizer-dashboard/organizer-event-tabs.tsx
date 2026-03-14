@@ -20,6 +20,8 @@ import type { TicketTypeCardProps } from "@/features/ticket-type"
 import type { OutputData } from "@editorjs/editorjs"
 import { ChevronUp, Pencil, Save, Ticket } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
+import type { SellingTableResponse } from "@/types/organizer"
+import type { EventTicketType } from "@/types/event"
 
 export interface OrganizerTicketTypeGroup {
   sessionLabel: string
@@ -31,6 +33,9 @@ export interface OrganizerEventTabsProps {
   description: OutputData
   /** Ticket types grouped by event_date (collapsible per group); variants: notOnSale, available, saleEnd */
   ticketGroups: OrganizerTicketTypeGroup[]
+  sellingTableResponse: SellingTableResponse | null
+  showDateList: string[]
+  ticketTypes: EventTicketType[]
   /** Open selling table from external trigger (e.g. hero See Selling button). */
   openingSellingTicket?: OrganizerSellingTicketSelection | null
   /** Called when description is saved (e.g. after Save button); omit to only allow in-place editing */
@@ -79,6 +84,9 @@ export function OrganizerEventTabs({
   eventId,
   description,
   ticketGroups,
+  sellingTableResponse,
+  showDateList,
+  ticketTypes,
   openingSellingTicket,
   onDescriptionSave,
 }: OrganizerEventTabsProps) {
@@ -166,9 +174,12 @@ export function OrganizerEventTabs({
           </div>
         </TabsContent>
         <TabsContent value="ticket-type" className="mt-0 space-y-3">
-          {selectedSellingTicket ? (
+          {selectedSellingTicket && sellingTableResponse ? (
             <OrganizerEventSellingTable
               selectedTicket={selectedSellingTicket}
+              sellingTableResponse={sellingTableResponse}
+              showDateList={showDateList}
+              ticketTypes={ticketTypes}
               onBack={() => setSelectedSellingTicket(null)}
             />
           ) : (
@@ -185,7 +196,7 @@ export function OrganizerEventTabs({
                 </CollapsibleTrigger>
                 <CollapsibleContent className="space-y-3">
                   {group.tickets.map((ticket, i) => {
-                    const isOpenable = ticket.variant !== "saleEnd"
+                    const isOpenable = ticket.variant !== "notOnSale"
                     return (
                       <div
                         key={i}

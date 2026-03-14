@@ -5,11 +5,18 @@ import {
 } from "@/features/organizer-dashboard"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import { getEventDetail } from "@/mocks/event-detail"
-import { DEFAULT_SELLING_TICKET_SELECTION } from "@/mocks/organizer-event-selling"
-import type { EventDetail, EventTicketType } from "@/types/event"
+import {
+  DEFAULT_SELLING_TICKET_SELECTION,
+  MOCK_SELLING_TABLE_RESPONSE,
+} from "@/mocks/organizer-event-selling"
+import type { OutputData } from "@editorjs/editorjs"
+import type { EventTicketType } from "@/types/event"
+import type {
+  SellingTicketSelection,
+} from "@/types/organizer"
 import { formatDateLabel } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
+import { useMemo, useState } from "react"
 
 /** Organizer: notOnSale = now < start_sale_date; available = remaining > 0 && now > start_sale_date; saleEnd = remaining === 0 */
 function mapOrganizerTicketTypesToCardProps(
@@ -80,15 +87,12 @@ export interface OrganizerEventDetailPageProps {
 export default function OrganizerEventDetailPage({
   eventId,
 }: OrganizerEventDetailPageProps) {
-  const [eventData, setEventData] = useState<EventDetail>()
-  const [openingSellingTicket, setOpeningSellingTicket] = useState<
-    typeof DEFAULT_SELLING_TICKET_SELECTION | null
-  >(null)
-
-  useEffect(() => {
-    // Placeholder for future API fetch.
-    setEventData(getEventDetail(eventId))
-  }, [eventId])
+  const eventData = useMemo(() => getEventDetail(eventId), [eventId])
+  const [openingSellingTicket, setOpeningSellingTicket] =
+    useState<SellingTicketSelection | null>(null)
+  const [descriptionOverrides, setDescriptionOverrides] = useState<
+    Record<string, OutputData>
+  >({})
 
   if (!eventData) {
     return (
@@ -123,13 +127,14 @@ export default function OrganizerEventDetailPage({
         />
         <OrganizerEventTabs
           eventId={eventData.id}
-          description={eventData.description}
+          description={descriptionOverrides[eventData.id] ?? eventData.description}
           ticketGroups={groupTicketTypesByEventDate(eventData.ticket_types)}
+          sellingTableResponse={MOCK_SELLING_TABLE_RESPONSE}
+          showDateList={eventData.show_date_list}
+          ticketTypes={eventData.ticket_types}
           openingSellingTicket={openingSellingTicket}
           onDescriptionSave={(data) =>
-            setEventData((prev) =>
-              prev ? { ...prev, description: data } : prev
-            )
+            setDescriptionOverrides((prev) => ({ ...prev, [eventData.id]: data }))
           }
         />
       </div>

@@ -8,7 +8,7 @@ import {
 import type { PurchaseOrderItem } from "@/types/purchase"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import { getEventDetail } from "@/mocks/event-detail"
-import type { EventTicketType } from "@/types/event"
+import type { EventDetail, EventTicketType } from "@/types/event"
 import { formatDateLabel } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
@@ -116,7 +116,7 @@ export interface EventDetailPageProps {
 }
 
 export default function EventDetailPage({ eventId }: EventDetailPageProps) {
-  const [event, setEvent] = useState<ReturnType<typeof getEventDetail>>()
+  const [event, setEvent] = useState<EventDetail>()
   const [step, setStep] = useState<"detail" | "choose">("detail")
   const [quantities, setQuantities] = useState<Record<string, number>>({})
 

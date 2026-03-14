@@ -1,117 +1,140 @@
-export interface SellingTableRow {
-  name: string
-  email: string
-  status: "purchased" | "pending"
-  eventRound: string
-  ticketType: string
-  bookingTime: string
-}
-
-export interface SellingTableResponse {
-  data: SellingTableRow[]
-  total: number
-  page: number
-  perPage: number
-}
-
-export interface SellingTicketSelection {
-  sessionLabel: string
-  title: string
-}
+import type {
+  SellingTableResponse,
+  SellingTableRow,
+  SellingTicketSelection,
+} from "@/types/organizer"
 
 export const DEFAULT_SELLING_TICKET_SELECTION: SellingTicketSelection = {
-  sessionLabel: "29 Mar 2026, 17:00",
+  sessionLabel: "29 Mar 26, 17:00",
   title: "VVIP + Soundcheck",
 }
 
-export const TABLE_VIEW_PAGE_SIZE_OPTIONS = [10, 15, 25] as const
-
 export const MOCK_SELLING_ROWS: SellingTableRow[] = [
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
+    name: "Napat Kittisak",
+    email: "napat.k@example.com",
     status: "purchased",
-    eventRound: "29 Mar 2026, 17:00",
+    eventRound: "2026-03-29T17:00:00",
     ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    bookingTime: "2026-03-18T09:10:21",
   },
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
+    name: "Pimchanok S.",
+    email: "pimchanok.s@example.com",
     status: "purchased",
-    eventRound: "29 Mar 2026, 17:00",
-    ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    eventRound: "2026-03-29T17:00:00",
+    ticketType: "VIP",
+    bookingTime: "2026-03-18T10:24:03",
   },
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
+    name: "Thanawat R.",
+    email: "thanawat.r@example.com",
+    status: "pending",
+    eventRound: "2026-03-29T17:00:00",
+    ticketType: "Standard",
+    bookingTime: "2026-03-18T11:42:55",
+  },
+  {
+    name: "Jirapat C.",
+    email: "jirapat.c@example.com",
     status: "purchased",
-    eventRound: "29 Mar 2026, 17:00",
+    eventRound: "2026-03-30T17:00:00",
     ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    bookingTime: "2026-03-19T08:01:16",
   },
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
+    name: "Waranya T.",
+    email: "waranya.t@example.com",
+    status: "pending",
+    eventRound: "2026-03-30T17:00:00",
+    ticketType: "VIP",
+    bookingTime: "2026-03-19T09:17:40",
+  },
+  {
+    name: "Pongpat N.",
+    email: "pongpat.n@example.com",
     status: "purchased",
-    eventRound: "29 Mar 2026, 17:00",
-    ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    eventRound: "2026-03-30T17:00:00",
+    ticketType: "Standard",
+    bookingTime: "2026-03-19T10:03:22",
   },
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
+    name: "Krittika M.",
+    email: "krittika.m@example.com",
+    status: "pending",
+    eventRound: "2026-03-29T20:00:00",
+    ticketType: "VVIP + Soundcheck",
+    bookingTime: "2026-03-20T12:11:48",
+  },
+  {
+    name: "Anusorn P.",
+    email: "anusorn.p@example.com",
     status: "purchased",
-    eventRound: "29 Mar 2026, 17:00",
-    ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    eventRound: "2026-03-29T20:00:00",
+    ticketType: "VIP",
+    bookingTime: "2026-03-20T13:36:57",
   },
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
+    name: "Sirin S.",
+    email: "sirin.s@example.com",
     status: "pending",
-    eventRound: "29 Mar 2026, 17:00",
-    ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    eventRound: "2026-03-29T20:00:00",
+    ticketType: "Standard",
+    bookingTime: "2026-03-20T14:04:31",
   },
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
-    status: "pending",
-    eventRound: "29 Mar 2026, 17:00",
+    name: "Chaiwat W.",
+    email: "chaiwat.w@example.com",
+    status: "purchased",
+    eventRound: "2026-03-30T20:00:00",
     ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    bookingTime: "2026-03-21T09:55:12",
   },
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
-    status: "pending",
-    eventRound: "29 Mar 2026, 17:00",
-    ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    name: "Phingphing K.",
+    email: "phingphing.k@example.com",
+    status: "purchased",
+    eventRound: "2026-03-30T20:00:00",
+    ticketType: "VIP",
+    bookingTime: "2026-03-21T10:21:49",
   },
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
+    name: "Natthapon A.",
+    email: "natthapon.a@example.com",
     status: "pending",
-    eventRound: "29 Mar 2026, 17:00",
-    ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    eventRound: "2026-03-30T20:00:00",
+    ticketType: "Standard",
+    bookingTime: "2026-03-21T11:45:38",
   },
   {
-    name: "Chotanansub Sophaken",
-    email: "example.123@gmail.com",
-    status: "pending",
-    eventRound: "29 Mar 2026, 17:00",
+    name: "Piyada L.",
+    email: "piyada.l@example.com",
+    status: "purchased",
+    eventRound: "2026-03-31T17:00:00",
     ticketType: "VVIP + Soundcheck",
-    bookingTime: "33 Mar 26, 33:00:00",
+    bookingTime: "2026-03-22T08:15:09",
+  },
+  {
+    name: "Prachya D.",
+    email: "prachya.d@example.com",
+    status: "pending",
+    eventRound: "2026-03-31T17:00:00",
+    ticketType: "VIP",
+    bookingTime: "2026-03-22T09:39:57",
+  },
+  {
+    name: "Ratchanon Y.",
+    email: "ratchanon.y@example.com",
+    status: "pending",
+    eventRound: "2026-03-31T17:00:00",
+    ticketType: "Standard",
+    bookingTime: "2026-03-22T10:28:44",
   },
 ]
 
 export const MOCK_SELLING_TABLE_RESPONSE: SellingTableResponse = {
   data: MOCK_SELLING_ROWS,
-  total: 230,
+  total: 156,
   page: 1,
   perPage: 15,
 }

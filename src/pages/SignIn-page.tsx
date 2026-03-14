@@ -142,7 +142,7 @@ export default function SignInPage() {
           variant="outline"
           className="mt-8 border-orange-200 text-orange-600 hover:bg-orange-50/50"
           onClick={() => {
-            navigate({ to: "/staff" })
+            navigate({ to: "/staff-sign-in" })
           }}
         >
           Event Staff

@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as StaffSignInRouteImport } from './routes/staff-sign-in'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ShowcaseRouteImport } from './routes/showcase'
@@ -31,6 +32,11 @@ import { Route as MyTicketsTicketIdQrRouteImport } from './routes/my-tickets/$ti
 import { Route as EventsEventIdPurchaseRouteImport } from './routes/events/$eventId/purchase'
 import { Route as EventsEventIdChooseRouteImport } from './routes/events/$eventId/choose'
 
+const StaffSignInRoute = StaffSignInRouteImport.update({
+  id: '/staff-sign-in',
+  path: '/staff-sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StaffRoute = StaffRouteImport.update({
   id: '/staff',
   path: '/staff',
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
   '/staff': typeof StaffRouteWithChildren
+  '/staff-sign-in': typeof StaffSignInRoute
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
   '/my-tickets/$ticketId': typeof MyTicketsTicketIdRouteWithChildren
   '/organizer/create': typeof OrganizerCreateRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
+  '/staff-sign-in': typeof StaffSignInRoute
   '/organizer/create': typeof OrganizerCreateRoute
   '/staff/scan': typeof StaffScanRoute
   '/staff/scan-success': typeof StaffScanSuccessRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/showcase': typeof ShowcaseRoute
   '/sign-in': typeof SignInRoute
   '/staff': typeof StaffRouteWithChildren
+  '/staff-sign-in': typeof StaffSignInRoute
   '/events/$eventId': typeof EventsEventIdRouteWithChildren
   '/my-tickets/$ticketId': typeof MyTicketsTicketIdRouteWithChildren
   '/organizer/create': typeof OrganizerCreateRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/showcase'
     | '/sign-in'
     | '/staff'
+    | '/staff-sign-in'
     | '/events/$eventId'
     | '/my-tickets/$ticketId'
     | '/organizer/create'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/'
     | '/showcase'
     | '/sign-in'
+    | '/staff-sign-in'
     | '/organizer/create'
     | '/staff/scan'
     | '/staff/scan-success'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/showcase'
     | '/sign-in'
     | '/staff'
+    | '/staff-sign-in'
     | '/events/$eventId'
     | '/my-tickets/$ticketId'
     | '/organizer/create'
@@ -276,12 +288,20 @@ export interface RootRouteChildren {
   ShowcaseRoute: typeof ShowcaseRoute
   SignInRoute: typeof SignInRoute
   StaffRoute: typeof StaffRouteWithChildren
+  StaffSignInRoute: typeof StaffSignInRoute
   EventsEventIdRoute: typeof EventsEventIdRouteWithChildren
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/staff-sign-in': {
+      id: '/staff-sign-in'
+      path: '/staff-sign-in'
+      fullPath: '/staff-sign-in'
+      preLoaderRoute: typeof StaffSignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/staff': {
       id: '/staff'
       path: '/staff'
@@ -512,6 +532,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShowcaseRoute: ShowcaseRoute,
   SignInRoute: SignInRoute,
   StaffRoute: StaffRouteWithChildren,
+  StaffSignInRoute: StaffSignInRoute,
   EventsEventIdRoute: EventsEventIdRouteWithChildren,
   ProfileIndexRoute: ProfileIndexRoute,
 }

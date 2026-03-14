@@ -26,12 +26,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  MOCK_SELLING_TABLE_RESPONSE,
-  TABLE_VIEW_PAGE_SIZE_OPTIONS,
-} from "@/mocks/organizer-event-selling"
 import { ChevronLeft, Upload } from "lucide-react"
 import { useMemo, useState } from "react"
+import dayjs from "dayjs"
+import {
+  TABLE_VIEW_PAGE_SIZE_OPTIONS,
+  TABLE_VIEW_STATUS_OPTIONS,
+} from "@/constants/organizer-event-sort.constant"
+import { formatDateLabel } from "@/utils/formatDate"
+import type { EventTicketType } from "@/types/event"
+import type { SellingTableResponse } from "@/types/organizer"
+
+const ALL_FILTER_VALUE = "all"
 
 export interface OrganizerSellingTicketSelection {
   sessionLabel: string
@@ -40,23 +46,110 @@ export interface OrganizerSellingTicketSelection {
 
 export interface OrganizerEventSellingTableProps {
   selectedTicket: OrganizerSellingTicketSelection
+  sellingTableResponse: SellingTableResponse
+  showDateList: string[]
+  ticketTypes: EventTicketType[]
   onBack: () => void
 }
 
 export function OrganizerEventSellingTable({
   selectedTicket,
+  sellingTableResponse,
+  showDateList,
+  ticketTypes,
   onBack,
 }: OrganizerEventSellingTableProps) {
-  const [page, setPage] = useState(MOCK_SELLING_TABLE_RESPONSE.page)
-  const [perPage, setPerPage] = useState(MOCK_SELLING_TABLE_RESPONSE.perPage)
-  const total = MOCK_SELLING_TABLE_RESPONSE.total
-  const rows = MOCK_SELLING_TABLE_RESPONSE.data
+  type StatusFilterValue = (typeof TABLE_VIEW_STATUS_OPTIONS)[number]["value"]
 
+  const [page, setPage] = useState(sellingTableResponse.page)
+  const [perPage, setPerPage] = useState(sellingTableResponse.perPage)
+  const rows = sellingTableResponse.data
+  const [nameQuery, setNameQuery] = useState("")
+  const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all")
+  const [eventRoundFilter, setEventRoundFilter] = useState(
+    selectedTicket.sessionLabel
+  )
+  const [ticketTypeFilter, setTicketTypeFilter] = useState(selectedTicket.title)
+
+  const eventRoundOptions = useMemo(() => {
+    const seen = new Set<string>()
+    return showDateList
+      .map((date) => formatDateLabel(date))
+      .filter((label) => {
+        if (seen.has(label)) return false
+        seen.add(label)
+        return true
+      })
+  }, [showDateList])
+
+  const ticketTypeOptionsByRound = useMemo(() => {
+    const map = new Map<string, string[]>()
+    ticketTypes.forEach((ticket) => {
+      const roundLabel = formatDateLabel(ticket.event_date)
+      const titles = map.get(roundLabel) ?? []
+      if (!titles.includes(ticket.title)) {
+        titles.push(ticket.title)
+      }
+      map.set(roundLabel, titles)
+    })
+    return map
+  }, [ticketTypes])
+
+  const allTicketTypeOptions = useMemo(() => {
+    const seen = new Set<string>()
+    return ticketTypes
+      .map((ticket) => ticket.title)
+      .filter((title) => {
+        if (seen.has(title)) return false
+        seen.add(title)
+        return true
+      })
+  }, [ticketTypes])
+
+  const ticketTypeOptions = useMemo(() => {
+    if (eventRoundFilter === ALL_FILTER_VALUE) {
+      return allTicketTypeOptions
+    }
+    return ticketTypeOptionsByRound.get(eventRoundFilter) ?? []
+  }, [allTicketTypeOptions, eventRoundFilter, ticketTypeOptionsByRound])
+
+  const effectiveEventRoundFilter = eventRoundOptions.includes(eventRoundFilter)
+    ? eventRoundFilter
+    : ALL_FILTER_VALUE
+  const effectiveTicketTypeFilter = ticketTypeOptions.includes(ticketTypeFilter)
+    ? ticketTypeFilter
+    : ALL_FILTER_VALUE
+
+  const filteredRows = useMemo(() => {
+    const query = nameQuery.trim().toLowerCase()
+    return rows.filter((row) => {
+      const matchesName =
+        query.length === 0 || row.name.toLowerCase().includes(query)
+      const matchesStatus =
+        statusFilter === ALL_FILTER_VALUE || row.status === statusFilter
+      const matchesEventRound =
+        effectiveEventRoundFilter === ALL_FILTER_VALUE ||
+        formatDateLabel(row.eventRound) === effectiveEventRoundFilter
+      const matchesTicketType =
+        effectiveTicketTypeFilter === ALL_FILTER_VALUE ||
+        row.ticketType === effectiveTicketTypeFilter
+      return (
+        matchesName && matchesStatus && matchesEventRound && matchesTicketType
+      )
+    })
+  }, [
+    effectiveEventRoundFilter,
+    effectiveTicketTypeFilter,
+    nameQuery,
+    rows,
+    statusFilter,
+  ])
+
+  const total = filteredRows.length
   const totalPages = Math.max(1, Math.ceil(total / perPage))
   const currentPage = Math.min(Math.max(page, 1), totalPages)
   const displayStart = total === 0 ? 0 : (currentPage - 1) * perPage + 1
   const displayEnd = total === 0 ? 0 : Math.min(currentPage * perPage, total)
-
   const visiblePages = useMemo(() => {
     if (totalPages <= 5) {
       return Array.from({ length: totalPages }, (_, idx) => idx + 1)
@@ -67,6 +160,11 @@ export function OrganizerEventSellingTable({
     }
     return [1, "...", currentPage, "...", totalPages] as const
   }, [currentPage, totalPages])
+  const pagedRows = useMemo(
+    () =>
+      filteredRows.slice((currentPage - 1) * perPage, currentPage * perPage),
+    [currentPage, filteredRows, perPage]
+  )
 
   return (
     <div className="space-y-4 rounded-xl bg-card p-4 ring-1 ring-border sm:p-6">
@@ -82,44 +180,77 @@ export function OrganizerEventSellingTable({
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,160px))_auto] lg:items-end">
         <div className="space-y-1">
           <Label>Name</Label>
-          <Input placeholder="Search name" />
+          <Input
+            placeholder="Search name"
+            value={nameQuery}
+            onChange={(e) => {
+              setNameQuery(e.target.value)
+              setPage(1)
+            }}
+          />
         </div>
         <div className="space-y-1">
           <Label>Status</Label>
-          <Select>
+          <Select
+            value={statusFilter}
+            onValueChange={(value) => {
+              setStatusFilter(value as StatusFilterValue)
+              setPage(1)
+            }}
+          >
             <SelectTrigger className="w-full rounded-lg">
-              <SelectValue placeholder="Select" />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="purchased">Purchased</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
+              {TABLE_VIEW_STATUS_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-1">
           <Label>Event Round</Label>
-          <Select>
+          <Select
+            value={effectiveEventRoundFilter}
+            onValueChange={(value) => {
+              setEventRoundFilter(value)
+              setPage(1)
+            }}
+          >
             <SelectTrigger className="w-full rounded-lg">
-              <SelectValue placeholder={selectedTicket.sessionLabel} />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={selectedTicket.sessionLabel}>
-                {selectedTicket.sessionLabel}
-              </SelectItem>
+              <SelectItem value={ALL_FILTER_VALUE}>All</SelectItem>
+              {eventRoundOptions.map((eventRound) => (
+                <SelectItem key={eventRound} value={eventRound}>
+                  {eventRound}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
         <div className="space-y-1">
           <Label>Ticket Type</Label>
-          <Select>
+          <Select
+            value={effectiveTicketTypeFilter}
+            onValueChange={(value) => {
+              setTicketTypeFilter(value)
+              setPage(1)
+            }}
+          >
             <SelectTrigger className="w-full rounded-lg">
-              <SelectValue placeholder={selectedTicket.title} />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={selectedTicket.title}>
-                {selectedTicket.title}
-              </SelectItem>
+              <SelectItem value={ALL_FILTER_VALUE}>All</SelectItem>
+              {ticketTypeOptions.map((ticketType) => (
+                <SelectItem key={ticketType} value={ticketType}>
+                  {ticketType}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -142,7 +273,7 @@ export function OrganizerEventSellingTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((row, index) => (
+            {pagedRows.map((row, index) => (
               <TableRow key={`${row.email}-${index}`}>
                 <TableCell className="px-4">{row.name}</TableCell>
                 <TableCell className="px-4">{row.email}</TableCell>
@@ -153,9 +284,15 @@ export function OrganizerEventSellingTable({
                     {row.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="px-4">{row.eventRound}</TableCell>
+                <TableCell className="px-4">
+                  {formatDateLabel(row.eventRound)}
+                </TableCell>
                 <TableCell className="px-4">{row.ticketType}</TableCell>
-                <TableCell className="px-4">{row.bookingTime}</TableCell>
+                <TableCell className="px-4">
+                  {dayjs(row.bookingTime).isValid()
+                    ? dayjs(row.bookingTime).format("D MMM YY, HH:mm:ss")
+                    : row.bookingTime}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

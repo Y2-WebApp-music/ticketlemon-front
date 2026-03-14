@@ -294,10 +294,7 @@ function NavBar() {
                 type="button"
                 variant="destructive"
                 className="w-full gap-2"
-                onClick={() => {
-                  closeMobileMenu()
-                  // TODO: sign out
-                }}
+                onClick={handleSignOut}
               >
                 <LogOut className="size-4" />
                 Sign Out

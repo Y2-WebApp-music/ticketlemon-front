@@ -2,6 +2,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
   EventStatus,
   getEventStatusBadgeVariant,
 } from "@/constants/event-status.constant"
@@ -15,6 +23,8 @@ import {
 import {
   CalendarRange,
   Focus,
+  Lightbulb,
+  LightbulbOff,
   MapPin,
   Pencil,
   Ticket,
@@ -130,6 +140,11 @@ export function OrganizerEventHero({
   event,
   onSeeSelling,
 }: OrganizerEventHeroProps) {
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false)
+  const [isPublished, setIsPublished] = useState(
+    event.status_id !== EventStatus.DRAFT &&
+      event.status_id !== EventStatus.SCHEDULED
+  )
   const formattedDates = event.show_date_list.map((iso) => formatDateLabel(iso))
   const statusBadgeVariant = getEventStatusBadgeVariant(event.status_id)
   const showLiveTime =
@@ -324,6 +339,12 @@ export function OrganizerEventHero({
       </Button>
     )
   }
+
+  const statusActionLabel = isPublished ? "Unpublished Event" : "Publish Event"
+  const statusDialogTitle = isPublished ? "Unpublished Event" : "Publish Event"
+  const statusDialogDescription = isPublished
+    ? "This event will be moved to unpublished status and will no longer be visible to attendees until you publish it again."
+    : "This event will be published and shown to attendees. Make sure event details and ticket settings are ready before continuing."
   return (
     <>
       <div className="relative h-[50vh] w-full sm:h-[460px]">
@@ -361,9 +382,17 @@ export function OrganizerEventHero({
                     {event.status_label}
                   </Badge>
                   <div className="flex grow items-center justify-end gap-2">
-                    <Button variant="outline" size="sm" className="gap-2">
-                      Unpublished Event
-                    </Button>
+                    {(event.status_id === EventStatus.DRAFT ||
+                      event.status_id === EventStatus.SCHEDULED) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-2"
+                        onClick={() => setStatusDialogOpen(true)}
+                      >
+                        {statusActionLabel}
+                      </Button>
+                    )}
                     <Button variant="outline" size="sm" className="gap-2">
                       <Pencil className="size-4" aria-hidden />
                       Edit Event
@@ -430,6 +459,43 @@ export function OrganizerEventHero({
           )}
         </div>
       </div>
+      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <DialogContent className="max-w-[520px] rounded-2xl py-8">
+          <DialogHeader className="items-center text-center">
+            {isPublished ? (
+              <LightbulbOff className="size-12 text-yellow-500" aria-hidden />
+            ) : (
+              <Lightbulb className="size-12 text-green-500" aria-hidden />
+            )}
+            <DialogTitle className="mt-2 text-xl font-medium text-foreground">
+              {statusDialogTitle}
+            </DialogTitle>
+            <DialogDescription className="mx-auto mt-2 max-w-[430px] text-center text-base text-muted-foreground">
+              {statusDialogDescription}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-3 justify-center sm:justify-center">
+            <Button
+              type="button"
+              variant="outline"
+              className="min-w-[140px] text-orange-600"
+              onClick={() => setStatusDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              className="min-w-[140px]"
+              onClick={() => {
+                setIsPublished((prev) => !prev)
+                setStatusDialogOpen(false)
+              }}
+            >
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
