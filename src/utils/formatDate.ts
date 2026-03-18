@@ -40,3 +40,9 @@ export function getRemainingMs(until: string | Dayjs): number {
   const untilDate = typeof until === "string" ? dayjs(until) : until
   return Math.max(0, untilDate.diff(dayjs()))
 }
+
+export function formatTitleDate(iso: string): string {
+  const d = dayjs(iso)
+  if (!d.isValid()) return iso
+  return d.format("D MMM")
+}

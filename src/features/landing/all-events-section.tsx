@@ -1,9 +1,10 @@
 import { EventCard } from "@/features/event-card"
-import type { EventListItem } from "@/types"
+import type { EventCardItem } from "@/types/event"
+import { formatTitleDate } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
 
 export interface AllEventsSectionProps {
-  events: EventListItem[]
+  events: EventCardItem[]
 }
 
 export function AllEventsSection({ events }: AllEventsSectionProps) {
@@ -14,18 +15,18 @@ export function AllEventsSection({ events }: AllEventsSectionProps) {
       </h2>
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {events.map((event, i) =>
-          event.id ? (
+          event.event_id ? (
             <Link
-              key={event.id + i}
+              key={event.event_id + i}
               to="/events/$eventId"
-              params={{ eventId: event.id }}
+              params={{ eventId: event.event_id }}
               className="block"
             >
               <EventCard
                 variant="thumbnail"
                 imageUrl={event.poster_url}
                 imageAlt=""
-                date={event.date}
+                date={`${formatTitleDate(event.show_start_date)} - ${formatTitleDate(event.show_end_date)}`}
                 title={event.title}
                 venue={event.venue}
               />
@@ -36,7 +37,7 @@ export function AllEventsSection({ events }: AllEventsSectionProps) {
               variant="thumbnail"
               imageUrl={event.poster_url}
               imageAlt=""
-              date={event.date}
+              date={`${formatTitleDate(event.show_start_date)} - ${formatTitleDate(event.show_end_date)}`}
               title={event.title}
               venue={event.venue}
             />

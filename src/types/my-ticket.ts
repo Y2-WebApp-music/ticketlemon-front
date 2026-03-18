@@ -23,15 +23,16 @@ export interface MyTicketDetail {
 
 /** My ticket list item API response (one card in "my tickets" list) */
 export interface MyTicketItem {
-  image_url: string
+  poster_url: string
   title: string
-  date: string
+  show_start_date: string
+  show_end_date: string
   venue: string
-  ticket_lines?: string[]
-  ticket_type_label?: string
-  /** When set, show unpaid state with countdown and purchase link */
-  minutes_left?: number
-  purchase_to?: string
-  /** When set, show paid state with view ticket link */
-  view_to?: string
+  ticket_type: string[]
+  // booking_time use to calculate minutes left
+  booking_time: string
+  // event_id use to navigate to event detail
+  event_id: string
+  // is_purchased use to show paid state
+  is_purchased: boolean
 }

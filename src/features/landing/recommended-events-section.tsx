@@ -5,11 +5,12 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel"
 import { EventCard } from "@/features/event-card"
-import type { EventListItem } from "@/types"
+import type { EventCardItem } from "@/types/event"
+import { formatTitleDate } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
 
 export interface RecommendedEventsSectionProps {
-  events: EventListItem[]
+  events: EventCardItem[]
   onCarouselApiChange: (api: CarouselApi | null) => void
 }
 
@@ -30,20 +31,20 @@ export function RecommendedEventsSection({
         <CarouselContent className="-ml-4 p-1">
           {events.map((event, i) => (
             <CarouselItem
-              key={`${event.id ?? i}-${i}`}
+              key={`${event.event_id ?? i}-${i}`}
               className="basis-full pl-4 sm:basis-[calc((100%-1rem))] md:basis-[calc((100%-3rem)/4)] lg:basis-[calc((100%-3rem)/4)] xl:basis-[calc((100%-4rem)/5)]"
             >
-              {event.id ? (
+              {event.event_id ? (
                 <Link
                   to="/events/$eventId"
-                  params={{ eventId: event.id }}
+                  params={{ eventId: event.event_id }}
                   className="block"
                 >
                   <EventCard
                     variant="thumbnail"
                     imageUrl={event.poster_url}
                     imageAlt=""
-                    date={event.date}
+                    date={`${formatTitleDate(event.show_start_date)} - ${formatTitleDate(event.show_end_date)}`}
                     title={event.title}
                     venue={event.venue}
                     className="w-full"
@@ -54,7 +55,7 @@ export function RecommendedEventsSection({
                   variant="thumbnail"
                   imageUrl={event.poster_url}
                   imageAlt=""
-                  date={event.date}
+                  date={`${formatTitleDate(event.show_start_date)} - ${formatTitleDate(event.show_end_date)}`}
                   title={event.title}
                   venue={event.venue}
                   className="w-full"

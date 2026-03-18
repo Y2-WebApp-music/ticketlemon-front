@@ -1,8 +1,7 @@
-export interface StaffEvent {
-  id: string
-  title: string
-  /** Date range label, e.g. \"8 Mar - 10 Mar\" */
-  date_range: string
-  venue: string
-  image_url: string
+export interface StaffEventScanResult {
+  name: string
+  age: number
+  ticket_type: string
+  ticket_detail: string
+  check_in_time: string
 }

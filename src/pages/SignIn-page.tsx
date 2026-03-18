@@ -1,7 +1,6 @@
-import { useNavigate } from "@tanstack/react-router"
-import { Button } from "@/components/ui/button"
 import TicketlemonFull from "@/assets/ticketlemon-full.svg?react"
 import WaifuMascot from "@/assets/waifu_mascot_charac.jpeg"
+import { Button } from "@/components/ui/button"
 import {
   OrganizerRegisterForm,
   RegisterStep1Form,
@@ -9,24 +8,11 @@ import {
   SignInForm,
   type RegisterDataForm,
 } from "@/features/auth"
-import { DEFAULT_PHONE_REGION } from "@/constants/phone-region.constant"
 import { signIn } from "@/services/authService"
+import { initialAuthDataForm } from "@/types/auth"
 import type { ErrorResponseProps } from "@/types/responseHandler"
+import { useNavigate } from "@tanstack/react-router"
 import * as React from "react"
-
-const initialDataForm: RegisterDataForm = {
-  email: "",
-  password: "",
-  confirmPassword: "",
-  firstName: "",
-  lastName: "",
-  phoneCountryCode: DEFAULT_PHONE_REGION.dialCode,
-  phone: "",
-  dateOfBirth: undefined,
-  gender: "",
-  subscribeNewsletter: false,
-  acceptTerms: false,
-}
 
 export default function SignInPage() {
   const navigate = useNavigate()
@@ -39,7 +25,7 @@ export default function SignInPage() {
     password: string
   }>({ email: "", password: "" })
   const [dataForm, setDataForm] =
-    React.useState<RegisterDataForm>(initialDataForm)
+    React.useState<RegisterDataForm>(initialAuthDataForm)
   const [signInLoading, setSignInLoading] = React.useState(false)
   const [signInError, setSignInError] = React.useState<string | null>(null)
 

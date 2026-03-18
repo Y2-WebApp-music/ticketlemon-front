@@ -6,16 +6,16 @@ import {
   LandingHeroSection,
   RecommendedEventsSection,
 } from "@/features/landing"
-import type { EventListItem } from "@/types"
 import { allEvents, recommendedEvents } from "@/mocks/landing"
+import type { EventCardItem } from "@/types/event"
 import { useEffect, useState } from "react"
 
 const AUTO_SCROLL_DELAY_MS = 4000
 
 export default function LandingPage() {
   const [recommendedApi, setRecommendedApi] = useState<CarouselApi | null>(null)
-  const [recommendedEventsState] = useState<EventListItem[]>(recommendedEvents)
-  const [allEventsState] = useState<EventListItem[]>(allEvents)
+  const [recommendedEventsState] = useState<EventCardItem[]>(recommendedEvents)
+  const [allEventsState] = useState<EventCardItem[]>(allEvents)
 
   useEffect(() => {
     if (!recommendedApi) return
@@ -31,7 +31,7 @@ export default function LandingPage() {
 
       <div className="relative mx-auto -mt-[220px] max-w-[1280px] min-w-0 space-y-10 px-4 pb-16 sm:px-6">
         <RecommendedEventsSection
-          events={[...recommendedEventsState, ...recommendedEventsState]}
+          events={recommendedEventsState}
           onCarouselApiChange={setRecommendedApi}
         />
         <AllEventsSection events={allEventsState} />

@@ -12,6 +12,8 @@ import {
   STAFF_DUPLICATE_SCAN_CODE,
   STAFF_VALID_SCAN_CODE,
 } from "@/mocks/staff"
+import { formatTitleDate } from "@/utils/formatDate"
+import { useStaffScanStore } from "@/stores/staff-scan-store"
 import { Link, useNavigate } from "@tanstack/react-router"
 import jsQR from "jsqr"
 import { ChevronLeft, CircleX, QrCode } from "lucide-react"
@@ -33,6 +35,11 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
   type ScanResultType = "wrong" | "duplicate"
   const navigate = useNavigate()
   const event = getStaffEventById(eventId)
+  const setEvent = useStaffScanStore((s) => s.setEvent)
+
+  React.useEffect(() => {
+    if (event) setEvent(event)
+  }, [event, setEvent])
   const videoRef = React.useRef<HTMLVideoElement | null>(null)
   const streamRef = React.useRef<MediaStream | null>(null)
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
@@ -206,7 +213,10 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
           <p className="text-lg font-medium tracking-tight text-foreground">
             {event.title}
           </p>
-          <p className="text-lg font-medium text-primary">{event.date_range}</p>
+          <p className="text-lg font-medium text-primary">
+            {formatTitleDate(event.show_start_date)} -{" "}
+            {formatTitleDate(event.show_end_date)}
+          </p>
           <p className="text-sm text-muted-foreground">{event.venue}</p>
         </div>
 

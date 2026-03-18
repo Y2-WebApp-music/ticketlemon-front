@@ -3,19 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import type { OrganizerRegisterFormPayload } from "@/types/auth"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function isValidEmail(value: string): boolean {
   return EMAIL_REGEX.test(value.trim())
-}
-
-export interface OrganizerRegisterFormPayload {
-  organizerName: string
-  organizerEmail: string
-  password: string
-  subscribeNewsletter: boolean
-  acceptTerms: boolean
 }
 
 export interface OrganizerRegisterFormProps {

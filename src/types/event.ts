@@ -1,9 +1,10 @@
 import type { OutputData } from "@editorjs/editorjs"
 
 /** Event list item (e.g. landing, search results) */
-export interface EventListItem {
-  id: string
-  date: string
+export interface EventCardItem {
+  event_id: string
+  show_start_date: string
+  show_end_date: string
   title: string
   venue: string
   poster_url: string

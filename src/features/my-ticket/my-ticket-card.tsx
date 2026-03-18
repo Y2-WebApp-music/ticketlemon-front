@@ -1,27 +1,14 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import type { MyTicketItem } from "@/types/my-ticket"
+import { formatDateLabel } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
+import dayjs from "dayjs"
 import { DollarSign, Ticket } from "lucide-react"
 
-export interface MyTicketCardProps {
-  /** Event image URL */
-  image_url: string
-  /** Event title */
-  title: string
-  /** Date range e.g. "8 Mar - 10 Mar" */
-  date: string
-  /** Venue name */
-  venue: string
-  /** Label above ticket lines e.g. "Your Ticket Type" or "Your select ticket" */
+export interface MyTicketCardProps extends MyTicketItem {
+  /** Label above ticket types list */
   ticket_type_label?: string
-  /** Ticket line items e.g. "x2 VVIP + Soundcheck (29 Mar 2026, 17:00)" */
-  ticket_lines?: string[]
-  /** Unpaid: show countdown and Purchase button. Omit for paid (View Ticket only) */
-  minutes_left?: number
-  /** Route path for View Ticket (e.g. /my-tickets/123). When set, card is a link (paid). */
-  view_to?: string
-  /** Route path for Purchase button (unpaid only) */
-  purchase_to?: string
   className?: string
 }
 
@@ -31,18 +18,45 @@ export interface MyTicketCardProps {
  * - Mobile: compact image, condensed text, same actions
  */
 export function MyTicketCard({
-  image_url,
+  poster_url,
   title,
-  date,
+  show_start_date,
+  show_end_date,
   venue,
+  ticket_type,
+  booking_time,
+  event_id,
+  is_purchased,
   ticket_type_label = "Your Ticket Type",
-  ticket_lines = [],
-  minutes_left,
-  view_to,
-  purchase_to,
   className,
 }: MyTicketCardProps) {
-  const isUnpaid = minutes_left != null
+  const isUnpaid = !is_purchased
+  const dateLabel = `${formatDateLabel(show_start_date)} - ${formatDateLabel(show_end_date)}`
+
+  // payment window: 30 minutes from booking_time
+  const minutesLeft = isUnpaid
+    ? Math.max(
+        0,
+        Math.ceil(
+          dayjs(booking_time).add(30, "minute").diff(dayjs()) / (60 * 1000)
+        )
+      )
+    : undefined
+
+  const viewEventLink = (
+    <Link to="/events/$eventId" params={{ eventId: event_id }}>
+      <Ticket className="size-4" aria-hidden />
+      View Ticket
+    </Link>
+  )
+
+  const purchaseLink = (
+    <Link to="/events/$eventId/purchase" params={{ eventId: event_id }}>
+      <DollarSign className="size-4" aria-hidden />
+      Purchase
+    </Link>
+  )
+
   const cardContent = (
     <>
       {/* Image: smaller on mobile + desktop */}
@@ -52,7 +66,7 @@ export function MyTicketCard({
           "h-[180px] w-full rounded-t-xl sm:h-[240px] sm:w-[180px] sm:rounded-t-none sm:rounded-l-xl"
         )}
       >
-        <img src={image_url} alt="" className="size-full object-cover" />
+        <img src={poster_url} alt="" className="size-full object-cover" />
       </div>
       {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col gap-2 p-3 sm:p-3.5">
@@ -61,14 +75,14 @@ export function MyTicketCard({
             {title}
           </p>
           <p className="text-xs font-medium text-primary sm:text-sm sm:leading-5">
-            {date}
+            {dateLabel}
           </p>
           <p className="text-xs leading-[14px] font-medium text-muted-foreground sm:text-xs">
             {venue}
           </p>
         </div>
         {/* Ticket type + lines: hidden on mobile in compact variant; we show on both for usability */}
-        {(ticket_type_label || ticket_lines.length > 0) && (
+        {(ticket_type_label || ticket_type.length > 0) && (
           <div className="space-y-1">
             {ticket_type_label && (
               <div className="flex items-center gap-1.5">
@@ -77,11 +91,11 @@ export function MyTicketCard({
                   aria-hidden
                 />
                 <span className="text-xs font-medium text-primary sm:text-sm">
-                  {ticket_type_label}
+                  Your select ticket
                 </span>
               </div>
             )}
-            {ticket_lines.map((line, i) => (
+            {ticket_type.map((line, i) => (
               <p
                 key={i}
                 className="text-xs leading-[14px] font-medium text-foreground sm:text-xs"
@@ -93,30 +107,24 @@ export function MyTicketCard({
         )}
         {/* Footer: timer + Purchase (unpaid) or View Ticket (paid) */}
         <div className="mt-auto flex flex-wrap items-center justify-end gap-2 pt-2">
-          {isUnpaid && (
+          {isUnpaid && minutesLeft != null && (
             <span className="text-xs font-medium text-muted-foreground sm:text-sm">
-              {minutes_left} minute{minutes_left !== 1 ? "s" : ""} left
+              {minutesLeft} minute{minutesLeft !== 1 ? "s" : ""} left
             </span>
           )}
-          {isUnpaid && purchase_to && (
+          {isUnpaid && minutesLeft != null && minutesLeft > 0 && (
             <Button asChild size="sm" className="shrink-0">
-              <Link to={purchase_to}>
-                <DollarSign className="size-4" aria-hidden />
-                Purchase
-              </Link>
+              {purchaseLink}
             </Button>
           )}
-          {!isUnpaid && view_to && (
+          {!isUnpaid && (
             <Button
               asChild
               variant="outline"
               size="sm"
               className="shrink-0 border-primary/50 text-primary hover:bg-primary/10"
             >
-              <Link to={view_to}>
-                <Ticket className="size-4" aria-hidden />
-                View Ticket
-              </Link>
+              {viewEventLink}
             </Button>
           )}
         </div>
@@ -131,9 +139,13 @@ export function MyTicketCard({
     className
   )
 
-  if (view_to && !isUnpaid) {
+  if (!isUnpaid) {
     return (
-      <Link to={view_to} className={cardClass}>
+      <Link
+        to="/events/$eventId"
+        params={{ eventId: event_id }}
+        className={cardClass}
+      >
         {cardContent}
       </Link>
     )

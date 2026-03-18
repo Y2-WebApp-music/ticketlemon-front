@@ -1,10 +1,14 @@
 import { PageLayout } from "@/components/layouts/page-layout"
 import { StaffEventCard } from "@/features/staff"
 import { STAFF_EVENTS, STAFF_NAME } from "@/mocks/staff"
+import type { EventCardItem } from "@/types/event"
+import { formatTitleDate } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
+import { useState } from "react"
 
 export default function StaffLandingPage() {
-  const [current] = STAFF_EVENTS
+  const [staffEvents] = useState<EventCardItem[]>(STAFF_EVENTS)
+  const [currentEvent] = useState<EventCardItem | undefined>(STAFF_EVENTS[0])
 
   return (
     <PageLayout className="min-h-svh bg-muted/30">
@@ -15,19 +19,22 @@ export default function StaffLandingPage() {
             <p className="text-sm text-muted-foreground">{STAFF_NAME}</p>
           </header>
 
-          {current && (
+          {currentEvent && (
             <section className="space-y-3">
               <h2 className="text-base font-medium text-foreground">
                 Now Event
               </h2>
-              <Link to="/staff/scan" search={{ eventId: current.id }}>
+              <Link
+                to="/staff/scan"
+                search={{ eventId: currentEvent.event_id }}
+              >
                 <StaffEventCard
-                  key={current.id}
+                  key={currentEvent.event_id}
                   highlight
-                  title={current.title}
-                  date_range={current.date_range}
-                  venue={current.venue}
-                  image_url={current.image_url}
+                  title={currentEvent.title}
+                  date_range={`${formatTitleDate(currentEvent.show_start_date)} - ${formatTitleDate(currentEvent.show_end_date)}`}
+                  venue={currentEvent.venue}
+                  image_url={currentEvent.poster_url}
                   className="cursor-pointer"
                 />
               </Link>
@@ -37,17 +44,17 @@ export default function StaffLandingPage() {
           <section className="space-y-3">
             <h2 className="text-base font-medium text-foreground">All Event</h2>
             <div className="flex flex-col gap-3">
-              {STAFF_EVENTS.map((event) => (
+              {staffEvents.map((event) => (
                 <Link
-                  key={event.id}
+                  key={event.event_id}
                   to="/staff/scan"
-                  search={{ eventId: event.id }}
+                  search={{ eventId: event.event_id }}
                 >
                   <StaffEventCard
                     title={event.title}
-                    date_range={event.date_range}
+                    date_range={`${formatTitleDate(event.show_start_date)} - ${formatTitleDate(event.show_end_date)}`}
                     venue={event.venue}
-                    image_url={event.image_url}
+                    image_url={event.poster_url}
                     className="cursor-pointer"
                   />
                 </Link>
