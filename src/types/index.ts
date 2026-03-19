@@ -1,5 +1,4 @@
 export type {
-  EventListItem,
   EventTicketType,
   EventDetail,
   ChooseTicketOption,
@@ -21,7 +20,6 @@ export type {
   TicketTypeEntry,
 } from "./create-event"
 export { createId, formatDateRangeLabel } from "./create-event"
-export type { StaffEvent } from "./staff"
 export type {
   PurchaseOrderItem,
   PurchaseCartState,
