@@ -138,7 +138,7 @@ export const organizerEventDetailsById: Record<string, OrganizerEventDetail> = {
         sold_out_date: "2026-03-10T18:24:12",
       },
     ],
-    staff_entries: [{ id: "staff-1", reserve_code: "A1B2C3" }],
+    staff_code: "A1B2C3",
   },
 }
 
@@ -147,7 +147,7 @@ export function getEventDetail(eventId: string) {
   return organizerEventDetailsById[eventId] as EventDetail | undefined
 }
 
-/** Get organizer event detail by id; includes staff_entries. */
+/** Get organizer event detail by id; includes staff_code. */
 export function getOrganizerEventDetail(eventId: string) {
   return organizerEventDetailsById[eventId]
 }

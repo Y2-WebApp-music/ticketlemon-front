@@ -6,11 +6,12 @@ import {
   PurchaseContactForm,
   PurchaseImportant,
 } from "@/features/purchase"
-import { getEventDetail } from "@/mocks/event-detail"
+import { getEventById } from "@/services/eventService"
 import type { PurchaseCartState, PurchaseFormPayload } from "@/types/purchase"
 import { Link, useLocation } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
 
 export interface PurchaseTicketPageProps {
   eventId: string
@@ -19,7 +20,8 @@ export interface PurchaseTicketPageProps {
 export default function PurchaseTicketPage({
   eventId,
 }: PurchaseTicketPageProps) {
-  const event = getEventDetail(eventId)
+  const [eventTitle, setEventTitle] = useState<string>("")
+  const [eventFound, setEventFound] = useState(true)
   const location = useLocation()
   const purchasePayload = useMemo(() => {
     const cart = location.state as unknown as PurchaseCartState | undefined
@@ -70,7 +72,26 @@ export default function PurchaseTicketPage({
     }
   }, [formPayload.accept_terms, formPayload.email, formPayload.phone])
 
-  if (!event) {
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const event = await getEventById(eventId)
+        setEventTitle(event.event_name)
+        setEventFound(true)
+      } catch (error) {
+        setEventFound(false)
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load event"
+        toast.error(message)
+      }
+    }
+
+    load()
+  }, [eventId])
+
+  if (!eventFound) {
     return (
       <PageLayout>
         <main className="flex min-h-[50vh] flex-col items-center justify-center px-4">
@@ -130,7 +151,7 @@ export default function PurchaseTicketPage({
             </div>
 
             <OrderSummary
-              eventTitle={event.title}
+              eventTitle={eventTitle}
               orderItems={purchasePayload.orderItems}
               total={purchasePayload.total}
               serviceFee={purchasePayload.serviceFee}

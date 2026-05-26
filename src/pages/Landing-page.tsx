@@ -6,16 +6,19 @@ import {
   LandingHeroSection,
   RecommendedEventsSection,
 } from "@/features/landing"
-import { allEvents, recommendedEvents } from "@/mocks/landing"
+import { getAllEvents } from "@/services/eventService"
 import type { EventCardItem } from "@/types/event"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 const AUTO_SCROLL_DELAY_MS = 4000
 
 export default function LandingPage() {
   const [recommendedApi, setRecommendedApi] = useState<CarouselApi | null>(null)
-  const [recommendedEventsState] = useState<EventCardItem[]>(recommendedEvents)
-  const [allEventsState] = useState<EventCardItem[]>(allEvents)
+  const [recommendedEventsState, setRecommendedEventsState] = useState<
+    EventCardItem[]
+  >([])
+  const [allEventsState, setAllEventsState] = useState<EventCardItem[]>([])
 
   useEffect(() => {
     if (!recommendedApi) return
@@ -24,6 +27,40 @@ export default function LandingPage() {
     }, AUTO_SCROLL_DELAY_MS)
     return () => clearInterval(interval)
   }, [recommendedApi])
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const events = await getAllEvents()
+        const mapped: EventCardItem[] = events.map((event) => {
+          const startDate = event.event_date_entries[0]?.start_date ?? ""
+          const endDate =
+            event.event_date_entries[event.event_date_entries.length - 1]?.start_date ??
+            startDate
+
+          return {
+            event_id: event.id,
+            show_start_date: startDate,
+            show_end_date: endDate,
+            title: event.event_name,
+            venue: event.venue,
+            poster_url: event.poster_url ?? "",
+          }
+        })
+
+        setAllEventsState(mapped)
+        setRecommendedEventsState(mapped.slice(0, 5))
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load events"
+        toast.error(message)
+      }
+    }
+
+    load()
+  }, [])
 
   return (
     <PageLayout>

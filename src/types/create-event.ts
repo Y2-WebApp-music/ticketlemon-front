@@ -1,5 +1,5 @@
-import { format } from "date-fns"
 import type { OutputData } from "@editorjs/editorjs"
+import { format } from "date-fns"
 
 export interface DateRangeEntry {
   id: string
@@ -20,11 +20,6 @@ export interface TicketTypeEntry {
   is_collapsed: boolean
 }
 
-export interface StaffEntry {
-  id: string
-  reserve_code: string
-}
-
 export interface CreateEventPayload {
   event_name: string
   category: string
@@ -32,14 +27,17 @@ export interface CreateEventPayload {
   impact_genre: string
   age_restriction: string
   description: OutputData | null
-  poster_preview: string | null
-  thumbnail_preview: string | null
+  poster_url: string | null
+  thumbnail_url: string | null
   event_date_entries: DateRangeEntry[]
   sale_date_entries: DateRangeEntry[]
   ticket_types: TicketTypeEntry[]
   ticket_min_per_order: string
   ticket_max_per_order: string
-  staff_entries: StaffEntry
+  staff_code: string
+  /** Creator metadata (optional) */
+  create_by_id?: string
+  create_by?: string
 }
 
 export function createId(): string {
@@ -69,10 +67,6 @@ export function createEmptyTicketTypeEntry(): TicketTypeEntry {
   }
 }
 
-export function createEmptyStaffEntry(): StaffEntry {
-  return { id: createId(), reserve_code: "" }
-}
-
 export function createInitialCreateEventPayload(): CreateEventPayload {
   return {
     event_name: "",
@@ -81,14 +75,16 @@ export function createInitialCreateEventPayload(): CreateEventPayload {
     impact_genre: "",
     age_restriction: "0",
     description: null,
-    poster_preview: null,
-    thumbnail_preview: null,
+    poster_url: null,
+    thumbnail_url: null,
     event_date_entries: [createEmptyDateRangeEntry()],
     sale_date_entries: [createEmptyDateRangeEntry()],
     ticket_types: [createEmptyTicketTypeEntry()],
     ticket_min_per_order: "",
     ticket_max_per_order: "",
-    staff_entries: { id: createId(), reserve_code: "" },
+    staff_code: "",
+    create_by_id: "",
+    create_by: "",
   }
 }
 

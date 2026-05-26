@@ -1,7 +1,8 @@
 import { PageLayout } from "@/components/layouts"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { TicketTypeCard } from "@/features/my-ticket-detail"
 import { getMyTicketDetail } from "@/mocks/my-ticket-detail"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
+import { formatDateLabel } from "@/utils/formatDate"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
 import * as React from "react"
@@ -52,7 +53,7 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
       {/* Mobile hero image */}
       <div className="relative sm:hidden">
         <img
-          src={detail.hero_image_url}
+          src={detail.poster_url}
           alt=""
           className="h-[125px] w-full object-cover"
         />
@@ -83,7 +84,7 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
             {/* Desktop hero image */}
             <div className="hidden overflow-hidden rounded-xl sm:block">
               <img
-                src={detail.hero_image_url}
+                src={detail.poster_url}
                 alt=""
                 className="h-[220px] w-full object-cover"
               />
@@ -94,16 +95,17 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
                 {detail.title}
               </p>
               <p className="text-base font-medium text-primary sm:text-base">
-                {detail.date}
+                {formatDateLabel(detail.show_start_date)} -{" "}
+                {formatDateLabel(detail.show_end_date)}
               </p>
               <p className="text-sm text-muted-foreground">{detail.venue}</p>
               <div className="h-px w-full bg-border" aria-hidden />
             </div>
 
-            {/* Description (desktop only per Figma layout) */}
+            {/* :TODO Change to editorJS */}
             <div className="hidden space-y-2 sm:block">
               <p className="text-xl leading-7 font-medium text-foreground">
-                {detail.description_title}
+                Description
               </p>
               <div className="text-base leading-6 whitespace-pre-wrap text-foreground">
                 {detail.description}
@@ -114,7 +116,7 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
           {/* Right column: tickets (desktop sticky), mobile: appears below header */}
           <div className="space-y-4 lg:sticky lg:top-24">
             <p className="text-lg font-medium text-primary sm:text-xl sm:leading-7 sm:tracking-tight">
-              {detail.ticket_title}
+              Your Ticket
             </p>
             <div className="space-y-4">
               {detail.ticket_types.map((t, i) => (

@@ -1,5 +1,6 @@
 import { PageLayout } from "@/components/layouts"
 import { getMyTicketDetail } from "@/mocks/my-ticket-detail"
+import { formatDateLabel } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
 
@@ -41,7 +42,7 @@ export default function MyTicketQrPage({ ticketId }: { ticketId: string }) {
           <p className="text-base leading-6 font-medium text-foreground">
             {detail.title}
           </p>
-          <p className="text-base font-medium text-primary">{detail.date}</p>
+          <p className="text-base font-medium text-primary">{`${formatDateLabel(detail.show_start_date)} - ${formatDateLabel(detail.show_end_date)}`}</p>
           <p className="text-sm text-muted-foreground">{detail.venue}</p>
         </div>
 

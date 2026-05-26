@@ -14,18 +14,59 @@ import { OrganizerEventCard } from "@/features/organizer-dashboard"
 import { ORGANIZER_EVENT_STATUS_FILTER_OPTIONS } from "@/constants/event-status.constant"
 import { ORGANIZER_EVENT_SORT_OPTIONS } from "@/constants/organizer-event-sort.constant"
 import type { OrganizerEvent } from "@/types"
-import {
-  comingEvents,
-  allEvents,
-  ORGANIZER_NAME,
-} from "@/mocks/organizer-dashboard"
+import { getAllEvents } from "@/services/eventService"
 import { Plus } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 export default function OrganizerDashboardPage() {
-  const [comingEventsState] = useState<OrganizerEvent[]>(comingEvents)
-  const [allEventsState] = useState<OrganizerEvent[]>(allEvents)
-  const [organizerNameState] = useState(ORGANIZER_NAME)
+  const [comingEventsState, setComingEventsState] = useState<OrganizerEvent[]>([])
+  const [allEventsState, setAllEventsState] = useState<OrganizerEvent[]>([])
+  const [organizerNameState, setOrganizerNameState] = useState("Organizer")
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const events = await getAllEvents()
+        const mapped: OrganizerEvent[] = events.map((event) => {
+          const firstShowDate = event.event_date_entries[0]?.start_date ?? ""
+          const showBeginLabel = firstShowDate
+            ? `Show begin ${new Date(firstShowDate).toLocaleString()}`
+            : "No schedule"
+
+          return {
+            event_id: event.id,
+            image_url: event.poster_url ?? "",
+            date: firstShowDate,
+            title: event.event_name,
+            venue: event.venue,
+            status_id: 0,
+            status_label: "Scheduled",
+            bottom_line: showBeginLabel,
+          }
+        })
+
+        const now = Date.now()
+        const coming = mapped.filter((event) => {
+          if (!event.date) return false
+          return new Date(event.date).getTime() >= now
+        })
+
+        setComingEventsState(coming)
+        setAllEventsState(mapped)
+        const firstCreator = events.find((event) => event.create_by)?.create_by
+        if (firstCreator) setOrganizerNameState(firstCreator)
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load organizer events"
+        toast.error(message)
+      }
+    }
+
+    load()
+  }, [])
 
   return (
     <PageLayout className="min-h-svh bg-muted/30">

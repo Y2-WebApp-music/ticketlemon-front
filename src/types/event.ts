@@ -39,14 +39,9 @@ export interface EventDetail {
   ticket_types: EventTicketType[]
 }
 
-export interface OrganizerStaffEntry {
-  id: string
-  reserve_code: string
-}
-
 /** Organizer event detail API response (includes staff codes). */
 export interface OrganizerEventDetail extends EventDetail {
-  staff_entries: OrganizerStaffEntry[]
+  staff_code: string
 }
 
 /** Ticket option for choose-ticket (per session) */

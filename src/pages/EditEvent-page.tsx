@@ -1,5 +1,6 @@
 import { PageLayout } from "@/components/layouts/page-layout"
 import { Button } from "@/components/ui/button"
+import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant"
 import {
   CreateEventSidebar,
   DateRangeSection,
@@ -12,27 +13,34 @@ import {
   type DateRangeEntry,
   type TicketTypeEntry,
 } from "@/features/create-event"
-import { Link, useParams } from "@tanstack/react-router"
-import { ChevronLeft, Save } from "lucide-react"
 import {
   createEmptyDateRangeEntry,
-  createEmptyStaffEntry,
   createEmptyTicketTypeEntry,
   createInitialCreateEventPayload,
   type CreateEventPayload,
 } from "@/types/create-event"
-import { useMemo, useRef, useState } from "react"
-import { CREATE_EVENT_SIDEBAR_SECTIONS } from "@/constants/create-event.constant"
+import {
+  getEventById,
+  updateEvent,
+  type EventRequestPayload,
+} from "@/services/eventService"
+import { Link, useNavigate, useParams } from "@tanstack/react-router"
+import { ChevronLeft, Save } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
+import type { OutputData } from "@editorjs/editorjs"
 
 const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024
 
 export default function EditEventPage() {
   const { eventId } = useParams({ from: "/organizer/edit/$eventId" })
+  const navigate = useNavigate()
 
   const [formData, setFormData] = useState<CreateEventPayload>(() =>
     createInitialCreateEventPayload()
   )
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
     event_name,
@@ -41,14 +49,14 @@ export default function EditEventPage() {
     impact_genre,
     age_restriction,
     description,
-    poster_preview,
-    thumbnail_preview,
+    poster_url,
+    thumbnail_url,
     event_date_entries,
     sale_date_entries,
     ticket_types,
     ticket_min_per_order,
     ticket_max_per_order,
-    staff_entries,
+    staff_code,
   } = formData
 
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({})
@@ -76,7 +84,7 @@ export default function EditEventPage() {
 
     setFormData((prev) => ({
       ...prev,
-      poster_preview: URL.createObjectURL(file),
+      poster_url: URL.createObjectURL(file),
     }))
   }
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,14 +97,14 @@ export default function EditEventPage() {
 
     setFormData((prev) => ({
       ...prev,
-      thumbnail_preview: URL.createObjectURL(file),
+      thumbnail_url: URL.createObjectURL(file),
     }))
   }
   const handlePosterRemove = () => {
-    setFormData((prev) => ({ ...prev, poster_preview: null }))
+    setFormData((prev) => ({ ...prev, poster_url: null }))
   }
   const handleThumbnailRemove = () => {
-    setFormData((prev) => ({ ...prev, thumbnail_preview: null }))
+    setFormData((prev) => ({ ...prev, thumbnail_url: null }))
   }
 
   const updateEventDateEntry = (id: string, patch: Partial<DateRangeEntry>) => {
@@ -195,16 +203,91 @@ export default function EditEventPage() {
   const updateStaffCode = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      staff_entries: {
-        id: prev.staff_entries.id ?? createEmptyStaffEntry().id,
-        reserve_code: value,
-      },
+      staff_code: value,
     }))
   }
 
+  useEffect(() => {
+    const toOutputData = (raw: string | null): OutputData | null => {
+      if (!raw) return null
+      try {
+        const parsed = JSON.parse(raw) as OutputData
+        if (parsed && Array.isArray(parsed.blocks)) return parsed
+      } catch {
+        // fallback to plain text paragraph below
+      }
+
+      return {
+        time: Date.now(),
+        version: "2.31.0",
+        blocks: [{ type: "paragraph", data: { text: raw } }],
+      }
+    }
+
+    const load = async () => {
+      try {
+        setIsLoading(true)
+        const event = await getEventById(eventId)
+
+        setFormData({
+          event_name: event.event_name,
+          category: event.category,
+          venue: event.venue,
+          impact_genre: event.impact_genre,
+          age_restriction: String(event.age_restriction ?? ""),
+          description: toOutputData(event.description),
+          poster_url: event.poster_url ?? null,
+          thumbnail_url: event.thumbnail_url ?? null,
+          event_date_entries:
+            event.event_date_entries?.map((entry) => ({
+              id: entry.id,
+              start_date: entry.start_date ? new Date(entry.start_date) : undefined,
+              end_date: entry.end_date ? new Date(entry.end_date) : undefined,
+              have_end_date: Boolean(entry.end_date),
+              is_collapsed: false,
+            })) ?? [createEmptyDateRangeEntry()],
+          sale_date_entries:
+            event.sale_date_entries?.map((entry) => ({
+              id: entry.id,
+              start_date: entry.start_date ? new Date(entry.start_date) : undefined,
+              end_date: entry.end_date ? new Date(entry.end_date) : undefined,
+              have_end_date: Boolean(entry.end_date),
+              is_collapsed: false,
+            })) ?? [createEmptyDateRangeEntry()],
+          ticket_types:
+            event.ticket_types?.map((ticket) => ({
+              id: ticket.id,
+              name: ticket.name,
+              price: String(ticket.price ?? ""),
+              quantity: String(ticket.quantity ?? ""),
+              detail: ticket.detail ?? "",
+              use_for_event_date_time: ticket.use_for_event_date_time,
+              sale_ticket_on: ticket.sale_ticket_on,
+              is_collapsed: ticket.is_collapsed,
+            })) ?? [createEmptyTicketTypeEntry()],
+          ticket_min_per_order: String(event.ticket_min_per_order ?? ""),
+          ticket_max_per_order: String(event.ticket_max_per_order ?? ""),
+          staff_code: event.staff_code ?? "",
+          create_by_id: event.create_by_id ?? "",
+          create_by: event.create_by ?? "",
+        })
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load event"
+        toast.error(message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    load()
+  }, [eventId])
+
   const completedSectionIds = useMemo(() => {
     const ids: string[] = []
-    if (poster_preview || thumbnail_preview)
+    if (poster_url || thumbnail_url)
       ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[0].id)
     if (
       event_name.trim() !== "" &&
@@ -231,7 +314,7 @@ export default function EditEventPage() {
       ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[5].id)
     if (ticket_min_per_order && ticket_max_per_order)
       ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[6].id)
-    if ((staff_entries.reserve_code ?? "").trim() !== "")
+    if ((staff_code ?? "").trim() !== "")
       ids.push(CREATE_EVENT_SIDEBAR_SECTIONS[7].id)
     return ids
   }, [
@@ -241,17 +324,63 @@ export default function EditEventPage() {
     event_name,
     event_date_entries,
     venue,
-    poster_preview,
+    poster_url,
     sale_date_entries,
-    staff_entries,
-    thumbnail_preview,
+    staff_code,
+    thumbnail_url,
     ticket_max_per_order,
     ticket_min_per_order,
     ticket_types,
   ])
 
-  const handleUpdateEvent = () => {
-    console.log("edit-event payload", formData)
+  const handleUpdateEvent = async () => {
+    try {
+      setIsSubmitting(true)
+      const payload: Partial<EventRequestPayload> = {
+        ...formData,
+        age_restriction: Number(formData.age_restriction),
+        description: formData.description ? JSON.stringify(formData.description) : null,
+        poster_url: formData.poster_url ?? undefined,
+        thumbnail_url: formData.thumbnail_url ?? undefined,
+        event_date_entries: formData.event_date_entries.map((entry) => ({
+          id: entry.id,
+          start_date: entry.start_date ? entry.start_date.toISOString() : "",
+          end_date: entry.have_end_date && entry.end_date ? entry.end_date.toISOString() : null,
+        })),
+        sale_date_entries: formData.sale_date_entries.map((entry) => ({
+          id: entry.id,
+          start_date: entry.start_date ? entry.start_date.toISOString() : "",
+          end_date: entry.have_end_date && entry.end_date ? entry.end_date.toISOString() : null,
+        })),
+        ticket_types: formData.ticket_types.map((ticket) => ({
+          id: ticket.id,
+          name: ticket.name,
+          price: ticket.price,
+          quantity: ticket.quantity,
+          detail: ticket.detail || null,
+          use_for_event_date_time: ticket.use_for_event_date_time,
+          sale_ticket_on: ticket.sale_ticket_on,
+          is_collapsed: ticket.is_collapsed,
+        })),
+        create_by_id: formData.create_by_id ?? "",
+        create_by: formData.create_by ?? "",
+      }
+
+      await updateEvent(eventId, payload)
+      toast.success("Event updated successfully")
+      navigate({
+        to: "/organizer/events/$eventId",
+        params: { eventId },
+      })
+    } catch (error) {
+      const message =
+        typeof error === "object" && error !== null && "message" in error
+          ? String(error.message)
+          : "Failed to update event"
+      toast.error(message)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const isEditEventReady = CREATE_EVENT_SIDEBAR_SECTIONS.every((section) =>
@@ -276,13 +405,16 @@ export default function EditEventPage() {
                 Edit Event
               </h1>
             </div>
+            {isLoading && (
+              <p className="text-sm text-muted-foreground">Loading event...</p>
+            )}
 
             <EventCoverSection
               sectionRef={(el) => {
                 sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[0].id] = el
               }}
-              posterPreview={poster_preview}
-              thumbnailPreview={thumbnail_preview}
+              posterPreview={poster_url}
+              thumbnailPreview={thumbnail_url}
               onPosterChange={handlePosterChange}
               onThumbnailChange={handleThumbnailChange}
               onPosterRemove={handlePosterRemove}
@@ -392,7 +524,7 @@ export default function EditEventPage() {
               sectionRef={(el) => {
                 sectionRefs.current[CREATE_EVENT_SIDEBAR_SECTIONS[7].id] = el
               }}
-              staffCode={staff_entries.reserve_code ?? ""}
+              staffCode={staff_code ?? ""}
               onStaffCodeChange={updateStaffCode}
             />
 
@@ -401,10 +533,10 @@ export default function EditEventPage() {
                 size="lg"
                 className="rounded-lg"
                 onClick={handleUpdateEvent}
-                disabled={!isEditEventReady}
+                disabled={!isEditEventReady || isSubmitting || isLoading}
               >
                 <Save className="size-4" />
-                Save Changes
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </Button>
             </div>
           </div>

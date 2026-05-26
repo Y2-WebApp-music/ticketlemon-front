@@ -3,21 +3,23 @@ export type MyTicketTicketTypeVariant = "unused" | "used"
 
 /** Single ticket type as returned from my-ticket detail API */
 export interface MyTicketTicketType {
+  id: string
   title: string
   description: string
   variant: MyTicketTicketTypeVariant
+  event_date: string
+  qr_code: string
 }
 
 /** My ticket detail API response */
 export interface MyTicketDetail {
   id: string
-  hero_image_url: string
+  poster_url: string
   title: string
-  date: string
+  show_start_date: string
+  show_end_date: string
   venue: string
-  description_title: string
   description: string
-  ticket_title: string
   ticket_types: MyTicketTicketType[]
 }
 

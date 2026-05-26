@@ -22,7 +22,6 @@ import {
 } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
 import dayjs from "dayjs"
-import { toast } from "sonner"
 import {
   CalendarRange,
   Focus,
@@ -35,6 +34,7 @@ import {
   Users,
 } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
 
 export interface OrganizerEventHeroProps {
   event: OrganizerEventDetail
@@ -533,15 +533,10 @@ export function OrganizerEventHero({
             </DialogDescription>
           </DialogHeader>
           <div className="mx-auto w-full max-w-[320px] space-y-2">
-            {event.staff_entries.length > 0 ? (
-              event.staff_entries.map((staff) => (
-                <div
-                  key={staff.id}
-                  className="rounded-lg border border-border bg-muted/30 px-4 py-3 text-center text-lg font-medium tracking-wider text-foreground"
-                >
-                  {staff.reserve_code}
-                </div>
-              ))
+            {event.staff_code ? (
+              <div className="rounded-lg border border-border bg-muted/30 px-4 py-3 text-center text-lg font-medium tracking-wider text-foreground">
+                {event.staff_code}
+              </div>
             ) : (
               <p className="text-center text-sm text-muted-foreground">
                 No staff code available.

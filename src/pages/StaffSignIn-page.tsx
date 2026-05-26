@@ -5,15 +5,35 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
+import { staffSignIn } from "@/services/eventService"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
 import * as React from "react"
+import { toast } from "sonner"
 
 export default function StaffSignInPage() {
   const navigate = useNavigate()
   const [staffCode, setStaffCode] = React.useState("")
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const canSubmit = staffCode.length === 6
+
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true)
+      await staffSignIn({ staff_code: staffCode })
+      toast.success("Staff signed in")
+      navigate({ to: "/staff" })
+    } catch (error) {
+      const message =
+        typeof error === "object" && error !== null && "message" in error
+          ? String(error.message)
+          : "Invalid staff code"
+      toast.error(message)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <div className="min-h-svh bg-background">
@@ -55,10 +75,10 @@ export default function StaffSignInPage() {
             type="button"
             size="lg"
             className="mt-10 px-5 text-base"
-            disabled={!canSubmit}
-            onClick={() => navigate({ to: "/staff" })}
+            disabled={!canSubmit || isSubmitting}
+            onClick={handleSubmit}
           >
-            Sign In
+            {isSubmitting ? "Signing In..." : "Sign In"}
           </Button>
         </section>
       </main>

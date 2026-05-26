@@ -4,7 +4,7 @@ import {
   OrganizerEventTabs,
 } from "@/features/organizer-dashboard"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
-import { getOrganizerEventDetail } from "@/mocks/event-detail"
+import { getEventById } from "@/services/eventService"
 import {
   DEFAULT_SELLING_TICKET_SELECTION,
   MOCK_SELLING_TABLE_RESPONSE,
@@ -14,7 +14,8 @@ import type { SellingTicketSelection } from "@/types/organizer"
 import { formatDateLabel } from "@/utils/formatDate"
 import type { OutputData } from "@editorjs/editorjs"
 import { Link } from "@tanstack/react-router"
-import { useMemo, useState } from "react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 /** Organizer: notOnSale = now < start_sale_date; available = remaining > 0 && now > start_sale_date; saleEnd = remaining === 0 */
 function mapOrganizerTicketTypesToCardProps(
@@ -85,15 +86,87 @@ export interface OrganizerEventDetailPageProps {
 export default function OrganizerEventDetailPage({
   eventId,
 }: OrganizerEventDetailPageProps) {
-  const eventData = useMemo<OrganizerEventDetail | undefined>(
-    () => getOrganizerEventDetail(eventId),
-    [eventId]
-  )
+  const [eventData, setEventData] = useState<OrganizerEventDetail | undefined>()
   const [openingSellingTicket, setOpeningSellingTicket] =
     useState<SellingTicketSelection | null>(null)
   const [descriptionOverrides, setDescriptionOverrides] = useState<
     Record<string, OutputData>
   >({})
+
+  useEffect(() => {
+    const toOutputData = (raw: string | null): OutputData => {
+      if (!raw) return { time: Date.now(), version: "2.31.0", blocks: [] }
+      try {
+        const parsed = JSON.parse(raw) as OutputData
+        if (parsed && Array.isArray(parsed.blocks)) return parsed
+      } catch {
+        // fallback to paragraph
+      }
+      return {
+        time: Date.now(),
+        version: "2.31.0",
+        blocks: [{ type: "paragraph", data: { text: raw } }],
+      }
+    }
+
+    const load = async () => {
+      try {
+        const apiEvent = await getEventById(eventId)
+        const eventDateMap = new Map(
+          apiEvent.event_date_entries.map((entry) => [entry.id, entry.start_date])
+        )
+        const saleDateMap = new Map(
+          apiEvent.sale_date_entries.map((entry) => [entry.id, entry.start_date])
+        )
+        const ticketTypes: EventTicketType[] = apiEvent.ticket_types.map((ticket) => {
+          const total = Number(ticket.quantity) || 0
+          return {
+            id: ticket.id,
+            title: ticket.name,
+            description: ticket.detail ?? undefined,
+            price: String(ticket.price),
+            total,
+            remaining: total,
+            start_sale_date:
+              saleDateMap.get(ticket.sale_ticket_on) ??
+              apiEvent.sale_date_entries[0]?.start_date ??
+              "",
+            end_sale_date: null,
+            event_date:
+              eventDateMap.get(ticket.use_for_event_date_time) ??
+              apiEvent.event_date_entries[0]?.start_date ??
+              "",
+            sold_out_date: null,
+          }
+        })
+
+        setEventData({
+          id: apiEvent.id,
+          status_id: 0,
+          status_label: "",
+          title: apiEvent.event_name,
+          poster_url: apiEvent.poster_url ?? "",
+          thumbnail_url: apiEvent.thumbnail_url ?? "",
+          event_date_entries: apiEvent.event_date_entries.map((entry) => entry.start_date),
+          venue: apiEvent.venue,
+          age_restriction: apiEvent.age_restriction,
+          sale_date_entries: apiEvent.sale_date_entries.map((entry) => entry.start_date),
+          description: toOutputData(apiEvent.description),
+          ticket_types: ticketTypes,
+          staff_code: apiEvent.staff_code ?? "",
+        })
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load event"
+        toast.error(message)
+        setEventData(undefined)
+      }
+    }
+
+    load()
+  }, [eventId])
 
   if (!eventData) {
     return (

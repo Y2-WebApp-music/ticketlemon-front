@@ -1,14 +1,49 @@
 import { PageLayout } from "@/components/layouts/page-layout"
 import { StaffEventCard } from "@/features/staff"
-import { STAFF_EVENTS, STAFF_NAME } from "@/mocks/staff"
+import { getAllEvents } from "@/services/eventService"
 import type { EventCardItem } from "@/types/event"
 import { formatTitleDate } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
 
 export default function StaffLandingPage() {
-  const [staffEvents] = useState<EventCardItem[]>(STAFF_EVENTS)
-  const [currentEvent] = useState<EventCardItem | undefined>(STAFF_EVENTS[0])
+  const [staffEvents, setStaffEvents] = useState<EventCardItem[]>([])
+  const [staffName] = useState("Staff")
+  const [currentEvent, setCurrentEvent] = useState<EventCardItem | undefined>()
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const events = await getAllEvents()
+        const mapped: EventCardItem[] = events.map((event) => {
+          const startDate = event.event_date_entries[0]?.start_date ?? ""
+          const endDate =
+            event.event_date_entries[event.event_date_entries.length - 1]?.start_date ??
+            startDate
+          return {
+            event_id: event.id,
+            show_start_date: startDate,
+            show_end_date: endDate,
+            title: event.event_name,
+            venue: event.venue,
+            poster_url: event.poster_url ?? "",
+          }
+        })
+
+        setStaffEvents(mapped)
+        setCurrentEvent(mapped[0])
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load staff events"
+        toast.error(message)
+      }
+    }
+
+    load()
+  }, [])
 
   return (
     <PageLayout className="min-h-svh bg-muted/30">
@@ -16,7 +51,7 @@ export default function StaffLandingPage() {
         <section className="min-w-0 flex-1 space-y-6">
           <header className="space-y-1">
             <h1 className="text-2xl font-semibold text-primary">Event Staff</h1>
-            <p className="text-sm text-muted-foreground">{STAFF_NAME}</p>
+            <p className="text-sm text-muted-foreground">{staffName}</p>
           </header>
 
           {currentEvent && (

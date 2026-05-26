@@ -10,7 +10,7 @@ export type Permission = string
 export interface SignInResponse {
   access_token: string
   role: UserRole
-  permission: Permission[]
+  // permission: Permission[]
 }
 
 export interface RegisterStep1DataForm {

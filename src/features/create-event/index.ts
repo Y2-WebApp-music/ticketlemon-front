@@ -26,6 +26,5 @@ export { createId, formatDateRangeLabel } from "@/types/create-event"
 export type {
   CreateEventPayload,
   DateRangeEntry,
-  StaffEntry,
   TicketTypeEntry,
 } from "@/types/create-event"

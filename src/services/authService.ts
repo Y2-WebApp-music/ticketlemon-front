@@ -1,6 +1,6 @@
-import httpClient from "./httpClientService"
-import { formatResponse } from "./responseHandlerService"
+import apiService from "./apiService"
 import type { SignInResponse } from "@/types/auth"
+import type { ApiSignUpResponse } from "@/types/api-response"
 import { useAuthStore } from "@/stores/auth-store"
 
 export interface SignInCredentials {
@@ -8,28 +8,44 @@ export interface SignInCredentials {
   password: string
 }
 
-/**
- * Sign in with email and password.
- * On success, stores access_token, role, and permission in the auth store (and localStorage via persist).
- * Expects API to return body shape { access_token, role, permission } or { data: { access_token, role, permission } }.
- * @throws Error or formatted API error on failure
- */
+export interface SignUpPayload {
+  email: string
+  first_name: string
+  last_name: string
+  phone_number: string
+  birthdate: string
+  gender: string
+  profile_image?: string
+  password: string
+}
+
 export async function signIn(
   credentials: SignInCredentials
 ): Promise<SignInResponse> {
-  const res = await httpClient.request({
+  const response = await apiService.fetchData<SignInResponse>({
     method: "POST",
-    url: "/auth/sign-in",
+    url: "/api/login",
     data: credentials,
   })
-  const response = formatResponse<SignInResponse>(res)
   const payload = response.data
   useAuthStore.getState().setAuth({
     access_token: payload.access_token,
     role: payload.role,
-    permission: payload.permission ?? [],
+    // permission: payload.permission ?? [],
   })
   return payload
+}
+
+export async function signUp(
+  payload: SignUpPayload
+): Promise<ApiSignUpResponse> {
+  const response = await apiService.fetchData<ApiSignUpResponse>({
+    method: "POST",
+    url: "/api/signup",
+    data: payload,
+  })
+
+  return response.data
 }
 
 /** Clear auth state (e.g. on sign out). */
