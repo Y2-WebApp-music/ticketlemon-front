@@ -35,36 +35,28 @@ import type { UserProfile } from "@/types"
 
 export interface ProfileFormProps {
   initialValues: UserProfile
+  onSave?: (values: UserProfile) => Promise<void>
 }
 
-export function ProfileForm({ initialValues }: ProfileFormProps) {
+export function ProfileForm({ initialValues, onSave }: ProfileFormProps) {
   const [values, setValues] = React.useState<UserProfile>(initialValues)
   const [saving, setSaving] = React.useState(false)
 
   const firstNameTrim = values.first_name.trim()
   const lastNameTrim = values.last_name.trim()
-  const emailTrim = values.email.trim()
   const phoneTrim = values.phone.trim()
 
-  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrim)
   const phoneOk = phoneTrim.length === 0 ? true : /^\d{1,13}$/.test(phoneTrim)
 
   const firstNameError =
     firstNameTrim.length === 0 ? "First name is required." : undefined
   const lastNameError =
     lastNameTrim.length === 0 ? "Last name is required." : undefined
-  const emailError =
-    emailTrim.length === 0
-      ? "Email is required."
-      : emailOk
-        ? undefined
-        : "Enter a valid email."
   const phoneError = phoneOk
     ? undefined
     : "Phone number must be digits only (max 13)."
 
-  const canSave =
-    !firstNameError && !lastNameError && !emailError && !phoneError
+  const canSave = !firstNameError && !lastNameError && !phoneError
 
   const update = <K extends keyof UserProfile>(key: K, value: UserProfile[K]) =>
     setValues((prev) => ({ ...prev, [key]: value }))
@@ -171,21 +163,14 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="profile-email">
-            Email <span className="text-destructive">*</span>
-          </Label>
+          <Label htmlFor="profile-email">Email</Label>
           <Input
             id="profile-email"
             type="email"
             value={values.email}
-            onChange={(e) => update("email", e.target.value)}
-            placeholder="Email"
-            required
-            aria-invalid={emailError ? true : undefined}
+            readOnly
+            className="cursor-default bg-muted text-muted-foreground"
           />
-          {emailError && (
-            <p className="text-sm text-destructive">{emailError}</p>
-          )}
         </div>
 
         <div className="space-y-2">
@@ -253,9 +238,10 @@ export function ProfileForm({ initialValues }: ProfileFormProps) {
           onClick={async () => {
             setSaving(true)
             try {
-              // Placeholder for API call
-              await new Promise((r) => setTimeout(r, 500))
+              await onSave?.(values)
               toast.success("Profile updated")
+            } catch {
+              toast.error("Failed to update profile")
             } finally {
               setSaving(false)
             }

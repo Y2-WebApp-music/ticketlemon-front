@@ -6,7 +6,11 @@ import {
   ProfileForm,
   type AccountSettingsSection,
 } from "@/features/profile"
-import { paymentMethodsMock, userProfileMock } from "@/mocks/profile"
+import { paymentMethodsMock } from "@/mocks/profile"
+import { getProfile } from "@/services/userService"
+import { updateUser, type UserUpdatePayload } from "@/services/staffService"
+import { useUserStore } from "@/stores/user-store"
+import type { UserProfile } from "@/types/profile"
 import * as React from "react"
 
 export default function ProfilePage() {
@@ -19,6 +23,32 @@ export default function ProfilePage() {
   ]
 
   const [activeId, setActiveId] = React.useState<string>("basic")
+  const [profile, setProfile] = React.useState<UserProfile | null>(null)
+  const [loading, setLoading] = React.useState(true)
+
+  const userId = useUserStore((s) => s.user_id)
+
+  React.useEffect(() => {
+    if (!userId) {
+      setLoading(false)
+      return
+    }
+    getProfile(userId)
+      .then(setProfile)
+      .finally(() => setLoading(false))
+  }, [userId])
+
+  async function handleSaveProfile(values: UserProfile) {
+    if (!userId) return
+    const payload: UserUpdatePayload = {
+      first_name: values.first_name,
+      last_name: values.last_name,
+      phone_number: values.phone_country_code + values.phone,
+      profile_image: values.image_url || undefined,
+    }
+    await updateUser(userId, payload)
+    setProfile(values)
+  }
 
   return (
     <PageLayout>
@@ -43,7 +73,17 @@ export default function ProfilePage() {
 
           <div className="max-w-[720px]">
             {activeId === "basic" && (
-              <ProfileForm initialValues={userProfileMock} />
+              loading ? (
+                <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
+                  Loading profile...
+                </div>
+              ) : profile ? (
+                <ProfileForm initialValues={profile} onSave={handleSaveProfile} />
+              ) : (
+                <div className="rounded-xl border border-border bg-card p-5 text-sm text-destructive">
+                  Failed to load profile.
+                </div>
+              )
             )}
             {activeId === "password" && <ChangePasswordCard />}
             {activeId === "payment" && (
