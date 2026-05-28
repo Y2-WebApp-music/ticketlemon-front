@@ -57,7 +57,8 @@ export function EventCard({
   className,
   status,
 }: EventCardProps) {
-  const overlay = status !== undefined ? STATUS_OVERLAY[status as EventStatus] : undefined
+  const overlay =
+    status !== undefined ? STATUS_OVERLAY[status as EventStatus] : undefined
   const dimText = !!overlay
 
   const content = (
@@ -80,7 +81,7 @@ export function EventCard({
         {overlay && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/65">
             <span
-              className="text-center text-xs font-black uppercase tracking-widest sm:text-sm"
+              className="text-center text-xs font-black tracking-widest uppercase sm:text-sm"
               style={{ color: overlay.color }}
             >
               {overlay.label}
@@ -93,10 +94,20 @@ export function EventCard({
           "relative z-10 flex min-w-0 flex-1 shrink-0 flex-col justify-start gap-0.5 bg-card p-4 sm:min-h-[100px] sm:flex-none sm:p-3"
         )}
       >
-        <p className={cn("text-sm leading-7 font-medium uppercase sm:leading-normal", dimText ? "text-muted-foreground" : "text-primary")}>
+        <p
+          className={cn(
+            "text-sm leading-7 font-medium uppercase sm:leading-normal",
+            dimText ? "text-muted-foreground" : "text-primary"
+          )}
+        >
           {date}
         </p>
-        <p className={cn("line-clamp-2 text-sm leading-snug font-semibold sm:text-sm", dimText ? "text-muted-foreground" : "text-foreground")}>
+        <p
+          className={cn(
+            "line-clamp-2 text-sm leading-snug font-semibold sm:text-sm",
+            dimText ? "text-muted-foreground" : "text-foreground"
+          )}
+        >
           {title}
         </p>
         <p className="line-clamp-1 text-xs leading-[14px] font-medium text-muted-foreground">

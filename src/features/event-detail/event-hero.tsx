@@ -26,7 +26,8 @@ export function EventHero({
   status_id,
   onBuyTickets,
 }: EventHeroProps) {
-  const buyDisabled = status_id !== undefined && DISABLED_STATUSES.has(status_id)
+  const buyDisabled =
+    status_id !== undefined && DISABLED_STATUSES.has(status_id)
   const formattedDates = event_date_entries.map((iso) => formatDateLabel(iso))
   return (
     <>

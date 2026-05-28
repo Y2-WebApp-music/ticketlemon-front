@@ -72,19 +72,21 @@ export default function ProfilePage() {
           </div>
 
           <div className="max-w-[720px]">
-            {activeId === "basic" && (
-              loading ? (
+            {activeId === "basic" &&
+              (loading ? (
                 <div className="rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
                   Loading profile...
                 </div>
               ) : profile ? (
-                <ProfileForm initialValues={profile} onSave={handleSaveProfile} />
+                <ProfileForm
+                  initialValues={profile}
+                  onSave={handleSaveProfile}
+                />
               ) : (
                 <div className="rounded-xl border border-border bg-card p-5 text-sm text-destructive">
                   Failed to load profile.
                 </div>
-              )
-            )}
+              ))}
             {activeId === "password" && <ChangePasswordCard />}
             {activeId === "payment" && (
               <PaymentMethodsCard initialMethods={paymentMethodsMock} />
