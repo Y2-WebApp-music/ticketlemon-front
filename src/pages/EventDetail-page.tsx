@@ -6,7 +6,7 @@ import {
   type TicketTypeGroup,
 } from "@/features/event-detail"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
-import { resolveEventStatusId } from "@/constants/event-status.constant"
+import { resolveEventStatus } from "@/constants/event-status.constant"
 import { getEventById } from "@/services/eventService"
 import type { EventDetail, EventTicketType } from "@/types/event"
 import type { PurchaseOrderItem } from "@/types/purchase"
@@ -204,8 +204,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
 
         setEvent({
           id: apiEvent.id,
-          status_id: resolveEventStatusId(apiEvent.status, endDate),
-          status_label: apiEvent.status ?? "",
+          status: resolveEventStatus(apiEvent.status, endDate),
           title: apiEvent.event_name,
           poster_url: apiEvent.poster_url ?? "",
           thumbnail_url: apiEvent.thumbnail_url ?? "",
@@ -300,7 +299,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
             imageUrl={event.poster_url}
             event_date_entries={event.event_date_entries}
             venue={event.venue}
-            status_id={event.status_id}
+            status={event.status}
             onBuyTickets={() => setStep("choose")}
           />
           <EventTabs

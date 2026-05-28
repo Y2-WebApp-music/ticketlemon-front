@@ -1,73 +1,86 @@
-export const EventStatus = {
-  DRAFT: 1,
-  SCHEDULED: 2,
-  ON_SALE: 3,
-  SOLD_OUT: 4,
-  SHOW: 5,
-  END: 6,
-  CANCELLED: 7,
-} as const
+/** Prisma `EventStatus` enum — same values returned by the API */
+export type EventStatus =
+  | "Draft"
+  | "Scheduled"
+  | "OnSale"
+  | "SoldOut"
+  | "Show"
+  | "EventEnd"
+  | "Cancel"
 
-export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
+export const EVENT_STATUS = {
+  DRAFT: "Draft",
+  SCHEDULED: "Scheduled",
+  ON_SALE: "OnSale",
+  SOLD_OUT: "SoldOut",
+  SHOW: "Show",
+  END: "EventEnd",
+  CANCELLED: "Cancel",
+} as const satisfies Record<string, EventStatus>
 
-/** Badge variant per EventStatus (for organizer event hero, cards, etc.) */
+export const EVENT_STATUS_LABEL: Record<EventStatus, string> = {
+  Draft: "Draft",
+  Scheduled: "Scheduled",
+  OnSale: "On Sale",
+  SoldOut: "Sold Out",
+  Show: "Show",
+  EventEnd: "Event End",
+  Cancel: "Cancelled",
+}
+
 export const EVENT_STATUS_BADGE_VARIANT: Record<
   EventStatus,
   "default" | "secondary" | "destructive" | "outline" | "pass" | "warning"
 > = {
-  [EventStatus.DRAFT]: "secondary",
-  [EventStatus.SCHEDULED]: "warning",
-  [EventStatus.ON_SALE]: "default",
-  [EventStatus.SOLD_OUT]: "outline",
-  [EventStatus.SHOW]: "pass",
-  [EventStatus.END]: "secondary",
-  [EventStatus.CANCELLED]: "destructive",
+  Draft: "secondary",
+  Scheduled: "warning",
+  OnSale: "default",
+  SoldOut: "outline",
+  Show: "pass",
+  EventEnd: "secondary",
+  Cancel: "destructive",
 }
 
-/** Resolve badge variant from API status_id; falls back to "default" if unknown */
+export function getEventStatusLabel(
+  status: EventStatus | string | null | undefined
+): string {
+  if (!status) return ""
+  return EVENT_STATUS_LABEL[status as EventStatus] ?? status
+}
+
 export function getEventStatusBadgeVariant(
-  statusId: number
+  status: EventStatus | string | null | undefined
 ): "default" | "secondary" | "destructive" | "outline" | "pass" | "warning" {
-  return EVENT_STATUS_BADGE_VARIANT[statusId as EventStatus] ?? "default"
+  if (!status || !(status in EVENT_STATUS_BADGE_VARIANT)) return "default"
+  return EVENT_STATUS_BADGE_VARIANT[status as EventStatus]
 }
 
-/** Map Prisma EventStatus enum string → numeric EventStatus ID */
-export const PRISMA_STATUS_TO_ID: Record<string, EventStatus> = {
-  Draft: EventStatus.DRAFT,
-  Scheduled: EventStatus.SCHEDULED,
-  OnSale: EventStatus.ON_SALE,
-  SoldOut: EventStatus.SOLD_OUT,
-  Show: EventStatus.SHOW,
-  EventEnd: EventStatus.END,
-  Cancel: EventStatus.CANCELLED,
-}
+const EVENT_STATUS_SET = new Set<string>(Object.values(EVENT_STATUS))
 
-/** Convert a Prisma status string to a numeric EventStatus ID.
- *  Falls back to computing END from show_end_date if status is missing. */
-export function resolveEventStatusId(
+/** Resolve API status; infers EventEnd from date when status is missing. */
+export function resolveEventStatus(
   prismaStatus: string | null | undefined,
   showEndDate: string
 ): EventStatus {
-  if (prismaStatus && prismaStatus in PRISMA_STATUS_TO_ID) {
-    return PRISMA_STATUS_TO_ID[prismaStatus]
+  if (prismaStatus && EVENT_STATUS_SET.has(prismaStatus)) {
+    return prismaStatus as EventStatus
   }
-  // Fallback: infer END from date when status is unavailable
   if (showEndDate && new Date(showEndDate) < new Date()) {
-    return EventStatus.END
+    return EVENT_STATUS.END
   }
-  return EventStatus.ON_SALE
+  return EVENT_STATUS.ON_SALE
 }
 
 /** Organizer dashboard: Event Status filter dropdown options */
 export const ORGANIZER_EVENT_STATUS_FILTER_OPTIONS = [
-  { value: 0, label: "All" },
-  { value: 1, label: "Show" },
-  { value: 2, label: "On Sale" },
-  { value: 3, label: "Schedule" },
-  { value: 4, label: "Sold Out" },
-  { value: 5, label: "Draft" },
-  { value: 6, label: "Event End" },
-  { value: 7, label: "Cancelled" },
+  { value: "all", label: "All" },
+  { value: EVENT_STATUS.SHOW, label: "Show" },
+  { value: EVENT_STATUS.ON_SALE, label: "On Sale" },
+  { value: EVENT_STATUS.SCHEDULED, label: "Schedule" },
+  { value: EVENT_STATUS.SOLD_OUT, label: "Sold Out" },
+  { value: EVENT_STATUS.DRAFT, label: "Draft" },
+  { value: EVENT_STATUS.END, label: "Event End" },
+  { value: EVENT_STATUS.CANCELLED, label: "Cancelled" },
 ] as const
 
 export type OrganizerEventStatusFilterValue =

@@ -3,8 +3,10 @@ import { Card } from "@/components/ui/card"
 import { Radio, Target, Ticket, Timer } from "lucide-react"
 import { Link } from "@tanstack/react-router"
 import {
-  EventStatus,
+  EVENT_STATUS,
   getEventStatusBadgeVariant,
+  getEventStatusLabel,
+  type EventStatus,
 } from "@/constants/event-status.constant"
 
 export interface OrganizerEventCardProps {
@@ -14,8 +16,7 @@ export interface OrganizerEventCardProps {
   date: string
   title: string
   venue: string
-  status_id: number
-  status_label: string
+  status: EventStatus
   /** Bottom line e.g. "Show begin 17:00", "33,333 Remaining", "Start Sale 18 Feb 26, 15:00" */
   bottom_line: string
 }
@@ -27,12 +28,11 @@ export function OrganizerEventCard({
   date,
   title,
   venue,
-  status_id,
-  status_label,
+  status,
   bottom_line,
 }: OrganizerEventCardProps) {
-  const badgeVariant = getEventStatusBadgeVariant(status_id)
-  const label = status_label
+  const badgeVariant = getEventStatusBadgeVariant(status)
+  const label = getEventStatusLabel(status)
 
   return (
     <Link
@@ -61,17 +61,16 @@ export function OrganizerEventCard({
           <p className="text-sm leading-[14px] font-medium text-muted-foreground">
             {venue}
           </p>
-          {/* Dynamic Info */}
           <div className="mt-auto flex items-center gap-1 rounded-full border border-primary px-3 py-1.5 text-xs font-medium text-primary">
-            {status_id === EventStatus.SHOW ? (
+            {status === EVENT_STATUS.SHOW ? (
               <Target className="size-4 shrink-0" aria-hidden />
-            ) : status_id === EventStatus.ON_SALE ? (
+            ) : status === EVENT_STATUS.ON_SALE ? (
               <Ticket className="size-4 shrink-0" aria-hidden />
-            ) : status_id === EventStatus.SOLD_OUT ? (
+            ) : status === EVENT_STATUS.SOLD_OUT ? (
               <Radio className="size-4 shrink-0" aria-hidden />
-            ) : status_id === EventStatus.SCHEDULED ? (
+            ) : status === EVENT_STATUS.SCHEDULED ? (
               <Timer className="size-4 shrink-0" aria-hidden />
-            ) : status_id === EventStatus.END ? (
+            ) : status === EVENT_STATUS.END ? (
               <Target className="size-4 shrink-0" aria-hidden />
             ) : (
               <Ticket className="size-4 shrink-0" aria-hidden />

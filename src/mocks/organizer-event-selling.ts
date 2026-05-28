@@ -137,4 +137,6 @@ export const MOCK_SELLING_TABLE_RESPONSE: SellingTableResponse = {
   total: 156,
   page: 1,
   perPage: 15,
+  event_date_entries: [],
+  ticket_types: [],
 }

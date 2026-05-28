@@ -20,8 +20,10 @@ import type { TicketTypeCardProps } from "@/features/ticket-type"
 import type { OutputData } from "@editorjs/editorjs"
 import { ChevronUp, Pencil, Save, Ticket } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
-import type { SellingTableResponse } from "@/types/organizer"
-import type { EventTicketType } from "@/types/event"
+import type {
+  EventSellingQueryParams,
+  SellingTableResponse,
+} from "@/types/organizer"
 
 export interface OrganizerTicketTypeGroup {
   sessionLabel: string
@@ -34,8 +36,9 @@ export interface OrganizerEventTabsProps {
   /** Ticket types grouped by event_date (collapsible per group); variants: notOnSale, available, saleEnd */
   ticketGroups: OrganizerTicketTypeGroup[]
   sellingTableResponse: SellingTableResponse | null
-  showDateList: string[]
-  ticketTypes: EventTicketType[]
+  sellingTableLoading?: boolean
+  onSellingQueryChange?: (params: EventSellingQueryParams) => void
+  onSellingTicketSelect?: (selection: OrganizerSellingTicketSelection) => void
   /** Open selling table from external trigger (e.g. hero See Selling button). */
   openingSellingTicket?: OrganizerSellingTicketSelection | null
   /** Called when description is saved (e.g. after Save button); omit to only allow in-place editing */
@@ -85,8 +88,9 @@ export function OrganizerEventTabs({
   description,
   ticketGroups,
   sellingTableResponse,
-  showDateList,
-  ticketTypes,
+  sellingTableLoading = false,
+  onSellingQueryChange,
+  onSellingTicketSelect,
   openingSellingTicket,
   onDescriptionSave,
 }: OrganizerEventTabsProps) {
@@ -108,14 +112,22 @@ export function OrganizerEventTabs({
     [onDescriptionSave]
   )
 
+  const openSellingTicket = useCallback(
+    (selection: OrganizerSellingTicketSelection) => {
+      setActiveTab("ticket-type")
+      setSelectedSellingTicket(selection)
+      onSellingTicketSelect?.(selection)
+    },
+    [onSellingTicketSelect]
+  )
+
   useEffect(() => {
     if (!openingSellingTicket) return
     const timerId = window.setTimeout(() => {
-      setActiveTab("ticket-type")
-      setSelectedSellingTicket(openingSellingTicket)
+      openSellingTicket(openingSellingTicket)
     }, 0)
     return () => window.clearTimeout(timerId)
-  }, [openingSellingTicket])
+  }, [openingSellingTicket, openSellingTicket])
 
   return (
     <div className="mx-auto mt-6 w-full max-w-[1280px] px-4 pb-16 sm:px-6">
@@ -174,12 +186,14 @@ export function OrganizerEventTabs({
           </div>
         </TabsContent>
         <TabsContent value="ticket-type" className="mt-0 space-y-3">
-          {selectedSellingTicket && sellingTableResponse ? (
+          {selectedSellingTicket &&
+          sellingTableResponse &&
+          onSellingQueryChange ? (
             <OrganizerEventSellingTable
               selectedTicket={selectedSellingTicket}
               sellingTableResponse={sellingTableResponse}
-              showDateList={showDateList}
-              ticketTypes={ticketTypes}
+              isLoading={sellingTableLoading}
+              onQueryChange={onSellingQueryChange}
               onBack={() => setSelectedSellingTicket(null)}
             />
           ) : (
@@ -206,7 +220,7 @@ export function OrganizerEventTabs({
                         onClick={
                           isOpenable
                             ? () =>
-                                setSelectedSellingTicket({
+                                openSellingTicket({
                                   sessionLabel: group.sessionLabel,
                                   title: ticket.title,
                                 })
@@ -217,7 +231,7 @@ export function OrganizerEventTabs({
                             ? (e) => {
                                 if (e.key === "Enter" || e.key === " ") {
                                   e.preventDefault()
-                                  setSelectedSellingTicket({
+                                  openSellingTicket({
                                     sessionLabel: group.sessionLabel,
                                     title: ticket.title,
                                   })

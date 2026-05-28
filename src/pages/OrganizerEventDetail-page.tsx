@@ -4,17 +4,19 @@ import {
   OrganizerEventTabs,
 } from "@/features/organizer-dashboard"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
-import { getEventById } from "@/services/eventService"
-import {
-  DEFAULT_SELLING_TICKET_SELECTION,
-  MOCK_SELLING_TABLE_RESPONSE,
-} from "@/mocks/organizer-event-selling"
+import { getEventById, getEventSelling } from "@/services/eventService"
+import { DEFAULT_SELLING_TICKET_SELECTION } from "@/mocks/organizer-event-selling"
 import type { EventTicketType, OrganizerEventDetail } from "@/types/event"
-import type { SellingTicketSelection } from "@/types/organizer"
+import type {
+  EventSellingQueryParams,
+  SellingTableResponse,
+  SellingTicketSelection,
+} from "@/types/organizer"
+import { resolveEventStatus } from "@/constants/event-status.constant"
 import { formatDateLabel } from "@/utils/formatDate"
 import type { OutputData } from "@editorjs/editorjs"
 import { Link } from "@tanstack/react-router"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { toast } from "sonner"
 
 /** Organizer: notOnSale = now < start_sale_date; available = remaining > 0 && now > start_sale_date; saleEnd = remaining === 0 */
@@ -89,9 +91,69 @@ export default function OrganizerEventDetailPage({
   const [eventData, setEventData] = useState<OrganizerEventDetail | undefined>()
   const [openingSellingTicket, setOpeningSellingTicket] =
     useState<SellingTicketSelection | null>(null)
+  const [eventDateEntryIdByLabel, setEventDateEntryIdByLabel] = useState<
+    Record<string, string>
+  >({})
+  const [sellingTableResponse, setSellingTableResponse] =
+    useState<SellingTableResponse | null>(null)
+  const [sellingTableLoading, setSellingTableLoading] = useState(false)
   const [descriptionOverrides, setDescriptionOverrides] = useState<
     Record<string, OutputData>
   >({})
+
+  const loadSellingTable = useCallback(
+    async (params: EventSellingQueryParams) => {
+      setSellingTableLoading(true)
+      try {
+        const response = await getEventSelling(eventId, params)
+        setSellingTableResponse(response)
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load selling data"
+        toast.error(message)
+        setSellingTableResponse(null)
+      } finally {
+        setSellingTableLoading(false)
+      }
+    },
+    [eventId]
+  )
+
+  const resolveSellingQuery = useCallback(
+    (
+      selection: SellingTicketSelection,
+      overrides: EventSellingQueryParams = {}
+    ): EventSellingQueryParams => {
+      const ticketType = eventData?.ticket_types.find(
+        (ticket) => ticket.title === selection.title
+      )
+
+      return {
+        page: 1,
+        per_page: 15,
+        event_date_entry_id: eventDateEntryIdByLabel[selection.sessionLabel],
+        ticket_type_id: ticketType?.id,
+        ...overrides,
+      }
+    },
+    [eventData?.ticket_types, eventDateEntryIdByLabel]
+  )
+
+  const handleSellingTicketSelect = useCallback(
+    (selection: SellingTicketSelection) => {
+      void loadSellingTable(resolveSellingQuery(selection))
+    },
+    [loadSellingTable, resolveSellingQuery]
+  )
+
+  const handleSellingQueryChange = useCallback(
+    (params: EventSellingQueryParams) => {
+      void loadSellingTable(params)
+    },
+    [loadSellingTable]
+  )
 
   useEffect(() => {
     const toOutputData = (raw: unknown): OutputData => {
@@ -167,10 +229,19 @@ export default function OrganizerEventDetailPage({
           }
         )
 
+        const dateEntryIdByLabel: Record<string, string> = {}
+        for (const entry of apiEvent.event_date_entries) {
+          dateEntryIdByLabel[formatDateLabel(entry.start_date)] = entry.id
+        }
+        setEventDateEntryIdByLabel(dateEntryIdByLabel)
+
+        const lastShowDate =
+          apiEvent.event_date_entries[apiEvent.event_date_entries.length - 1]
+            ?.start_date ?? ""
+
         setEventData({
           id: apiEvent.id,
-          status_id: 0,
-          status_label: "",
+          status: resolveEventStatus(apiEvent.status, lastShowDate),
           title: apiEvent.event_name,
           poster_url: apiEvent.poster_url ?? "",
           thumbnail_url: apiEvent.thumbnail_url ?? "",
@@ -236,9 +307,10 @@ export default function OrganizerEventDetailPage({
             descriptionOverrides[eventData.id] ?? eventData.description
           }
           ticketGroups={groupTicketTypesByEventDate(eventData.ticket_types)}
-          sellingTableResponse={MOCK_SELLING_TABLE_RESPONSE}
-          showDateList={eventData.event_date_entries}
-          ticketTypes={eventData.ticket_types}
+          sellingTableResponse={sellingTableResponse}
+          sellingTableLoading={sellingTableLoading}
+          onSellingQueryChange={handleSellingQueryChange}
+          onSellingTicketSelect={handleSellingTicketSelect}
           openingSellingTicket={openingSellingTicket}
           onDescriptionSave={(data) =>
             setDescriptionOverrides((prev) => ({

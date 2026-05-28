@@ -10,8 +10,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import {
-  EventStatus,
+  EVENT_STATUS,
   getEventStatusBadgeVariant,
+  getEventStatusLabel,
 } from "@/constants/event-status.constant"
 import type { EventTicketType, OrganizerEventDetail } from "@/types/event"
 import {
@@ -145,22 +146,22 @@ export function OrganizerEventHero({
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
   const [staffCodeDialogOpen, setStaffCodeDialogOpen] = useState(false)
   const [isPublished, setIsPublished] = useState(
-    event.status_id !== EventStatus.DRAFT &&
-      event.status_id !== EventStatus.SCHEDULED
+    event.status !== EVENT_STATUS.DRAFT &&
+      event.status !== EVENT_STATUS.SCHEDULED
   )
   const formattedDates = event.event_date_entries.map((iso) =>
     formatDateLabel(iso)
   )
-  const statusBadgeVariant = getEventStatusBadgeVariant(event.status_id)
+  const statusBadgeVariant = getEventStatusBadgeVariant(event.status)
   const showLiveTime =
-    event.status_id === EventStatus.ON_SALE ||
-    event.status_id === EventStatus.SOLD_OUT ||
-    event.status_id === EventStatus.SHOW
+    event.status === EVENT_STATUS.ON_SALE ||
+    event.status === EVENT_STATUS.SOLD_OUT ||
+    event.status === EVENT_STATUS.SHOW
   const now = useNow(showLiveTime ? 1000 : 60_000)
 
   const statusCardData = useMemo(() => {
-    const statusId = event.status_id
-    if (statusId === EventStatus.CANCELLED) return null
+    const eventStatus = event.status
+    if (eventStatus === EVENT_STATUS.CANCELLED) return null
 
     const saleDateList = event.sale_date_entries ?? []
     const showDateList = event.event_date_entries ?? []
@@ -175,7 +176,10 @@ export function OrganizerEventHero({
     }
 
     // Draft & Scheduled: Start sale (nearest sale_date from now)
-    if (statusId === EventStatus.DRAFT || statusId === EventStatus.SCHEDULED) {
+    if (
+      eventStatus === EVENT_STATUS.DRAFT ||
+      eventStatus === EVENT_STATUS.SCHEDULED
+    ) {
       const nearest = getNearestSaleFromNow(saleDateList)
       const blocks: Block[] = [
         {
@@ -197,7 +201,7 @@ export function OrganizerEventHero({
     }
 
     // On Sale
-    if (statusId === EventStatus.ON_SALE) {
+    if (eventStatus === EVENT_STATUS.ON_SALE) {
       const { remaining, total } = getOnSaleRemaining(saleDateList, ticketTypes)
       const timeUseStart = getTimeUseStart(saleDateList)
       const elapsedMs = timeUseStart ? getElapsedMs(timeUseStart, now) : 0
@@ -234,7 +238,7 @@ export function OrganizerEventHero({
     }
 
     // Sold Out
-    if (statusId === EventStatus.SOLD_OUT) {
+    if (eventStatus === EVENT_STATUS.SOLD_OUT) {
       const showBeginTarget = getShowBeginTarget(showDateList)
       const countdownMs = showBeginTarget ? getRemainingMs(showBeginTarget) : 0
       const ticketSaleTimeUseMs = getTicketSaleTimeUseMs(ticketTypes)
@@ -273,7 +277,7 @@ export function OrganizerEventHero({
     }
 
     // Show
-    if (statusId === EventStatus.SHOW) {
+    if (eventStatus === EVENT_STATUS.SHOW) {
       const showBeginTarget = getShowBeginTarget(showDateList)
       const countdownMs = showBeginTarget ? getRemainingMs(showBeginTarget) : 0
       const blocks: Block[] = [
@@ -299,7 +303,7 @@ export function OrganizerEventHero({
     }
 
     // End
-    if (statusId === EventStatus.END) {
+    if (eventStatus === EVENT_STATUS.END) {
       const blocks: Block[] = [
         { key: "check-in", label: "Check In", value: "—", subtext: "TODO" },
       ]
@@ -390,11 +394,11 @@ export function OrganizerEventHero({
                 </h1>
                 <div className="mt-3 flex items-center gap-2">
                   <Badge className="p-3 text-base" variant={statusBadgeVariant}>
-                    {event.status_label}
+                    {getEventStatusLabel(event.status)}
                   </Badge>
                   <div className="flex grow items-center justify-end gap-2">
-                    {(event.status_id === EventStatus.DRAFT ||
-                      event.status_id === EventStatus.SCHEDULED) && (
+                    {(event.status === EVENT_STATUS.DRAFT ||
+                      event.status === EVENT_STATUS.SCHEDULED) && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -458,7 +462,7 @@ export function OrganizerEventHero({
               </div>
             </div>
           </div>
-          {event.status_id !== EventStatus.CANCELLED && statusCardData && (
+          {event.status !== EVENT_STATUS.CANCELLED && statusCardData && (
             <div className="flex h-full items-center justify-center">
               <Card className="w-full shrink-0 gap-0 rounded-xl border border-border p-5 shadow-sm lg:sticky lg:top-24 lg:w-[280px]">
                 <h2 className="text-center text-lg font-medium text-primary">

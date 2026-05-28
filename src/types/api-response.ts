@@ -1,4 +1,5 @@
 import type { UserRole } from "./auth"
+import type { EventStatus } from "@/constants/event-status.constant"
 import type { MyTicketDetail, MyTicketItem } from "./my-ticket"
 
 export interface ApiMessageResponse {
@@ -61,15 +62,7 @@ export interface ApiEvent {
   ticket_min_per_order: number | null
   ticket_max_per_order: number | null
   staff_code: string | null
-  status:
-    | "Scheduled"
-    | "OnSale"
-    | "SoldOut"
-    | "Draft"
-    | "Show"
-    | "EventEnd"
-    | "Cancel"
-    | null
+  status: EventStatus | null
 }
 
 export interface ApiEventMutationResponse extends ApiMessageResponse {

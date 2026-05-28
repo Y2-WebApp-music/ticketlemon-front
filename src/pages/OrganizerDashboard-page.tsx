@@ -11,7 +11,10 @@ import {
 } from "@/components/ui/select"
 import { PageLayout } from "@/components/layouts/page-layout"
 import { OrganizerEventCard } from "@/features/organizer-dashboard"
-import { ORGANIZER_EVENT_STATUS_FILTER_OPTIONS } from "@/constants/event-status.constant"
+import {
+  ORGANIZER_EVENT_STATUS_FILTER_OPTIONS,
+  resolveEventStatus,
+} from "@/constants/event-status.constant"
 import { ORGANIZER_EVENT_SORT_OPTIONS } from "@/constants/organizer-event-sort.constant"
 import type { OrganizerEvent } from "@/types"
 import { getAllEvents } from "@/services/eventService"
@@ -36,14 +39,17 @@ export default function OrganizerDashboardPage() {
             ? `Show begin ${new Date(firstShowDate).toLocaleString()}`
             : "No schedule"
 
+          const lastShowDate =
+            event.event_date_entries[event.event_date_entries.length - 1]
+              ?.start_date ?? ""
+
           return {
             event_id: event.id,
             image_url: event.poster_url ?? "",
             date: firstShowDate,
             title: event.event_name,
             venue: event.venue,
-            status_id: 0,
-            status_label: "Scheduled",
+            status: resolveEventStatus(event.status, lastShowDate),
             bottom_line: showBeginLabel,
           }
         })
@@ -117,7 +123,7 @@ export default function OrganizerDashboardPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {ORGANIZER_EVENT_STATUS_FILTER_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.value} value={String(opt.value)}>
+                    <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
                     </SelectItem>
                   ))}

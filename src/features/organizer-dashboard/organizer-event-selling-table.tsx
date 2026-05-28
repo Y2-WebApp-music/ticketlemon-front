@@ -34,8 +34,10 @@ import {
   TABLE_VIEW_STATUS_OPTIONS,
 } from "@/constants/organizer-event-sort.constant"
 import { formatDateLabel } from "@/utils/formatDate"
-import type { EventTicketType } from "@/types/event"
-import type { SellingTableResponse } from "@/types/organizer"
+import type {
+  EventSellingQueryParams,
+  SellingTableResponse,
+} from "@/types/organizer"
 
 const ALL_FILTER_VALUE = "all"
 
@@ -47,23 +49,25 @@ export interface OrganizerSellingTicketSelection {
 export interface OrganizerEventSellingTableProps {
   selectedTicket: OrganizerSellingTicketSelection
   sellingTableResponse: SellingTableResponse
-  showDateList: string[]
-  ticketTypes: EventTicketType[]
+  isLoading?: boolean
   onBack: () => void
+  onQueryChange: (params: EventSellingQueryParams) => void
 }
 
 export function OrganizerEventSellingTable({
   selectedTicket,
   sellingTableResponse,
-  showDateList,
-  ticketTypes,
+  isLoading = false,
   onBack,
+  onQueryChange,
 }: OrganizerEventSellingTableProps) {
   type StatusFilterValue = (typeof TABLE_VIEW_STATUS_OPTIONS)[number]["value"]
 
-  const [page, setPage] = useState(sellingTableResponse.page)
-  const [perPage, setPerPage] = useState(sellingTableResponse.perPage)
   const rows = sellingTableResponse.data
+  const { total, page: currentPage, perPage } = sellingTableResponse
+  const eventDateEntries = sellingTableResponse.event_date_entries
+  const ticketTypes = sellingTableResponse.ticket_types
+
   const [nameQuery, setNameQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all")
   const [eventRoundFilter, setEventRoundFilter] = useState(
@@ -71,100 +75,106 @@ export function OrganizerEventSellingTable({
   )
   const [ticketTypeFilter, setTicketTypeFilter] = useState(selectedTicket.title)
 
-  const eventRoundOptions = useMemo(() => {
-    const seen = new Set<string>()
-    return showDateList
-      .map((date) => formatDateLabel(date))
-      .filter((label) => {
-        if (seen.has(label)) return false
-        seen.add(label)
-        return true
-      })
-  }, [showDateList])
+  const eventRoundOptions = useMemo(
+    () =>
+      eventDateEntries.map((entry) => ({
+        id: entry.id,
+        label: formatDateLabel(entry.start_date),
+      })),
+    [eventDateEntries]
+  )
 
   const ticketTypeOptionsByRound = useMemo(() => {
-    const map = new Map<string, string[]>()
-    ticketTypes.forEach((ticket) => {
-      const roundLabel = formatDateLabel(ticket.event_date)
-      const titles = map.get(roundLabel) ?? []
-      if (!titles.includes(ticket.title)) {
-        titles.push(ticket.title)
+    const map = new Map<string, Array<{ id: string; name: string }>>()
+    for (const ticketType of ticketTypes) {
+      const roundEntry = eventDateEntries.find(
+        (entry) => entry.id === ticketType.use_for_event_date_time
+      )
+      if (!roundEntry) continue
+      const roundLabel = formatDateLabel(roundEntry.start_date)
+      const list = map.get(roundLabel) ?? []
+      if (!list.some((item) => item.id === ticketType.id)) {
+        list.push({ id: ticketType.id, name: ticketType.name })
       }
-      map.set(roundLabel, titles)
-    })
+      map.set(roundLabel, list)
+    }
     return map
-  }, [ticketTypes])
+  }, [eventDateEntries, ticketTypes])
 
-  const allTicketTypeOptions = useMemo(() => {
-    const seen = new Set<string>()
-    return ticketTypes
-      .map((ticket) => ticket.title)
-      .filter((title) => {
-        if (seen.has(title)) return false
-        seen.add(title)
-        return true
-      })
-  }, [ticketTypes])
+  const allTicketTypeOptions = useMemo(
+    () =>
+      ticketTypes.map((ticketType) => ({
+        id: ticketType.id,
+        name: ticketType.name,
+      })),
+    [ticketTypes]
+  )
 
   const ticketTypeOptions = useMemo(() => {
     if (eventRoundFilter === ALL_FILTER_VALUE) {
       return allTicketTypeOptions
     }
-    return ticketTypeOptionsByRound.get(eventRoundFilter) ?? []
+    return (
+      ticketTypeOptionsByRound.get(eventRoundFilter) ?? allTicketTypeOptions
+    )
   }, [allTicketTypeOptions, eventRoundFilter, ticketTypeOptionsByRound])
 
-  const effectiveEventRoundFilter = eventRoundOptions.includes(eventRoundFilter)
+  const effectiveEventRoundFilter = eventRoundOptions.some(
+    (round) => round.label === eventRoundFilter
+  )
     ? eventRoundFilter
     : ALL_FILTER_VALUE
-  const effectiveTicketTypeFilter = ticketTypeOptions.includes(ticketTypeFilter)
+  const effectiveTicketTypeFilter = ticketTypeOptions.some(
+    (ticketType) => ticketType.name === ticketTypeFilter
+  )
     ? ticketTypeFilter
     : ALL_FILTER_VALUE
 
-  const filteredRows = useMemo(() => {
-    const query = nameQuery.trim().toLowerCase()
-    return rows.filter((row) => {
-      const matchesName =
-        query.length === 0 || row.name.toLowerCase().includes(query)
-      const matchesStatus =
-        statusFilter === ALL_FILTER_VALUE || row.status === statusFilter
-      const matchesEventRound =
-        effectiveEventRoundFilter === ALL_FILTER_VALUE ||
-        formatDateLabel(row.eventRound) === effectiveEventRoundFilter
-      const matchesTicketType =
-        effectiveTicketTypeFilter === ALL_FILTER_VALUE ||
-        row.ticketType === effectiveTicketTypeFilter
-      return (
-        matchesName && matchesStatus && matchesEventRound && matchesTicketType
-      )
-    })
-  }, [
-    effectiveEventRoundFilter,
-    effectiveTicketTypeFilter,
-    nameQuery,
-    rows,
-    statusFilter,
-  ])
+  const buildQuery = (
+    overrides: Partial<EventSellingQueryParams> = {}
+  ): EventSellingQueryParams => {
+    const selectedRound = eventRoundOptions.find(
+      (round) => round.label === effectiveEventRoundFilter
+    )
+    const selectedTicketType = ticketTypeOptions.find(
+      (ticketType) => ticketType.name === effectiveTicketTypeFilter
+    )
 
-  const total = filteredRows.length
+    return {
+      page: currentPage,
+      per_page: perPage,
+      search: nameQuery.trim() || undefined,
+      status: statusFilter === ALL_FILTER_VALUE ? undefined : statusFilter,
+      event_date_entry_id:
+        effectiveEventRoundFilter === ALL_FILTER_VALUE
+          ? undefined
+          : selectedRound?.id,
+      ticket_type_id:
+        effectiveTicketTypeFilter === ALL_FILTER_VALUE
+          ? undefined
+          : selectedTicketType?.id,
+      ...overrides,
+    }
+  }
+
+  const applyQuery = (overrides: Partial<EventSellingQueryParams> = {}) => {
+    onQueryChange(buildQuery(overrides))
+  }
+
   const totalPages = Math.max(1, Math.ceil(total / perPage))
-  const currentPage = Math.min(Math.max(page, 1), totalPages)
-  const displayStart = total === 0 ? 0 : (currentPage - 1) * perPage + 1
-  const displayEnd = total === 0 ? 0 : Math.min(currentPage * perPage, total)
+  const safePage = Math.min(Math.max(currentPage, 1), totalPages)
+  const displayStart = total === 0 ? 0 : (safePage - 1) * perPage + 1
+  const displayEnd = total === 0 ? 0 : Math.min(safePage * perPage, total)
   const visiblePages = useMemo(() => {
     if (totalPages <= 5) {
       return Array.from({ length: totalPages }, (_, idx) => idx + 1)
     }
-    if (currentPage <= 3) return [1, 2, 3, "...", totalPages] as const
-    if (currentPage >= totalPages - 2) {
+    if (safePage <= 3) return [1, 2, 3, "...", totalPages] as const
+    if (safePage >= totalPages - 2) {
       return [1, "...", totalPages - 2, totalPages - 1, totalPages] as const
     }
-    return [1, "...", currentPage, "...", totalPages] as const
-  }, [currentPage, totalPages])
-  const pagedRows = useMemo(
-    () =>
-      filteredRows.slice((currentPage - 1) * perPage, currentPage * perPage),
-    [currentPage, filteredRows, perPage]
-  )
+    return [1, "...", safePage, "...", totalPages] as const
+  }, [safePage, totalPages])
 
   return (
     <div className="space-y-4 rounded-xl bg-card p-4 ring-1 ring-border sm:p-6">
@@ -177,15 +187,15 @@ export function OrganizerEventSellingTable({
         Back
       </button>
 
-      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,160px))_auto] lg:items-end">
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,160px))_auto_auto] lg:items-end">
         <div className="space-y-1">
           <Label>Name</Label>
           <Input
             placeholder="Search name"
             value={nameQuery}
-            onChange={(e) => {
-              setNameQuery(e.target.value)
-              setPage(1)
+            onChange={(e) => setNameQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") applyQuery({ page: 1 })
             }}
           />
         </div>
@@ -195,7 +205,10 @@ export function OrganizerEventSellingTable({
             value={statusFilter}
             onValueChange={(value) => {
               setStatusFilter(value as StatusFilterValue)
-              setPage(1)
+              applyQuery({
+                page: 1,
+                status: value === ALL_FILTER_VALUE ? undefined : value,
+              })
             }}
           >
             <SelectTrigger className="w-full rounded-lg">
@@ -216,7 +229,14 @@ export function OrganizerEventSellingTable({
             value={effectiveEventRoundFilter}
             onValueChange={(value) => {
               setEventRoundFilter(value)
-              setPage(1)
+              const selectedRound = eventRoundOptions.find(
+                (round) => round.label === value
+              )
+              applyQuery({
+                page: 1,
+                event_date_entry_id:
+                  value === ALL_FILTER_VALUE ? undefined : selectedRound?.id,
+              })
             }}
           >
             <SelectTrigger className="w-full rounded-lg">
@@ -225,8 +245,8 @@ export function OrganizerEventSellingTable({
             <SelectContent>
               <SelectItem value={ALL_FILTER_VALUE}>All</SelectItem>
               {eventRoundOptions.map((eventRound) => (
-                <SelectItem key={eventRound} value={eventRound}>
-                  {eventRound}
+                <SelectItem key={eventRound.id} value={eventRound.label}>
+                  {eventRound.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -238,7 +258,14 @@ export function OrganizerEventSellingTable({
             value={effectiveTicketTypeFilter}
             onValueChange={(value) => {
               setTicketTypeFilter(value)
-              setPage(1)
+              const selectedType = ticketTypeOptions.find(
+                (ticketType) => ticketType.name === value
+              )
+              applyQuery({
+                page: 1,
+                ticket_type_id:
+                  value === ALL_FILTER_VALUE ? undefined : selectedType?.id,
+              })
             }}
           >
             <SelectTrigger className="w-full rounded-lg">
@@ -247,13 +274,21 @@ export function OrganizerEventSellingTable({
             <SelectContent>
               <SelectItem value={ALL_FILTER_VALUE}>All</SelectItem>
               {ticketTypeOptions.map((ticketType) => (
-                <SelectItem key={ticketType} value={ticketType}>
-                  {ticketType}
+                <SelectItem key={ticketType.id} value={ticketType.name}>
+                  {ticketType.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="rounded-lg"
+          onClick={() => applyQuery({ page: 1 })}
+        >
+          Search
+        </Button>
         <Button type="button" variant="outline" className="rounded-lg">
           <Upload className="size-4" />
           Export Table
@@ -273,28 +308,48 @@ export function OrganizerEventSellingTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pagedRows.map((row, index) => (
-              <TableRow key={`${row.email}-${index}`}>
-                <TableCell className="px-4">{row.name}</TableCell>
-                <TableCell className="px-4">{row.email}</TableCell>
-                <TableCell className="px-4">
-                  <Badge
-                    variant={row.status === "purchased" ? "pass" : "warning"}
-                  >
-                    {row.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-4">
-                  {formatDateLabel(row.eventRound)}
-                </TableCell>
-                <TableCell className="px-4">{row.ticketType}</TableCell>
-                <TableCell className="px-4">
-                  {dayjs(row.bookingTime).isValid()
-                    ? dayjs(row.bookingTime).format("D MMM YY, HH:mm:ss")
-                    : row.bookingTime}
+            {isLoading ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="px-4 py-8 text-center text-muted-foreground"
+                >
+                  Loading...
                 </TableCell>
               </TableRow>
-            ))}
+            ) : rows.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={6}
+                  className="px-4 py-8 text-center text-muted-foreground"
+                >
+                  No selling records found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              rows.map((row, index) => (
+                <TableRow key={`${row.email}-${row.bookingTime}-${index}`}>
+                  <TableCell className="px-4">{row.name}</TableCell>
+                  <TableCell className="px-4">{row.email}</TableCell>
+                  <TableCell className="px-4">
+                    <Badge
+                      variant={row.status === "purchased" ? "pass" : "warning"}
+                    >
+                      {row.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="px-4">
+                    {formatDateLabel(row.eventRound)}
+                  </TableCell>
+                  <TableCell className="px-4">{row.ticketType}</TableCell>
+                  <TableCell className="px-4">
+                    {dayjs(row.bookingTime).isValid()
+                      ? dayjs(row.bookingTime).format("D MMM YY, HH:mm:ss")
+                      : row.bookingTime}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -305,8 +360,7 @@ export function OrganizerEventSellingTable({
           <Select
             value={String(perPage)}
             onValueChange={(value) => {
-              setPerPage(Number(value))
-              setPage(1)
+              applyQuery({ page: 1, per_page: Number(value) })
             }}
           >
             <SelectTrigger className="w-[64px] rounded-lg">
@@ -328,7 +382,7 @@ export function OrganizerEventSellingTable({
                 href="#"
                 onClick={(e) => {
                   e.preventDefault()
-                  setPage((prev) => Math.max(prev - 1, 1))
+                  applyQuery({ page: Math.max(safePage - 1, 1) })
                 }}
               />
             </PaginationItem>
@@ -341,10 +395,10 @@ export function OrganizerEventSellingTable({
                 <PaginationItem key={value}>
                   <PaginationLink
                     href="#"
-                    isActive={value === currentPage}
+                    isActive={value === safePage}
                     onClick={(e) => {
                       e.preventDefault()
-                      setPage(value)
+                      applyQuery({ page: value })
                     }}
                   >
                     {value}
@@ -357,7 +411,7 @@ export function OrganizerEventSellingTable({
                 href="#"
                 onClick={(e) => {
                   e.preventDefault()
-                  setPage((prev) => Math.min(prev + 1, totalPages))
+                  applyQuery({ page: Math.min(safePage + 1, totalPages) })
                 }}
               />
             </PaginationItem>

@@ -1,4 +1,5 @@
 import type { OutputData } from "@editorjs/editorjs"
+import type { EventStatus } from "@/constants/event-status.constant"
 
 /** Event list item (e.g. landing, search results) */
 export interface EventCardItem {
@@ -8,7 +9,7 @@ export interface EventCardItem {
   title: string
   venue: string
   poster_url: string
-  status_id: number
+  status: EventStatus
 }
 
 export interface EventTicketType {
@@ -27,8 +28,7 @@ export interface EventTicketType {
 /** Event detail API response */
 export interface EventDetail {
   id: string
-  status_id: number
-  status_label: string
+  status: EventStatus
   title: string
   poster_url: string
   thumbnail_url: string

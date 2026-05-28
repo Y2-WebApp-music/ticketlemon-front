@@ -5,6 +5,10 @@ import type {
   ApiGenerateStaffCodeResponse,
   ApiMessageResponse,
 } from "@/types/api-response"
+import type {
+  EventSellingQueryParams,
+  SellingTableResponse,
+} from "@/types/organizer"
 
 export interface EventDateEntryRequest {
   id: string
@@ -166,6 +170,19 @@ export async function getEventsByCreateById(
   const response = await apiService.fetchData<ApiEvent[]>({
     method: "GET",
     url: `/api/event/create-by/${create_by_id}`,
+  })
+
+  return response.data
+}
+
+export async function getEventSelling(
+  eventId: string,
+  params?: EventSellingQueryParams
+): Promise<SellingTableResponse> {
+  const response = await apiService.fetchData<SellingTableResponse>({
+    method: "GET",
+    url: `/api/event/${eventId}/selling`,
+    params,
   })
 
   return response.data

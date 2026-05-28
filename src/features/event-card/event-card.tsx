@@ -1,4 +1,7 @@
-import { EventStatus } from "@/constants/event-status.constant"
+import {
+  EVENT_STATUS,
+  type EventStatus,
+} from "@/constants/event-status.constant"
 import { cn } from "@/lib/utils"
 import * as React from "react"
 
@@ -15,24 +18,24 @@ export interface EventCardBaseProps {
   href?: string
   className?: string
   children?: React.ReactNode
-  /** EventStatus numeric ID — shows an overlay for SOLD_OUT, END, CANCELLED */
-  status?: number
+  /** Prisma event status — overlay for SoldOut, EventEnd, Cancel */
+  status?: EventStatus
 }
 
 const STATUS_OVERLAY: Partial<
   Record<EventStatus, { label: string; color: string; grayscale: boolean }>
 > = {
-  [EventStatus.SOLD_OUT]: {
+  [EVENT_STATUS.SOLD_OUT]: {
     label: "Sold Out",
     color: "#fbbf24",
     grayscale: false,
   },
-  [EventStatus.END]: {
+  [EVENT_STATUS.END]: {
     label: "Event Ended",
     color: "#e5e7eb",
     grayscale: true,
   },
-  [EventStatus.CANCELLED]: {
+  [EVENT_STATUS.CANCELLED]: {
     label: "Cancelled",
     color: "#f87171",
     grayscale: true,
@@ -57,8 +60,7 @@ export function EventCard({
   className,
   status,
 }: EventCardProps) {
-  const overlay =
-    status !== undefined ? STATUS_OVERLAY[status as EventStatus] : undefined
+  const overlay = status !== undefined ? STATUS_OVERLAY[status] : undefined
   const dimText = !!overlay
 
   const content = (
