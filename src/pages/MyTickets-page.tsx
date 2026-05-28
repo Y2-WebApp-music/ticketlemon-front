@@ -1,18 +1,56 @@
 import { PageLayout } from "@/components/layouts"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MyTicketCard } from "@/features/my-ticket"
-import {
-  myTicketsUserName,
-  paidTickets,
-  unpaidTickets,
-} from "@/mocks/my-tickets"
+import { getTicketsByUserId } from "@/services/ticketService"
+import { useUserStore } from "@/stores/user-store"
+import type { MyTicketItem } from "@/types/my-ticket"
 import dayjs from "dayjs"
+import { useEffect, useMemo, useState } from "react"
+import { toast } from "sonner"
 
 export default function MyTicketsPage() {
-  const unpaid = unpaidTickets.filter((t) => !t.is_purchased)
-  const paid = paidTickets.filter((t) => t.is_purchased)
-  const upcoming = paid.filter((t) => dayjs(t.show_end_date).isAfter(dayjs()))
-  const history = paid.filter((t) => !dayjs(t.show_end_date).isAfter(dayjs()))
+  const userId = useUserStore((state) => state.user_id)
+  const userName =
+    useUserStore((state) => {
+      const full = [state.first_name, state.last_name]
+        .filter(Boolean)
+        .join(" ")
+        .trim()
+      return full || state.email || "User"
+    }) ?? "User"
+  const [tickets, setTickets] = useState<MyTicketItem[]>([])
+
+  useEffect(() => {
+    const load = async () => {
+      if (!userId) return
+      try {
+        const response = await getTicketsByUserId(userId)
+        setTickets(response)
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load tickets"
+        toast.error(message)
+      }
+    }
+
+    load()
+  }, [userId])
+
+  const unpaid = useMemo(
+    () => tickets.filter((t) => !t.is_purchased),
+    [tickets]
+  )
+  const paid = useMemo(() => tickets.filter((t) => t.is_purchased), [tickets])
+  const upcoming = useMemo(
+    () => paid.filter((t) => dayjs(t.show_end_date).isAfter(dayjs())),
+    [paid]
+  )
+  const history = useMemo(
+    () => paid.filter((t) => !dayjs(t.show_end_date).isAfter(dayjs())),
+    [paid]
+  )
 
   return (
     <PageLayout>
@@ -22,7 +60,7 @@ export default function MyTicketsPage() {
           <h1 className="text-2xl font-medium tracking-tight text-primary">
             My Ticket
           </h1>
-          <p className="text-base text-muted-foreground">{myTicketsUserName}</p>
+          <p className="text-base text-muted-foreground">{userName}</p>
         </div>
 
         {/* Unpaid */}

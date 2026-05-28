@@ -1,9 +1,9 @@
 import { create } from "zustand"
-import type { StaffEvent } from "@/types/staff"
+import type { EventCardItem } from "@/types/event"
 
 export interface StaffScanState {
-  event: StaffEvent | null
-  setEvent: (event: StaffEvent | null) => void
+  event: EventCardItem | null
+  setEvent: (event: EventCardItem | null) => void
   reset: () => void
 }
 

@@ -27,7 +27,7 @@ export const useAuthStore = create<AuthState>()(
         set({
           access_token: data.access_token,
           role: data.role,
-          permission: data.permission ?? [],
+          // permission: data.permission ?? [],
         }),
       clearAuth: () => set(initialState),
       hasPermission: (permission) => {

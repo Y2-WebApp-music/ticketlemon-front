@@ -123,4 +123,8 @@ export interface ApiDeleteUserResponse extends ApiMessageResponse {
 export interface ApiLoginResponse {
   access_token: string
   role: UserRole
+  user_id: string
+  email?: string
+  first_name?: string
+  last_name?: string
 }

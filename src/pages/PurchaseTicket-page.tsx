@@ -7,8 +7,10 @@ import {
   PurchaseImportant,
 } from "@/features/purchase"
 import { getEventById } from "@/services/eventService"
+import { createTicket } from "@/services/ticketService"
+import { useUserStore } from "@/stores/user-store"
 import type { PurchaseCartState, PurchaseFormPayload } from "@/types/purchase"
-import { Link, useLocation } from "@tanstack/react-router"
+import { Link, useLocation, useNavigate } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
@@ -20,8 +22,11 @@ export interface PurchaseTicketPageProps {
 export default function PurchaseTicketPage({
   eventId,
 }: PurchaseTicketPageProps) {
+  const navigate = useNavigate()
+  const userId = useUserStore((state) => state.user_id)
   const [eventTitle, setEventTitle] = useState<string>("")
   const [eventFound, setEventFound] = useState(true)
+  const [isPaying, setIsPaying] = useState(false)
   const location = useLocation()
   const purchasePayload = useMemo(() => {
     const cart = location.state as unknown as PurchaseCartState | undefined
@@ -71,6 +76,46 @@ export default function PurchaseTicketPage({
       canPay: emailOk && phoneOk && formPayload.accept_terms,
     }
   }, [formPayload.accept_terms, formPayload.email, formPayload.phone])
+
+  const handlePayNow = async () => {
+    if (!canPay) return
+    if (!userId) {
+      toast.error("Please sign in before purchasing tickets.")
+      navigate({ to: "/sign-in" })
+      return
+    }
+
+    if (purchasePayload.orderItems.length === 0) {
+      toast.error("No tickets selected.")
+      return
+    }
+
+    try {
+      setIsPaying(true)
+      const requests = purchasePayload.orderItems.flatMap((item) =>
+        Array.from({ length: item.qty }, () =>
+          createTicket({
+            event_id: eventId,
+            user_id: userId,
+            ticket_type_id: item.ticket_type_id,
+            status: "Pending",
+          })
+        )
+      )
+
+      await Promise.all(requests)
+      toast.success("Tickets reserved successfully.")
+      navigate({ to: "/my-tickets" })
+    } catch (error) {
+      const message =
+        typeof error === "object" && error !== null && "message" in error
+          ? String(error.message)
+          : "Failed to reserve tickets"
+      toast.error(message)
+    } finally {
+      setIsPaying(false)
+    }
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -162,6 +207,8 @@ export default function PurchaseTicketPage({
                 setFormPayload((prev) => ({ ...prev, accept_terms: checked }))
               }
               payDisabled={!canPay}
+              onPayNow={handlePayNow}
+              isPaying={isPaying}
             />
           </div>
         </div>

@@ -7,6 +7,6 @@ export const Route = createFileRoute("/my-tickets/$ticketId/")({
 })
 
 function MyTicketDetailIndexRoute() {
-  const { ticketId } = Route.useParams()
-  return <MyTicketDetailPage ticketId={ticketId} />
+  const { ticketId: eventId } = Route.useParams()
+  return <MyTicketDetailPage eventId={eventId} />
 }

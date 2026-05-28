@@ -35,8 +35,8 @@ export default function LandingPage() {
         const mapped: EventCardItem[] = events.map((event) => {
           const startDate = event.event_date_entries[0]?.start_date ?? ""
           const endDate =
-            event.event_date_entries[event.event_date_entries.length - 1]?.start_date ??
-            startDate
+            event.event_date_entries[event.event_date_entries.length - 1]
+              ?.start_date ?? startDate
 
           return {
             event_id: event.id,

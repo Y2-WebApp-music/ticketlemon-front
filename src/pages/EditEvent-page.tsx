@@ -238,33 +238,34 @@ export default function EditEventPage() {
           description: toOutputData(event.description),
           poster_url: event.poster_url ?? null,
           thumbnail_url: event.thumbnail_url ?? null,
-          event_date_entries:
-            event.event_date_entries?.map((entry) => ({
-              id: entry.id,
-              start_date: entry.start_date ? new Date(entry.start_date) : undefined,
-              end_date: entry.end_date ? new Date(entry.end_date) : undefined,
-              have_end_date: Boolean(entry.end_date),
-              is_collapsed: false,
-            })) ?? [createEmptyDateRangeEntry()],
-          sale_date_entries:
-            event.sale_date_entries?.map((entry) => ({
-              id: entry.id,
-              start_date: entry.start_date ? new Date(entry.start_date) : undefined,
-              end_date: entry.end_date ? new Date(entry.end_date) : undefined,
-              have_end_date: Boolean(entry.end_date),
-              is_collapsed: false,
-            })) ?? [createEmptyDateRangeEntry()],
-          ticket_types:
-            event.ticket_types?.map((ticket) => ({
-              id: ticket.id,
-              name: ticket.name,
-              price: String(ticket.price ?? ""),
-              quantity: String(ticket.quantity ?? ""),
-              detail: ticket.detail ?? "",
-              use_for_event_date_time: ticket.use_for_event_date_time,
-              sale_ticket_on: ticket.sale_ticket_on,
-              is_collapsed: ticket.is_collapsed,
-            })) ?? [createEmptyTicketTypeEntry()],
+          event_date_entries: event.event_date_entries?.map((entry) => ({
+            id: entry.id,
+            start_date: entry.start_date
+              ? new Date(entry.start_date)
+              : undefined,
+            end_date: entry.end_date ? new Date(entry.end_date) : undefined,
+            have_end_date: Boolean(entry.end_date),
+            is_collapsed: false,
+          })) ?? [createEmptyDateRangeEntry()],
+          sale_date_entries: event.sale_date_entries?.map((entry) => ({
+            id: entry.id,
+            start_date: entry.start_date
+              ? new Date(entry.start_date)
+              : undefined,
+            end_date: entry.end_date ? new Date(entry.end_date) : undefined,
+            have_end_date: Boolean(entry.end_date),
+            is_collapsed: false,
+          })) ?? [createEmptyDateRangeEntry()],
+          ticket_types: event.ticket_types?.map((ticket) => ({
+            id: ticket.id,
+            name: ticket.name,
+            price: String(ticket.price ?? ""),
+            quantity: String(ticket.quantity ?? ""),
+            detail: ticket.detail ?? "",
+            use_for_event_date_time: ticket.use_for_event_date_time,
+            sale_ticket_on: ticket.sale_ticket_on,
+            is_collapsed: ticket.is_collapsed,
+          })) ?? [createEmptyTicketTypeEntry()],
           ticket_min_per_order: String(event.ticket_min_per_order ?? ""),
           ticket_max_per_order: String(event.ticket_max_per_order ?? ""),
           staff_code: event.staff_code ?? "",
@@ -339,18 +340,26 @@ export default function EditEventPage() {
       const payload: Partial<EventRequestPayload> = {
         ...formData,
         age_restriction: Number(formData.age_restriction),
-        description: formData.description ? JSON.stringify(formData.description) : null,
+        description: formData.description
+          ? JSON.stringify(formData.description)
+          : null,
         poster_url: formData.poster_url ?? undefined,
         thumbnail_url: formData.thumbnail_url ?? undefined,
         event_date_entries: formData.event_date_entries.map((entry) => ({
           id: entry.id,
           start_date: entry.start_date ? entry.start_date.toISOString() : "",
-          end_date: entry.have_end_date && entry.end_date ? entry.end_date.toISOString() : null,
+          end_date:
+            entry.have_end_date && entry.end_date
+              ? entry.end_date.toISOString()
+              : null,
         })),
         sale_date_entries: formData.sale_date_entries.map((entry) => ({
           id: entry.id,
           start_date: entry.start_date ? entry.start_date.toISOString() : "",
-          end_date: entry.have_end_date && entry.end_date ? entry.end_date.toISOString() : null,
+          end_date:
+            entry.have_end_date && entry.end_date
+              ? entry.end_date.toISOString()
+              : null,
         })),
         ticket_types: formData.ticket_types.map((ticket) => ({
           id: ticket.id,

@@ -12,6 +12,8 @@ export interface OrderSummaryProps {
   acceptTerms: boolean
   onAcceptTermsChange: (checked: boolean) => void
   payDisabled?: boolean
+  onPayNow?: () => void | Promise<void>
+  isPaying?: boolean
 }
 
 export function OrderSummary({
@@ -24,6 +26,8 @@ export function OrderSummary({
   acceptTerms,
   onAcceptTermsChange,
   payDisabled,
+  onPayNow,
+  isPaying,
 }: OrderSummaryProps) {
   return (
     <aside className="w-full shrink-0 lg:w-[380px]">
@@ -106,8 +110,13 @@ export function OrderSummary({
                 </p>
               </div>
             </label>
-            <Button className="w-full" size="lg" disabled={payDisabled}>
-              Pay now
+            <Button
+              className="w-full"
+              size="lg"
+              disabled={payDisabled || isPaying}
+              onClick={() => void onPayNow?.()}
+            >
+              {isPaying ? "Processing..." : "Pay now"}
             </Button>
           </div>
         </div>

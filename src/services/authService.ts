@@ -2,6 +2,7 @@ import apiService from "./apiService"
 import type { SignInResponse } from "@/types/auth"
 import type { ApiSignUpResponse } from "@/types/api-response"
 import { useAuthStore } from "@/stores/auth-store"
+import { useUserStore } from "@/stores/user-store"
 
 export interface SignInCredentials {
   email: string
@@ -33,6 +34,7 @@ export async function signIn(
     role: payload.role,
     // permission: payload.permission ?? [],
   })
+  useUserStore.getState().setUserFromSignIn(payload)
   return payload
 }
 
@@ -51,4 +53,5 @@ export async function signUp(
 /** Clear auth state (e.g. on sign out). */
 export function signOut(): void {
   useAuthStore.getState().clearAuth()
+  useUserStore.getState().clearUser()
 }

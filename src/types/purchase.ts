@@ -1,4 +1,5 @@
 export interface PurchaseOrderItem {
+  ticket_type_id: string
   title: string
   session_label: string
   price: string

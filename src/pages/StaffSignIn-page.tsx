@@ -23,7 +23,7 @@ export default function StaffSignInPage() {
       setIsSubmitting(true)
       await staffSignIn({ staff_code: staffCode })
       toast.success("Staff signed in")
-      navigate({ to: "/staff" })
+      navigate({ to: "/staff/scan", search: { eventId: "" } })
     } catch (error) {
       const message =
         typeof error === "object" && error !== null && "message" in error

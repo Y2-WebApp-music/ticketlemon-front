@@ -253,18 +253,26 @@ export default function CreateEventPage() {
       const payload: EventRequestPayload = {
         ...formData,
         age_restriction: Number(formData.age_restriction),
-        description: formData.description ? JSON.stringify(formData.description) : null,
+        description: formData.description
+          ? JSON.stringify(formData.description)
+          : null,
         poster_url: formData.poster_url ?? undefined,
         thumbnail_url: formData.thumbnail_url ?? undefined,
         event_date_entries: formData.event_date_entries.map((entry) => ({
           id: entry.id,
           start_date: entry.start_date ? entry.start_date.toISOString() : "",
-          end_date: entry.have_end_date && entry.end_date ? entry.end_date.toISOString() : null,
+          end_date:
+            entry.have_end_date && entry.end_date
+              ? entry.end_date.toISOString()
+              : null,
         })),
         sale_date_entries: formData.sale_date_entries.map((entry) => ({
           id: entry.id,
           start_date: entry.start_date ? entry.start_date.toISOString() : "",
-          end_date: entry.have_end_date && entry.end_date ? entry.end_date.toISOString() : null,
+          end_date:
+            entry.have_end_date && entry.end_date
+              ? entry.end_date.toISOString()
+              : null,
         })),
         ticket_types: formData.ticket_types.map((ticket) => ({
           id: ticket.id,

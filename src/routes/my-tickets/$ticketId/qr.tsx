@@ -7,6 +7,6 @@ export const Route = createFileRoute("/my-tickets/$ticketId/qr")({
 })
 
 function MyTicketQrRoute() {
-  const { ticketId } = Route.useParams()
-  return <MyTicketQrPage ticketId={ticketId} />
+  const { ticketId: eventId } = Route.useParams()
+  return <MyTicketQrPage eventId={eventId} />
 }

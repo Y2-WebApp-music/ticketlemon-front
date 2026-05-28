@@ -7,17 +7,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Spinner } from "@/components/ui/spinner"
-import {
-  getStaffEventById,
-  STAFF_DUPLICATE_SCAN_CODE,
-  STAFF_VALID_SCAN_CODE,
-} from "@/mocks/staff"
+import { getAllEvents } from "@/services/eventService"
+import { checkInTicket } from "@/services/ticketService"
 import { formatTitleDate } from "@/utils/formatDate"
 import { useStaffScanStore } from "@/stores/staff-scan-store"
 import { Link, useNavigate } from "@tanstack/react-router"
 import jsQR from "jsqr"
 import { ChevronLeft, CircleX, QrCode } from "lucide-react"
 import * as React from "react"
+import type { EventCardItem } from "@/types/event"
 
 type DetectedBarcode = {
   rawValue?: string
@@ -34,12 +32,43 @@ type BarcodeDetectorConstructor = new (options: {
 export default function StaffScanPage({ eventId }: { eventId: string }) {
   type ScanResultType = "wrong" | "duplicate"
   const navigate = useNavigate()
-  const event = getStaffEventById(eventId)
+  const eventFromStore = useStaffScanStore((s) => s.event)
+  const [event, setLocalEvent] = React.useState<EventCardItem | null>(
+    eventFromStore ?? null
+  )
   const setEvent = useStaffScanStore((s) => s.setEvent)
 
   React.useEffect(() => {
-    if (event) setEvent(event)
-  }, [event, setEvent])
+    const load = async () => {
+      if (eventFromStore) return
+      try {
+        const events = await getAllEvents()
+        const mapped: EventCardItem[] = events.map((item) => {
+          const startDate = item.event_date_entries[0]?.start_date ?? ""
+          const endDate =
+            item.event_date_entries[item.event_date_entries.length - 1]
+              ?.start_date ?? startDate
+          return {
+            event_id: item.id,
+            show_start_date: startDate,
+            show_end_date: endDate,
+            title: item.event_name,
+            venue: item.venue,
+            poster_url: item.poster_url ?? "",
+          }
+        })
+
+        const selected =
+          mapped.find((item) => item.event_id === eventId) ?? mapped[0] ?? null
+        setLocalEvent(selected)
+        setEvent(selected)
+      } catch {
+        // scanner still works without event metadata
+      }
+    }
+
+    load()
+  }, [eventFromStore, eventId, setEvent])
   const videoRef = React.useRef<HTMLVideoElement | null>(null)
   const streamRef = React.useRef<MediaStream | null>(null)
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
@@ -51,6 +80,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
   const [scanResult, setScanResult] = React.useState<ScanResultType | null>(
     null
   )
+  const [isCheckingIn, setIsCheckingIn] = React.useState(false)
   const [cameraDialogOpen, setCameraDialogOpen] = React.useState(false)
   const [scanSession, setScanSession] = React.useState(0)
 
@@ -77,8 +107,23 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
   }, [])
 
   const onValidCode = React.useCallback(
-    (code: string) => {
+    async (code: string) => {
+      try {
+        setIsCheckingIn(true)
+        await checkInTicket(code)
+      } catch (error) {
+        const status =
+          typeof error === "object" && error !== null && "status" in error
+            ? Number(error.status)
+            : 0
+        stopScanning()
+        setScanResult(status === 400 ? "duplicate" : "wrong")
+        setIsCheckingIn(false)
+        return
+      }
+
       stopScanning()
+      setIsCheckingIn(false)
       navigate({
         to: "/staff/scan-success",
         search: { eventId, code },
@@ -88,16 +133,10 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
   )
 
   const onScanCode = React.useCallback(
-    (code: string) => {
-      if (code === STAFF_VALID_SCAN_CODE) {
-        onValidCode(code)
-        return
-      }
-
-      stopScanning()
-      setScanResult(code === STAFF_DUPLICATE_SCAN_CODE ? "duplicate" : "wrong")
+    async (code: string) => {
+      await onValidCode(code)
     },
-    [onValidCode, stopScanning]
+    [onValidCode]
   )
 
   React.useEffect(() => {
@@ -164,7 +203,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
 
             if (!rawValue) return
             setLastScan(rawValue)
-            onScanCode(rawValue)
+            void onScanCode(rawValue)
           } catch {
             // ignore detector frames errors
           }
@@ -189,7 +228,9 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
     return (
       <PageLayout className="min-h-svh bg-muted/30">
         <main className="mx-auto max-w-[402px] px-4 py-6">
-          <p className="text-sm text-muted-foreground">Event not found.</p>
+          <p className="text-sm text-muted-foreground">
+            Loading event metadata...
+          </p>
           <Link to="/staff" className="mt-4 inline-flex text-primary">
             Back
           </Link>
@@ -242,7 +283,12 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
           )}
           {lastScan && (
             <p className="mt-2 text-center text-xs text-muted-foreground">
-              {/* Last scanned: <span className="font-medium">{lastScan}</span> */}
+              Last scanned: <span className="font-medium">{lastScan}</span>
+            </p>
+          )}
+          {isCheckingIn && (
+            <p className="mt-2 text-center text-xs text-primary">
+              Checking ticket...
             </p>
           )}
         </div>
@@ -252,31 +298,14 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
             <Button
               size="lg"
               type="button"
-              onClick={() => onValidCode(STAFF_VALID_SCAN_CODE)}
+              onClick={() => {
+                const input = window.prompt("Enter scanned ticket id")
+                if (!input) return
+                void onValidCode(input.trim())
+              }}
             >
               <QrCode className="size-4" />
               Enter Code
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              type="button"
-              className="text-xs"
-              onClick={() => {
-                stopScanning()
-                setScanResult("duplicate")
-              }}
-            >
-              Dev: Show Duplicate Dialog
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              type="button"
-              className="text-xs"
-              onClick={() => onScanCode("TICKETLEMON_STAFF_WRONG_QR")}
-            >
-              Dev: Wrong QR
             </Button>
           </div>
         </div>
@@ -338,7 +367,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
               </div>
             ) : (
               <p className="mt-2 leading-tight text-muted-foreground sm:text-base">
-                QR code not recognized. Please scan again.
+                Ticket not found. Please scan again.
               </p>
             )}
 

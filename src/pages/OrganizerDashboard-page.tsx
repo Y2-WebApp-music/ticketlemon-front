@@ -20,7 +20,9 @@ import { useEffect, useState } from "react"
 import { toast } from "sonner"
 
 export default function OrganizerDashboardPage() {
-  const [comingEventsState, setComingEventsState] = useState<OrganizerEvent[]>([])
+  const [comingEventsState, setComingEventsState] = useState<OrganizerEvent[]>(
+    []
+  )
   const [allEventsState, setAllEventsState] = useState<OrganizerEvent[]>([])
   const [organizerNameState, setOrganizerNameState] = useState("Organizer")
 

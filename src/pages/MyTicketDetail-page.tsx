@@ -1,11 +1,15 @@
 import { PageLayout } from "@/components/layouts"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { TicketTypeCard } from "@/features/my-ticket-detail"
-import { getMyTicketDetail } from "@/mocks/my-ticket-detail"
+import { getTicketsByUserIdAndEventId } from "@/services/ticketService"
+import { useUserStore } from "@/stores/user-store"
+import type { MyTicketDetail } from "@/types/my-ticket"
 import { formatDateLabel } from "@/utils/formatDate"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
 import * as React from "react"
+import QRCode from "qrcode"
+import { toast } from "sonner"
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = React.useState(false)
@@ -21,8 +25,9 @@ function useMediaQuery(query: string) {
   return matches
 }
 
-export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
-  const detail = getMyTicketDetail(ticketId)
+export default function MyTicketDetailPage({ eventId }: { eventId: string }) {
+  const userId = useUserStore((state) => state.user_id)
+  const [detail, setDetail] = React.useState<MyTicketDetail | null>(null)
   const navigate = useNavigate()
   const isDesktop = useMediaQuery("(min-width: 640px)")
   const [qrOpen, setQrOpen] = React.useState(false)
@@ -30,6 +35,47 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
   const [qrTicketDescription, setQrTicketDescription] = React.useState<
     string | null
   >(null)
+  const [qrTicketValue, setQrTicketValue] = React.useState<string | null>(null)
+  const [qrTicketImage, setQrTicketImage] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    const load = async () => {
+      if (!userId) return
+      try {
+        const response = await getTicketsByUserIdAndEventId(userId, eventId)
+        setDetail(response)
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load ticket detail"
+        toast.error(message)
+        setDetail(null)
+      }
+    }
+
+    load()
+  }, [eventId, userId])
+
+  React.useEffect(() => {
+    const generate = async () => {
+      if (!qrTicketValue) {
+        setQrTicketImage(null)
+        return
+      }
+      try {
+        const url = await QRCode.toDataURL(qrTicketValue, {
+          width: 300,
+          margin: 1,
+        })
+        setQrTicketImage(url)
+      } catch {
+        setQrTicketImage(null)
+      }
+    }
+
+    generate()
+  }, [qrTicketValue])
 
   if (!detail) {
     return (
@@ -128,12 +174,13 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
                       ? () => {
                           setQrTicketTitle(t.title)
                           setQrTicketDescription(t.description)
+                          setQrTicketValue(t.id)
                           if (isDesktop) {
                             setQrOpen(true)
                           } else {
                             navigate({
                               to: "/my-tickets/$ticketId/qr",
-                              params: { ticketId },
+                              params: { ticketId: eventId },
                             })
                           }
                         }
@@ -144,6 +191,7 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
                       ? () => {
                           setQrTicketTitle(t.title)
                           setQrTicketDescription(t.description)
+                          setQrTicketValue(t.id)
                           setQrOpen(true)
                         }
                       : undefined
@@ -167,10 +215,18 @@ export default function MyTicketDetailPage({ ticketId }: { ticketId: string }) {
             </div>
 
             <div className="flex justify-center">
-              <div className="flex size-[320px] items-center justify-center rounded-xl border-4 border-primary bg-muted/30">
-                <p className="text-3xl font-medium tracking-tight text-foreground">
-                  QR Zone
-                </p>
+              <div className="flex size-[320px] items-center justify-center rounded-xl border-4 border-primary bg-muted/30 p-4">
+                {qrTicketImage ? (
+                  <img
+                    src={qrTicketImage}
+                    alt="Ticket QR code"
+                    className="size-[280px]"
+                  />
+                ) : (
+                  <p className="text-center font-mono text-sm break-all text-foreground">
+                    {qrTicketValue ?? "-"}
+                  </p>
+                )}
               </div>
             </div>
 

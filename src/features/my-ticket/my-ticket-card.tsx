@@ -44,7 +44,7 @@ export function MyTicketCard({
     : undefined
 
   const viewEventLink = (
-    <Link to="/events/$eventId" params={{ eventId: event_id }}>
+    <Link to="/my-tickets/$ticketId" params={{ ticketId: event_id }}>
       <Ticket className="size-4" aria-hidden />
       View Ticket
     </Link>
@@ -142,8 +142,8 @@ export function MyTicketCard({
   if (!isUnpaid) {
     return (
       <Link
-        to="/events/$eventId"
-        params={{ eventId: event_id }}
+        to="/my-tickets/$ticketId"
+        params={{ ticketId: event_id }}
         className={cardClass}
       >
         {cardContent}

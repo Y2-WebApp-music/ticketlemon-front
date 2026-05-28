@@ -1,13 +1,10 @@
 import { PageLayout } from "@/components/layouts/page-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { getStaffEventById, STAFF_EVENT_SCAN_RESULT } from "@/mocks/staff"
 import { useStaffScanStore } from "@/stores/staff-scan-store"
-import type { StaffEventScanResult } from "@/types/staff"
 import { formatTitleDate } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
 import { CheckCircle2, ChevronLeft, UserRoundCheck } from "lucide-react"
-import { useState } from "react"
 import { toast } from "sonner"
 
 export default function StaffScanSuccessPage({
@@ -19,8 +16,7 @@ export default function StaffScanSuccessPage({
 }) {
   const eventFromStore = useStaffScanStore((s) => s.event)
   const resetStaffScan = useStaffScanStore((s) => s.reset)
-  const event = eventFromStore ?? getStaffEventById(eventId)
-  const [scanResult] = useState<StaffEventScanResult>(STAFF_EVENT_SCAN_RESULT)
+  const event = eventFromStore
 
   return (
     <PageLayout className="min-h-svh bg-muted/30">
@@ -70,21 +66,17 @@ export default function StaffScanSuccessPage({
             <div className="space-y-2">
               <p className="text-lg leading-7 text-foreground">
                 Name:
-                <span className="ml-2 font-medium">{scanResult?.name}</span>
+                <span className="ml-2 font-medium">-</span>
               </p>
               <p className="text-base leading-7 text-foreground">
-                Age: <span className="font-medium">{scanResult?.age}</span>
+                Age: <span className="font-medium">-</span>
               </p>
             </div>
 
             <div className="space-y-1">
               <p className="text-lg font-medium text-primary">Ticket Type</p>
-              <p className="text-base font-medium text-foreground">
-                {scanResult?.ticket_type}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {scanResult?.ticket_detail}
-              </p>
+              <p className="text-base font-medium text-foreground">-</p>
+              <p className="text-sm text-muted-foreground">-</p>
               <p className="mt-2 text-xs text-muted-foreground">
                 QR: {code || "-"}
               </p>
