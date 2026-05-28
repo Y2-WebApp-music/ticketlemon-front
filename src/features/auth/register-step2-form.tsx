@@ -23,15 +23,15 @@ import {
   ensureDialCode,
   formatPhoneRegionLabel,
 } from "@/constants/phone-region.constant"
-import type { RegisterDataForm } from "./register-types"
+import type { RegisterDataForm, RegisterStep2DataForm } from "@/types/auth"
 
 const GENDER_OPTIONS = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
+  { value: "Male", label: "Male" },
+  { value: "Female", label: "Female" },
   { value: "other", label: "Other" },
 ] as const
 
-export type { RegisterStep2DataForm } from "./register-types"
+export type { RegisterStep2DataForm }
 
 export interface RegisterStep2FormProps {
   idPrefix: string

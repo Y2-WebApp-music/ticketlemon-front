@@ -18,6 +18,8 @@ export interface UserUpdatePayload {
   birthdate?: string
   gender?: string
   profile_image?: string
+  org_name?: string
+  role?: "user" | "organizer"
 }
 
 export async function staffSignIn(

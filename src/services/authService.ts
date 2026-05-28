@@ -18,6 +18,8 @@ export interface SignUpPayload {
   gender: string
   profile_image?: string
   password: string
+  org_name?: string
+  role?: "customer" | "organizer"
 }
 
 export async function signIn(
@@ -29,11 +31,7 @@ export async function signIn(
     data: credentials,
   })
   const payload = response.data
-  useAuthStore.getState().setAuth({
-    access_token: payload.access_token,
-    role: payload.role,
-    // permission: payload.permission ?? [],
-  })
+  useAuthStore.getState().setAuth(payload)
   useUserStore.getState().setUserFromSignIn(payload)
   return payload
 }

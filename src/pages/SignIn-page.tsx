@@ -8,11 +8,13 @@ import {
   SignInForm,
   type RegisterDataForm,
 } from "@/features/auth"
-import { signIn } from "@/services/authService"
+import { signIn, signUp } from "@/services/authService"
+import { updateUser } from "@/services/staffService"
 import { initialAuthDataForm } from "@/types/auth"
 import type { ErrorResponseProps } from "@/types/responseHandler"
 import { useNavigate } from "@tanstack/react-router"
 import * as React from "react"
+import type { OrganizerRegisterFormPayload } from "@/types/auth"
 
 export default function SignInPage() {
   const navigate = useNavigate()
@@ -28,6 +30,13 @@ export default function SignInPage() {
     React.useState<RegisterDataForm>(initialAuthDataForm)
   const [signInLoading, setSignInLoading] = React.useState(false)
   const [signInError, setSignInError] = React.useState<string | null>(null)
+  const [signUpLoading, setSignUpLoading] = React.useState(false)
+  const [signUpError, setSignUpError] = React.useState<string | null>(null)
+  const [organizerSignUpLoading, setOrganizerSignUpLoading] =
+    React.useState(false)
+  const [organizerSignUpError, setOrganizerSignUpError] = React.useState<
+    string | null
+  >(null)
 
   const goToRegister = () => {
     if (isOrganizerSignIn) {
@@ -44,6 +53,87 @@ export default function SignInPage() {
   }
   const goToRegisterStep2 = () => setRegisterStep(2)
   const goToRegisterStep1 = () => setRegisterStep(1)
+
+  const handleOrganizerSignUp = async (
+    payload: OrganizerRegisterFormPayload
+  ) => {
+    setOrganizerSignUpError(null)
+    setOrganizerSignUpLoading(true)
+    try {
+      const email = payload.organizerEmail.trim()
+      const password = payload.password
+
+      const signInPayload = await signIn({ email, password })
+      setSignInDataForm({ email, password })
+
+      await updateUser(signInPayload.user_id, {
+        org_name: payload.organizerName.trim(),
+        role: "organizer",
+      })
+
+      navigate({ to: "/organizer" })
+    } catch (err) {
+      const message =
+        err && typeof err === "object" && "message" in err
+          ? String((err as ErrorResponseProps).message)
+          : "Create organizer failed. Please try again."
+      setOrganizerSignUpError(message)
+    } finally {
+      setOrganizerSignUpLoading(false)
+    }
+  }
+
+  const handleSignUp = async () => {
+    setSignUpError(null)
+    setSignUpLoading(true)
+    try {
+      const email = dataForm.email.trim()
+      const password = dataForm.password
+
+      await signUp({
+        email,
+        password,
+        first_name: dataForm.firstName.trim(),
+        last_name: dataForm.lastName.trim(),
+        phone_number:
+          dataForm.phone.trim() !== ""
+            ? `${dataForm.phoneCountryCode}${dataForm.phone}`
+            : "",
+        birthdate: dataForm.dateOfBirth
+          ? dataForm.dateOfBirth.toISOString()
+          : "",
+        gender: dataForm.gender,
+      })
+
+      // Prefill sign-in data either way
+      setSignInDataForm({ email, password })
+
+      // Best effort: auto sign-in after successful registration
+      try {
+        const payload = await signIn({ email, password })
+        if (payload.role === "organizer" || payload.role === "admin") {
+          navigate({ to: "/organizer" })
+        } else if (payload.role === "staff") {
+          navigate({ to: "/staff" })
+        } else {
+          navigate({ to: "/" })
+        }
+        return
+      } catch {
+        // Fall back to sign-in screen if auto sign-in fails
+      }
+
+      goToSignIn()
+    } catch (err) {
+      const message =
+        err && typeof err === "object" && "message" in err
+          ? String((err as ErrorResponseProps).message)
+          : "Sign up failed. Please try again."
+      setSignUpError(message)
+    } finally {
+      setSignUpLoading(false)
+    }
+  }
 
   const handleSignIn = async () => {
     setSignInError(null)
@@ -90,17 +180,24 @@ export default function SignInPage() {
                   onSignIn={goToSignIn}
                 />
               ) : (
-                <RegisterStep2Form
-                  idPrefix="mobile"
-                  variant="mobile"
-                  dataForm={dataForm}
-                  onDataFormChange={setDataForm}
-                  onBack={goToRegisterStep1}
-                  onContinue={() => {
-                    // TODO: complete registration
-                  }}
-                  onSignIn={goToSignIn}
-                />
+                <>
+                  {signUpError && (
+                    <p className="-mt-2 w-full text-sm text-destructive">
+                      {signUpError}
+                    </p>
+                  )}
+                  <RegisterStep2Form
+                    idPrefix="mobile"
+                    variant="mobile"
+                    dataForm={dataForm}
+                    onDataFormChange={setDataForm}
+                    onBack={goToRegisterStep1}
+                    onContinue={() => {
+                      if (!signUpLoading) handleSignUp()
+                    }}
+                    onSignIn={goToSignIn}
+                  />
+                </>
               )
             ) : (
               <SignInForm
@@ -119,9 +216,8 @@ export default function SignInPage() {
                 onSignIn={handleSignIn}
                 signInLoading={signInLoading}
                 signInError={signInError}
-                onGoogleSignIn={() => {
-                  // TODO: google sign in
-                }}
+                showGoogleSignIn={false}
+                onGoogleSignIn={() => {}}
                 onForgotPassword={() => {
                   // TODO: forgot password flow
                 }}
@@ -169,15 +265,24 @@ export default function SignInPage() {
                 }`}
               >
                 {isOrganizerSignIn && isOrganizerRegister ? (
-                  <OrganizerRegisterForm
-                    idPrefix="desktop"
-                    variant="desktop"
-                    customerEmail={signInDataForm.email}
-                    onSignIn={goToSignIn}
-                    onCreateOrganizer={() => {
-                      // TODO: organizer registration flow
-                    }}
-                  />
+                  <>
+                    {organizerSignUpError && (
+                      <p className="-mt-2 w-full text-sm text-destructive">
+                        {organizerSignUpError}
+                      </p>
+                    )}
+                    <OrganizerRegisterForm
+                      idPrefix="desktop"
+                      variant="desktop"
+                      customerEmail={signInDataForm.email}
+                      onSignIn={goToSignIn}
+                      onCreateOrganizer={(payload) => {
+                        if (!organizerSignUpLoading) {
+                          handleOrganizerSignUp(payload)
+                        }
+                      }}
+                    />
+                  </>
                 ) : isRegister ? (
                   registerStep === 1 ? (
                     <RegisterStep1Form
@@ -189,17 +294,24 @@ export default function SignInPage() {
                       onSignIn={goToSignIn}
                     />
                   ) : (
-                    <RegisterStep2Form
-                      idPrefix="desktop"
-                      variant="desktop"
-                      dataForm={dataForm}
-                      onDataFormChange={setDataForm}
-                      onBack={goToRegisterStep1}
-                      onContinue={() => {
-                        // TODO: complete registration
-                      }}
-                      onSignIn={goToSignIn}
-                    />
+                    <>
+                      {signUpError && (
+                        <p className="-mt-2 w-full text-sm text-destructive">
+                          {signUpError}
+                        </p>
+                      )}
+                      <RegisterStep2Form
+                        idPrefix="desktop"
+                        variant="desktop"
+                        dataForm={dataForm}
+                        onDataFormChange={setDataForm}
+                        onBack={goToRegisterStep1}
+                        onContinue={() => {
+                          if (!signUpLoading) handleSignUp()
+                        }}
+                        onSignIn={goToSignIn}
+                      />
+                    </>
                   )
                 ) : (
                   <SignInForm
@@ -222,10 +334,8 @@ export default function SignInPage() {
                     onSignIn={handleSignIn}
                     signInLoading={signInLoading}
                     signInError={signInError}
-                    showGoogleSignIn={!isOrganizerSignIn}
-                    onGoogleSignIn={() => {
-                      // TODO: google sign in
-                    }}
+                    showGoogleSignIn={false}
+                    onGoogleSignIn={() => {}}
                     onForgotPassword={() => {
                       // TODO: forgot password flow
                     }}

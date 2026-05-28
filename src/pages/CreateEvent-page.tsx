@@ -20,6 +20,7 @@ import {
   type CreateEventPayload,
 } from "@/types/create-event"
 import { createEvent, type EventRequestPayload } from "@/services/eventService"
+import { useUserStore } from "@/stores/user-store"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { ChevronLeft, Plus } from "lucide-react"
 import { useMemo, useRef, useState } from "react"
@@ -29,9 +30,12 @@ const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024
 
 export default function CreateEventPage() {
   const navigate = useNavigate()
+  const { user_id, org_name } = useUserStore()
   const [formData, setFormData] = useState<CreateEventPayload>(() =>
     createInitialCreateEventPayload()
   )
+  const [posterFile, setPosterFile] = useState<File | null>(null)
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const {
@@ -74,10 +78,14 @@ export default function CreateEventPage() {
       return
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      poster_url: URL.createObjectURL(file),
-    }))
+    setPosterFile(file)
+    setFormData((prev) => {
+      if (prev.poster_url) URL.revokeObjectURL(prev.poster_url)
+      return {
+        ...prev,
+        poster_url: URL.createObjectURL(file),
+      }
+    })
   }
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -87,16 +95,28 @@ export default function CreateEventPage() {
       return
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      thumbnail_url: URL.createObjectURL(file),
-    }))
+    setThumbnailFile(file)
+    setFormData((prev) => {
+      if (prev.thumbnail_url) URL.revokeObjectURL(prev.thumbnail_url)
+      return {
+        ...prev,
+        thumbnail_url: URL.createObjectURL(file),
+      }
+    })
   }
   const handlePosterRemove = () => {
-    setFormData((prev) => ({ ...prev, poster_url: null }))
+    setPosterFile(null)
+    setFormData((prev) => {
+      if (prev.poster_url) URL.revokeObjectURL(prev.poster_url)
+      return { ...prev, poster_url: null }
+    })
   }
   const handleThumbnailRemove = () => {
-    setFormData((prev) => ({ ...prev, thumbnail_url: null }))
+    setThumbnailFile(null)
+    setFormData((prev) => {
+      if (prev.thumbnail_url) URL.revokeObjectURL(prev.thumbnail_url)
+      return { ...prev, thumbnail_url: null }
+    })
   }
 
   const updateEventDateEntry = (id: string, patch: Partial<DateRangeEntry>) => {
@@ -256,8 +276,8 @@ export default function CreateEventPage() {
         description: formData.description
           ? JSON.stringify(formData.description)
           : null,
-        poster_url: formData.poster_url ?? undefined,
-        thumbnail_url: formData.thumbnail_url ?? undefined,
+        poster_url: posterFile ?? undefined,
+        thumbnail_url: thumbnailFile ?? undefined,
         event_date_entries: formData.event_date_entries.map((entry) => ({
           id: entry.id,
           start_date: entry.start_date ? entry.start_date.toISOString() : "",
@@ -284,8 +304,8 @@ export default function CreateEventPage() {
           sale_ticket_on: ticket.sale_ticket_on,
           is_collapsed: ticket.is_collapsed,
         })),
-        create_by_id: formData.create_by_id ?? "",
-        create_by: formData.create_by ?? "",
+        create_by_id: user_id ?? formData.create_by_id ?? "",
+        create_by: org_name ?? "",
       }
 
       await createEvent(payload)

@@ -123,19 +123,38 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
   const [quantities, setQuantities] = useState<Record<string, number>>({})
 
   useEffect(() => {
-    const toOutputData = (raw: string | null): OutputData => {
+    const toOutputData = (raw: unknown): OutputData => {
       if (!raw) return { time: Date.now(), version: "2.31.0", blocks: [] }
-      try {
-        const parsed = JSON.parse(raw) as OutputData
-        if (parsed && Array.isArray(parsed.blocks)) return parsed
-      } catch {
-        // fallback to paragraph
+
+      if (typeof raw === "object" && raw !== null && "blocks" in raw) {
+        const maybe = raw as Partial<OutputData>
+        if (Array.isArray(maybe.blocks)) {
+          return (
+            (raw as OutputData) ?? {
+              time: Date.now(),
+              version: "2.31.0",
+              blocks: [],
+            }
+          )
+        }
       }
-      return {
-        time: Date.now(),
-        version: "2.31.0",
-        blocks: [{ type: "paragraph", data: { text: raw } }],
+
+      if (typeof raw === "string") {
+        try {
+          const parsed = JSON.parse(raw) as OutputData
+          if (parsed && Array.isArray(parsed.blocks)) return parsed
+        } catch {
+          // fallback to paragraph below
+        }
+
+        return {
+          time: Date.now(),
+          version: "2.31.0",
+          blocks: [{ type: "paragraph", data: { text: raw } }],
+        }
       }
+
+      return { time: Date.now(), version: "2.31.0", blocks: [] }
     }
 
     const load = async () => {

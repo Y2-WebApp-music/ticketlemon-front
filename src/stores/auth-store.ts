@@ -1,13 +1,13 @@
 import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
-import type { Permission, SignInResponse, UserRole } from "@/types/auth"
+import type { Permission, UserRole } from "@/types/auth"
 import { AUTH_STORAGE_KEY } from "@/constants/auth-storage.constant"
 
 export interface AuthState {
   access_token: string | null
   role: UserRole | null
   permission: Permission[]
-  setAuth: (data: SignInResponse) => void
+  setAuth: (data: { access_token: string; role: UserRole }) => void
   clearAuth: () => void
   hasPermission: (permission: string) => boolean
   hasAnyPermission: (permissions: string[]) => boolean

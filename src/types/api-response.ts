@@ -33,7 +33,7 @@ export interface ApiEvent {
   venue: string
   impact_genre: string
   age_restriction: number
-  description: string | null
+  description: unknown
   poster_url: string | null
   thumbnail_url: string | null
   create_by_id: string

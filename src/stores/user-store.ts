@@ -9,6 +9,7 @@ export interface UserState {
   email: string | null
   first_name: string | null
   last_name: string | null
+  org_name: string | null
   setUserFromSignIn: (payload: SignInResponse) => void
   clearUser: () => void
 }
@@ -18,6 +19,7 @@ const initialState = {
   email: null as string | null,
   first_name: null as string | null,
   last_name: null as string | null,
+  org_name: null as string | null,
 }
 
 export const useUserStore = create<UserState>()(
@@ -30,6 +32,7 @@ export const useUserStore = create<UserState>()(
           email: payload.email ?? null,
           first_name: payload.first_name ?? null,
           last_name: payload.last_name ?? null,
+          org_name: payload.org_name ?? null,
         }),
       clearUser: () => set(initialState),
     }),
@@ -41,6 +44,7 @@ export const useUserStore = create<UserState>()(
         email: state.email,
         first_name: state.first_name,
         last_name: state.last_name,
+        org_name: state.org_name,
       }),
     }
   )

@@ -14,6 +14,7 @@ export interface SignInResponse {
   email?: string
   first_name?: string
   last_name?: string
+  org_name?: string | null
   // permission: Permission[]
 }
 

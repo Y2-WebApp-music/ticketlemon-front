@@ -208,20 +208,30 @@ export default function EditEventPage() {
   }
 
   useEffect(() => {
-    const toOutputData = (raw: string | null): OutputData | null => {
+    const toOutputData = (raw: unknown): OutputData | null => {
       if (!raw) return null
-      try {
-        const parsed = JSON.parse(raw) as OutputData
-        if (parsed && Array.isArray(parsed.blocks)) return parsed
-      } catch {
-        // fallback to plain text paragraph below
+
+      if (typeof raw === "object" && raw !== null && "blocks" in raw) {
+        const maybe = raw as Partial<OutputData>
+        if (Array.isArray(maybe.blocks)) return raw as OutputData
       }
 
-      return {
-        time: Date.now(),
-        version: "2.31.0",
-        blocks: [{ type: "paragraph", data: { text: raw } }],
+      if (typeof raw === "string") {
+        try {
+          const parsed = JSON.parse(raw) as OutputData
+          if (parsed && Array.isArray(parsed.blocks)) return parsed
+        } catch {
+          // fallback to plain text paragraph below
+        }
+
+        return {
+          time: Date.now(),
+          version: "2.31.0",
+          blocks: [{ type: "paragraph", data: { text: raw } }],
+        }
       }
+
+      return null
     }
 
     const load = async () => {
