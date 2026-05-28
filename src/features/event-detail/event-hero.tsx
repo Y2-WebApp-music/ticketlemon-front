@@ -1,12 +1,20 @@
+import { EventStatus } from "@/constants/event-status.constant"
 import { Button } from "@/components/ui/button"
 import { formatDateLabel } from "@/utils/formatDate"
 import { CalendarRange, MapPin, Ticket, Users } from "lucide-react"
+
+const DISABLED_STATUSES = new Set<number>([
+  EventStatus.SOLD_OUT,
+  EventStatus.END,
+  EventStatus.CANCELLED,
+])
 
 export interface EventHeroProps {
   title: string
   imageUrl: string
   event_date_entries: string[]
   venue: string
+  status_id?: number
   onBuyTickets?: () => void
 }
 
@@ -15,8 +23,10 @@ export function EventHero({
   imageUrl,
   event_date_entries,
   venue,
+  status_id,
   onBuyTickets,
 }: EventHeroProps) {
+  const buyDisabled = status_id !== undefined && DISABLED_STATUSES.has(status_id)
   const formattedDates = event_date_entries.map((iso) => formatDateLabel(iso))
   return (
     <>
@@ -81,6 +91,7 @@ export function EventHero({
                 type="button"
                 className="w-full"
                 size="lg"
+                disabled={buyDisabled}
                 onClick={onBuyTickets}
               >
                 <Ticket className="size-5" aria-hidden />

@@ -7,6 +7,7 @@ import {
   RecommendedEventsSection,
 } from "@/features/landing"
 import { getAllEvents } from "@/services/eventService"
+import { resolveEventStatusId } from "@/constants/event-status.constant"
 import type { EventCardItem } from "@/types/event"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -45,6 +46,7 @@ export default function LandingPage() {
             title: event.event_name,
             venue: event.venue,
             poster_url: event.poster_url ?? "",
+            status_id: resolveEventStatusId(event.status, endDate),
           }
         })
 

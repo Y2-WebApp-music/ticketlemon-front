@@ -47,6 +47,7 @@ export function RecommendedEventsSection({
                     date={`${formatTitleDate(event.show_start_date)} - ${formatTitleDate(event.show_end_date)}`}
                     title={event.title}
                     venue={event.venue}
+                    status={event.status_id}
                     className="w-full"
                   />
                 </Link>
@@ -58,6 +59,7 @@ export function RecommendedEventsSection({
                   date={`${formatTitleDate(event.show_start_date)} - ${formatTitleDate(event.show_end_date)}`}
                   title={event.title}
                   venue={event.venue}
+                  status={event.status_id}
                   className="w-full"
                 />
               )}

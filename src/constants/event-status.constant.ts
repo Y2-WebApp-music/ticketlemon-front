@@ -31,6 +31,33 @@ export function getEventStatusBadgeVariant(
   return EVENT_STATUS_BADGE_VARIANT[statusId as EventStatus] ?? "default"
 }
 
+/** Map Prisma EventStatus enum string → numeric EventStatus ID */
+export const PRISMA_STATUS_TO_ID: Record<string, EventStatus> = {
+  Draft: EventStatus.DRAFT,
+  Scheduled: EventStatus.SCHEDULED,
+  OnSale: EventStatus.ON_SALE,
+  SoldOut: EventStatus.SOLD_OUT,
+  Show: EventStatus.SHOW,
+  EventEnd: EventStatus.END,
+  Cancel: EventStatus.CANCELLED,
+}
+
+/** Convert a Prisma status string to a numeric EventStatus ID.
+ *  Falls back to computing END from show_end_date if status is missing. */
+export function resolveEventStatusId(
+  prismaStatus: string | null | undefined,
+  showEndDate: string
+): EventStatus {
+  if (prismaStatus && prismaStatus in PRISMA_STATUS_TO_ID) {
+    return PRISMA_STATUS_TO_ID[prismaStatus]
+  }
+  // Fallback: infer END from date when status is unavailable
+  if (showEndDate && new Date(showEndDate) < new Date()) {
+    return EventStatus.END
+  }
+  return EventStatus.ON_SALE
+}
+
 /** Organizer dashboard: Event Status filter dropdown options */
 export const ORGANIZER_EVENT_STATUS_FILTER_OPTIONS = [
   { value: 0, label: "All" },
