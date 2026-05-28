@@ -42,14 +42,14 @@ export interface OrganizerEventTabsProps {
   /** Open selling table from external trigger (e.g. hero See Selling button). */
   openingSellingTicket?: OrganizerSellingTicketSelection | null
   /** Called when description is saved (e.g. after Save button); omit to only allow in-place editing */
-  onDescriptionSave?: (data: OutputData) => void
+  onDescriptionSave?: (data: OutputData) => void | Promise<void>
 }
 
 function DescriptionEditToolbar({
   onSave,
   onCancel,
 }: {
-  onSave: (data: OutputData) => void
+  onSave: (data: OutputData) => void | Promise<void>
   onCancel: () => void
 }) {
   const { editor } = useEditorJs()
@@ -58,7 +58,7 @@ function DescriptionEditToolbar({
     setSaving(true)
     try {
       const data = await saveEditor(editor)
-      if (data) onSave(data)
+      if (data) await onSave(data)
     } finally {
       setSaving(false)
     }
@@ -104,10 +104,14 @@ export function OrganizerEventTabs({
     useState<OrganizerSellingTicketSelection | null>(null)
 
   const handleDescriptionSave = useCallback(
-    (data: OutputData) => {
-      setEditingDescription(data)
-      setIsEditing(false)
-      onDescriptionSave?.(data)
+    async (data: OutputData) => {
+      try {
+        await onDescriptionSave?.(data)
+        setEditingDescription(data)
+        setIsEditing(false)
+      } catch {
+        // Parent shows error toast; keep edit mode open
+      }
     },
     [onDescriptionSave]
   )

@@ -4,7 +4,11 @@ import {
   OrganizerEventTabs,
 } from "@/features/organizer-dashboard"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
-import { getEventById, getEventSelling } from "@/services/eventService"
+import {
+  getEventById,
+  getEventSelling,
+  updateEvent,
+} from "@/services/eventService"
 import { DEFAULT_SELLING_TICKET_SELECTION } from "@/mocks/organizer-event-selling"
 import type { EventTicketType, OrganizerEventDetail } from "@/types/event"
 import type {
@@ -153,6 +157,31 @@ export default function OrganizerEventDetailPage({
       void loadSellingTable(params)
     },
     [loadSellingTable]
+  )
+
+  const handleDescriptionSave = useCallback(
+    async (data: OutputData) => {
+      if (!eventData) return
+
+      try {
+        await updateEvent(eventData.id, { description: data })
+        setEventData((prev) => (prev ? { ...prev, description: data } : prev))
+        setDescriptionOverrides((prev) => {
+          const next = { ...prev }
+          delete next[eventData.id]
+          return next
+        })
+        toast.success("Description saved")
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to save description"
+        toast.error(message)
+        throw error
+      }
+    },
+    [eventData]
   )
 
   useEffect(() => {
@@ -312,12 +341,7 @@ export default function OrganizerEventDetailPage({
           onSellingQueryChange={handleSellingQueryChange}
           onSellingTicketSelect={handleSellingTicketSelect}
           openingSellingTicket={openingSellingTicket}
-          onDescriptionSave={(data) =>
-            setDescriptionOverrides((prev) => ({
-              ...prev,
-              [eventData.id]: data,
-            }))
-          }
+          onDescriptionSave={handleDescriptionSave}
         />
       </div>
     </PageLayout>
