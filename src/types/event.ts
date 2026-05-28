@@ -8,6 +8,7 @@ export interface EventCardItem {
   title: string
   venue: string
   poster_url: string
+  status_id: number
 }
 
 export interface EventTicketType {

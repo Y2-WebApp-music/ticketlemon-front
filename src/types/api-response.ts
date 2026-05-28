@@ -61,6 +61,7 @@ export interface ApiEvent {
   ticket_min_per_order: number | null
   ticket_max_per_order: number | null
   staff_code: string | null
+  status: "Scheduled" | "OnSale" | "SoldOut" | "Draft" | "Show" | "EventEnd" | "Cancel" | null
 }
 
 export interface ApiEventMutationResponse extends ApiMessageResponse {

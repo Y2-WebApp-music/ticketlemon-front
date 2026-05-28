@@ -29,6 +29,7 @@ export function AllEventsSection({ events }: AllEventsSectionProps) {
                 date={`${formatTitleDate(event.show_start_date)} - ${formatTitleDate(event.show_end_date)}`}
                 title={event.title}
                 venue={event.venue}
+                status={event.status_id}
               />
             </Link>
           ) : (
@@ -40,6 +41,7 @@ export function AllEventsSection({ events }: AllEventsSectionProps) {
               date={`${formatTitleDate(event.show_start_date)} - ${formatTitleDate(event.show_end_date)}`}
               title={event.title}
               venue={event.venue}
+              status={event.status_id}
             />
           )
         )}
