@@ -48,8 +48,17 @@ export async function signUp(
   return response.data
 }
 
-/** Clear auth state (e.g. on sign out). */
-export function signOut(): void {
-  useAuthStore.getState().clearAuth()
-  useUserStore.getState().clearUser()
+/** Notify the gateway and clear auth state. Local state is cleared even if the request fails. */
+export async function signOut(): Promise<void> {
+  try {
+    await apiService.fetchData({
+      method: "POST",
+      url: "/api/logout",
+    })
+  } catch {
+    // Ignore network/4xx errors — we still want to clear local state below.
+  } finally {
+    useAuthStore.getState().clearAuth()
+    useUserStore.getState().clearUser()
+  }
 }
