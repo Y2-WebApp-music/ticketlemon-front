@@ -6,6 +6,7 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { staffSignIn } from "@/services/eventService"
+import { useStaffScanStore } from "@/stores/staff-scan-store"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { ChevronLeft } from "lucide-react"
 import * as React from "react"
@@ -13,6 +14,7 @@ import { toast } from "sonner"
 
 export default function StaffSignInPage() {
   const navigate = useNavigate()
+  const setStaffEvent = useStaffScanStore((s) => s.setStaffEvent)
   const [staffCode, setStaffCode] = React.useState("")
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
@@ -21,9 +23,10 @@ export default function StaffSignInPage() {
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true)
-      await staffSignIn({ staff_code: staffCode })
+      const event = await staffSignIn({ staff_code: staffCode })
+      setStaffEvent(event)
       toast.success("Staff signed in")
-      navigate({ to: "/staff/scan", search: { eventId: "" } })
+      navigate({ to: "/staff/scan", search: { eventId: event.id } })
     } catch (error) {
       const message =
         typeof error === "object" && error !== null && "message" in error

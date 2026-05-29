@@ -109,7 +109,7 @@ function NavBar() {
             </div>
           ) : (
             <Link
-              to={isStaffRole ? "/staff" : "/organizer"}
+              to={isStaffRole ? "/staff-sign-in" : "/organizer"}
               className="flex shrink-0 items-center gap-1.5 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <TicketlemonFull

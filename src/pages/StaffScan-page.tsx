@@ -7,9 +7,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Spinner } from "@/components/ui/spinner"
-import { getAllEvents } from "@/services/eventService"
-import { checkInTicket } from "@/services/ticketService"
-import { formatTitleDate } from "@/utils/formatDate"
+import { getEventById } from "@/services/eventService"
+import { checkInTicket, getTicketById } from "@/services/ticketService"
+import { getUserById } from "@/services/staffService"
+import { formatDateLabel, formatTitleDate } from "@/utils/formatDate"
+import type { ApiEvent, ApiTicket } from "@/types/api-response"
+import type { ErrorResponseProps } from "@/types/responseHandler"
 import { useStaffScanStore } from "@/stores/staff-scan-store"
 import { Link, useNavigate } from "@tanstack/react-router"
 import jsQR from "jsqr"
@@ -29,46 +32,52 @@ type BarcodeDetectorConstructor = new (options: {
   formats: string[]
 }) => BarcodeDetectorLike
 
+interface DuplicateTicketInfo {
+  name: string
+  ticketType: string
+  checkedInAt: string
+}
+
+function formatTicketTypeLabel(ticket: ApiTicket, event?: ApiEvent): string {
+  if (!event) return ticket.type
+
+  const matchedType = event.ticket_types.find(
+    (item) => item.name === ticket.type
+  )
+  const eventDate = event.event_date_entries.find(
+    (entry) => entry.id === matchedType?.use_for_event_date_time
+  )
+
+  if (eventDate?.start_date) {
+    return `${ticket.type} (${formatDateLabel(eventDate.start_date)})`
+  }
+
+  return ticket.type
+}
+
+function isDuplicateCheckInError(error: unknown): boolean {
+  if (typeof error !== "object" || error === null) return false
+  const err = error as ErrorResponseProps
+  return /already checked in/i.test(String(err.message ?? ""))
+}
+
 export default function StaffScanPage({ eventId }: { eventId: string }) {
   type ScanResultType = "wrong" | "duplicate"
   const navigate = useNavigate()
   const eventFromStore = useStaffScanStore((s) => s.event)
+  const eventDetailFromStore = useStaffScanStore((s) => s.eventDetail)
   const [event, setLocalEvent] = React.useState<EventCardItem | null>(
     eventFromStore ?? null
   )
-  const setEvent = useStaffScanStore((s) => s.setEvent)
 
   React.useEffect(() => {
-    const load = async () => {
-      if (eventFromStore) return
-      try {
-        const events = await getAllEvents()
-        const mapped: EventCardItem[] = events.map((item) => {
-          const startDate = item.event_date_entries[0]?.start_date ?? ""
-          const endDate =
-            item.event_date_entries[item.event_date_entries.length - 1]
-              ?.start_date ?? startDate
-          return {
-            event_id: item.id,
-            show_start_date: startDate,
-            show_end_date: endDate,
-            title: item.event_name,
-            venue: item.venue,
-            poster_url: item.poster_url ?? "",
-          }
-        })
-
-        const selected =
-          mapped.find((item) => item.event_id === eventId) ?? mapped[0] ?? null
-        setLocalEvent(selected)
-        setEvent(selected)
-      } catch {
-        // scanner still works without event metadata
-      }
+    if (eventFromStore) {
+      setLocalEvent(eventFromStore)
+      return
     }
 
-    load()
-  }, [eventFromStore, eventId, setEvent])
+    navigate({ to: "/staff-sign-in", replace: true })
+  }, [eventFromStore, navigate])
   const videoRef = React.useRef<HTMLVideoElement | null>(null)
   const streamRef = React.useRef<MediaStream | null>(null)
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null)
@@ -80,7 +89,10 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
   const [scanResult, setScanResult] = React.useState<ScanResultType | null>(
     null
   )
+  const [duplicateInfo, setDuplicateInfo] =
+    React.useState<DuplicateTicketInfo | null>(null)
   const [isCheckingIn, setIsCheckingIn] = React.useState(false)
+  const isCheckingInRef = React.useRef(false)
   const [cameraDialogOpen, setCameraDialogOpen] = React.useState(false)
   const [scanSession, setScanSession] = React.useState(0)
 
@@ -96,8 +108,42 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
 
   const closeResultDialog = React.useCallback(() => {
     setScanResult(null)
+    setDuplicateInfo(null)
     setScanSession((prev) => prev + 1)
   }, [])
+
+  const loadDuplicateTicketInfo = React.useCallback(
+    async (code: string): Promise<DuplicateTicketInfo | null> => {
+      try {
+        const ticket = await getTicketById(code)
+        const activeEventId = eventFromStore?.event_id ?? eventId
+        if (ticket.event_id !== activeEventId) return null
+
+        const eventDetail =
+          eventDetailFromStore?.id === ticket.event_id
+            ? eventDetailFromStore
+            : await getEventById(ticket.event_id)
+
+        const user = await getUserById(ticket.user_id)
+
+        const name = [user.first_name, user.last_name]
+          .filter(Boolean)
+          .join(" ")
+          .trim()
+
+        return {
+          name: name || user.email,
+          ticketType: formatTicketTypeLabel(ticket, eventDetail),
+          checkedInAt: ticket.updated_at
+            ? formatDateLabel(ticket.updated_at)
+            : "—",
+        }
+      } catch {
+        return null
+      }
+    },
+    [eventDetailFromStore, eventFromStore, eventId]
+  )
 
   const retryCameraAccess = React.useCallback(() => {
     setCameraDialogOpen(false)
@@ -108,28 +154,45 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
 
   const onValidCode = React.useCallback(
     async (code: string) => {
+      if (isCheckingInRef.current) return
+
+      isCheckingInRef.current = true
+      setIsCheckingIn(true)
+
       try {
-        setIsCheckingIn(true)
         await checkInTicket(code)
       } catch (error) {
-        const status =
-          typeof error === "object" && error !== null && "status" in error
-            ? Number(error.status)
-            : 0
         stopScanning()
-        setScanResult(status === 400 ? "duplicate" : "wrong")
+
+        if (isDuplicateCheckInError(error)) {
+          const info = await loadDuplicateTicketInfo(code)
+          setDuplicateInfo(info)
+          setScanResult("duplicate")
+        } else {
+          setDuplicateInfo(null)
+          setScanResult("wrong")
+        }
+
+        isCheckingInRef.current = false
         setIsCheckingIn(false)
         return
       }
 
       stopScanning()
+      isCheckingInRef.current = false
       setIsCheckingIn(false)
       navigate({
         to: "/staff/scan-success",
-        search: { eventId, code },
+        search: { eventId: eventFromStore?.event_id ?? eventId, code },
       })
     },
-    [eventId, navigate, stopScanning]
+    [
+      eventFromStore?.event_id,
+      eventId,
+      loadDuplicateTicketInfo,
+      navigate,
+      stopScanning,
+    ]
   )
 
   const onScanCode = React.useCallback(
@@ -202,6 +265,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
             }
 
             if (!rawValue) return
+            if (isCheckingInRef.current) return
             setLastScan(rawValue)
             void onScanCode(rawValue)
           } catch {
@@ -231,7 +295,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
           <p className="text-sm text-muted-foreground">
             Loading event metadata...
           </p>
-          <Link to="/staff" className="mt-4 inline-flex text-primary">
+          <Link to="/staff-sign-in" className="mt-4 inline-flex text-primary">
             Back
           </Link>
         </main>
@@ -243,7 +307,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
     <PageLayout className="min-h-svh bg-muted/30">
       <main className="mx-auto w-full max-w-[402px] px-4 py-4">
         <Link
-          to="/staff"
+          to="/staff-sign-in"
           className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-primary/80"
         >
           <ChevronLeft className="size-4" />
@@ -345,7 +409,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
                     Name
                   </p>
                   <p className="text-base text-foreground sm:text-xl">
-                    Chotanansub Sophaken
+                    {duplicateInfo?.name ?? "—"}
                   </p>
                 </div>
                 <div className="space-y-1">
@@ -353,7 +417,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
                     Ticket Type
                   </p>
                   <p className="text-base text-foreground sm:text-xl">
-                    VVIP + Soundcheck (29 Mar 2026, 17:00)
+                    {duplicateInfo?.ticketType ?? "—"}
                   </p>
                 </div>
                 <div className="space-y-1">
@@ -361,7 +425,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
                     Check In
                   </p>
                   <p className="text-base text-foreground sm:text-xl">
-                    29 Mar 2026, 16:24:35
+                    {duplicateInfo?.checkedInAt ?? "—"}
                   </p>
                 </div>
               </div>

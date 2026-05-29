@@ -1,11 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router"
-
-import StaffLandingPage from "@/pages/StaffLanding-page"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/staff/")({
-  component: StaffLandingRoute,
+  beforeLoad: () => {
+    throw redirect({ to: "/staff-sign-in" })
+  },
 })
-
-function StaffLandingRoute() {
-  return <StaffLandingPage />
-}

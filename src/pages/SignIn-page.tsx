@@ -114,7 +114,7 @@ export default function SignInPage() {
         if (payload.role === "organizer" || payload.role === "admin") {
           navigate({ to: "/organizer" })
         } else if (payload.role === "staff") {
-          navigate({ to: "/staff" })
+          navigate({ to: "/staff-sign-in" })
         } else {
           navigate({ to: "/" })
         }
@@ -146,7 +146,7 @@ export default function SignInPage() {
       if (payload.role === "organizer" || payload.role === "admin") {
         navigate({ to: "/organizer" })
       } else if (payload.role === "staff") {
-        navigate({ to: "/staff" })
+        navigate({ to: "/staff-sign-in" })
       } else {
         navigate({ to: "/" })
       }

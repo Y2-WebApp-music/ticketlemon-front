@@ -151,8 +151,8 @@ export async function generateStaffCode(
 
 export async function staffSignIn(payload: {
   staff_code: string
-}): Promise<ApiMessageResponse> {
-  const response = await apiService.fetchData<ApiMessageResponse>({
+}): Promise<ApiEvent> {
+  const response = await apiService.fetchData<ApiEvent>({
     method: "POST",
     url: "/api/event/staff-signin",
     data: payload,
