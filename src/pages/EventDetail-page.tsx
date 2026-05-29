@@ -212,6 +212,30 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
     [event?.ticket_types]
   )
 
+  const { saleNotStarted, saleStartLabel } = useMemo(() => {
+    const types = event?.ticket_types ?? []
+    const now = Date.now()
+    const hasOnSaleTicket = types.some(
+      (tt) => new Date(tt.start_sale_date).getTime() <= now
+    )
+
+    if (hasOnSaleTicket || types.length === 0) {
+      return { saleNotStarted: false, saleStartLabel: undefined }
+    }
+
+    const earliestStart = types
+      .map((tt) => tt.start_sale_date)
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))[0]
+
+    return {
+      saleNotStarted: true,
+      saleStartLabel: earliestStart
+        ? formatDateLabel(earliestStart)
+        : undefined,
+    }
+  }, [event?.ticket_types])
+
   const updateQuantity = useCallback((ticketId: string, qty: number) => {
     setQuantities((prev) => ({ ...prev, [ticketId]: Math.max(0, qty) }))
   }, [])
@@ -272,9 +296,13 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
           <EventHero
             title={event.title}
             imageUrl={event.poster_url}
+            thumbnailUrl={event.thumbnail_url}
             event_date_entries={event.event_date_entries}
             venue={event.venue}
+            age_restriction={event.age_restriction}
             status={event.status}
+            saleNotStarted={saleNotStarted}
+            saleStartLabel={saleStartLabel}
             onBuyTickets={() => setStep("choose")}
           />
           <EventTabs

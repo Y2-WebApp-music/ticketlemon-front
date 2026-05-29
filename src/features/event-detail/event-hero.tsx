@@ -15,30 +15,52 @@ const DISABLED_STATUSES = new Set<EventStatus>([
 export interface EventHeroProps {
   title: string
   imageUrl: string
+  thumbnailUrl?: string
   event_date_entries: string[]
   venue: string
+  age_restriction?: number | null
   status?: EventStatus
+  /** When true, sale has not started yet — disables buy and shows sale start label */
+  saleNotStarted?: boolean
+  /** Formatted sale start date for button label when saleNotStarted */
+  saleStartLabel?: string
   onBuyTickets?: () => void
+}
+
+function formatAgeRestriction(ageRestriction?: number | null): string {
+  if (ageRestriction == null || ageRestriction === 0) {
+    return "No age restriction"
+  }
+  return `Age ${ageRestriction}+`
 }
 
 export function EventHero({
   title,
   imageUrl,
+  thumbnailUrl,
   event_date_entries,
   venue,
+  age_restriction,
   status,
+  saleNotStarted = false,
+  saleStartLabel,
   onBuyTickets,
 }: EventHeroProps) {
-  const buyDisabled = status !== undefined && DISABLED_STATUSES.has(status)
+  const buyDisabled =
+    (status !== undefined && DISABLED_STATUSES.has(status)) || saleNotStarted
+  const buyLabel =
+    saleNotStarted && saleStartLabel
+      ? `Sale on ${saleStartLabel}`
+      : "Buy Tickets"
   const formattedDates = event_date_entries.map((iso) => formatDateLabel(iso))
   return (
     <>
       <div
-        className="absolute top-0 h-[50vh] w-full blur-lg sm:blur-none"
+        className="absolute top-0 h-[50vh] w-full blur-lg sm:blur-[2px]"
         aria-hidden
       >
         <img
-          src={"/src/assets/Thumbnail.png"}
+          src={thumbnailUrl || imageUrl}
           alt=""
           className="h-[700px] w-full object-cover sm:aspect-1500/360 sm:h-auto"
         />
@@ -86,7 +108,7 @@ export function EventHero({
                     aria-hidden
                   />
                   <span className="text-sm text-muted-foreground">
-                    No age restriction
+                    {formatAgeRestriction(age_restriction)}
                   </span>
                 </div>
               </div>
@@ -98,7 +120,7 @@ export function EventHero({
                 onClick={onBuyTickets}
               >
                 <Ticket className="size-5" aria-hidden />
-                Buy Tickets
+                {buyLabel}
               </Button>
             </div>
           </div>
