@@ -14,67 +14,135 @@ import { OrganizerEventCard } from "@/features/organizer-dashboard"
 import {
   ORGANIZER_EVENT_STATUS_FILTER_OPTIONS,
   resolveEventStatus,
+  type OrganizerEventStatusFilterValue,
 } from "@/constants/event-status.constant"
-import { ORGANIZER_EVENT_SORT_OPTIONS } from "@/constants/organizer-event-sort.constant"
+import {
+  ORGANIZER_EVENT_SORT_OPTIONS,
+  type OrganizerEventSortValue,
+} from "@/constants/organizer-event-sort.constant"
 import type { OrganizerEvent } from "@/types"
-import { getAllEvents } from "@/services/eventService"
+import type { ApiEvent } from "@/types/api-response"
+import { getEventsByCreateById } from "@/services/eventService"
+import { useUserStore } from "@/stores/user-store"
 import { Plus } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 
+function mapApiEventToOrganizerEvent(event: ApiEvent): OrganizerEvent {
+  const showStartDate = event.event_date_entries[0]?.start_date ?? ""
+  const showEndDate =
+    event.event_date_entries[event.event_date_entries.length - 1]?.start_date ??
+    showStartDate
+  const showBeginLabel = showStartDate
+    ? `Show begin ${new Date(showStartDate).toLocaleString()}`
+    : "No schedule"
+
+  return {
+    event_id: event.id,
+    image_url: event.poster_url ?? "",
+    show_start_date: showStartDate,
+    show_end_date: showEndDate,
+    title: event.event_name,
+    venue: event.venue,
+    status: resolveEventStatus(event.status, showEndDate),
+    bottom_line: showBeginLabel,
+  }
+}
+
+function sortOrganizerEvents(
+  events: OrganizerEvent[],
+  sort: OrganizerEventSortValue
+): OrganizerEvent[] {
+  const sorted = [...events]
+  switch (sort) {
+    case "date_asc":
+      return sorted.sort((a, b) =>
+        a.show_start_date.localeCompare(b.show_start_date)
+      )
+    case "date_desc":
+      return sorted.sort((a, b) =>
+        b.show_start_date.localeCompare(a.show_start_date)
+      )
+    case "name":
+      return sorted.sort((a, b) => a.title.localeCompare(b.title))
+    default:
+      return sorted
+  }
+}
+
 export default function OrganizerDashboardPage() {
+  const userId = useUserStore((state) => state.user_id)
+  const orgName = useUserStore((state) => state.org_name)
+  const firstName = useUserStore((state) => state.first_name)
+  const lastName = useUserStore((state) => state.last_name)
+  const email = useUserStore((state) => state.email)
+
   const [comingEventsState, setComingEventsState] = useState<OrganizerEvent[]>(
     []
   )
   const [allEventsState, setAllEventsState] = useState<OrganizerEvent[]>([])
-  const [organizerNameState, setOrganizerNameState] = useState("Organizer")
+  const [isLoading, setIsLoading] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [statusFilter, setStatusFilter] =
+    useState<OrganizerEventStatusFilterValue>("all")
+  const [sortValue, setSortValue] =
+    useState<OrganizerEventSortValue>("date_asc")
+
+  const organizerNameState = useMemo(() => {
+    if (orgName?.trim()) return orgName.trim()
+    const fullName = [firstName, lastName].filter(Boolean).join(" ").trim()
+    if (fullName) return fullName
+    return email ?? "Organizer"
+  }, [email, firstName, lastName, orgName])
 
   useEffect(() => {
-    const load = async () => {
-      try {
-        const events = await getAllEvents()
-        const mapped: OrganizerEvent[] = events.map((event) => {
-          const firstShowDate = event.event_date_entries[0]?.start_date ?? ""
-          const showBeginLabel = firstShowDate
-            ? `Show begin ${new Date(firstShowDate).toLocaleString()}`
-            : "No schedule"
+    const timerId = window.setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim())
+    }, 300)
+    return () => window.clearTimeout(timerId)
+  }, [searchQuery])
 
-          const lastShowDate =
-            event.event_date_entries[event.event_date_entries.length - 1]
-              ?.start_date ?? ""
-
-          return {
-            event_id: event.id,
-            image_url: event.poster_url ?? "",
-            date: firstShowDate,
-            title: event.event_name,
-            venue: event.venue,
-            status: resolveEventStatus(event.status, lastShowDate),
-            bottom_line: showBeginLabel,
-          }
-        })
-
-        const now = Date.now()
-        const coming = mapped.filter((event) => {
-          if (!event.date) return false
-          return new Date(event.date).getTime() >= now
-        })
-
-        setComingEventsState(coming)
-        setAllEventsState(mapped)
-        const firstCreator = events.find((event) => event.create_by)?.create_by
-        if (firstCreator) setOrganizerNameState(firstCreator)
-      } catch (error) {
-        const message =
-          typeof error === "object" && error !== null && "message" in error
-            ? String(error.message)
-            : "Failed to load organizer events"
-        toast.error(message)
-      }
+  const loadEvents = useCallback(async () => {
+    if (!userId) {
+      setComingEventsState([])
+      setAllEventsState([])
+      return
     }
 
-    load()
-  }, [])
+    setIsLoading(true)
+    try {
+      const events = await getEventsByCreateById(userId, {
+        ...(debouncedSearch ? { search: debouncedSearch } : {}),
+        ...(statusFilter !== "all" ? { status: statusFilter } : {}),
+      })
+
+      const mapped = events.map(mapApiEventToOrganizerEvent)
+      const sorted = sortOrganizerEvents(mapped, sortValue)
+      const now = Date.now()
+      const coming = sorted.filter((event) => {
+        if (!event.show_start_date) return false
+        return new Date(event.show_start_date).getTime() >= now
+      })
+
+      setComingEventsState(coming)
+      setAllEventsState(sorted)
+    } catch (error) {
+      const message =
+        typeof error === "object" && error !== null && "message" in error
+          ? String(error.message)
+          : "Failed to load organizer events"
+      toast.error(message)
+      setComingEventsState([])
+      setAllEventsState([])
+    } finally {
+      setIsLoading(false)
+    }
+  }, [debouncedSearch, sortValue, statusFilter, userId])
+
+  useEffect(() => {
+    void loadEvents()
+  }, [loadEvents])
 
   return (
     <PageLayout className="min-h-svh bg-muted/30">
@@ -97,7 +165,6 @@ export default function OrganizerDashboardPage() {
             </p>
           </div>
 
-          {/* Filters */}
           <div className="flex flex-wrap items-end gap-4">
             <div className="min-w-[200px] flex-1 space-y-1.5">
               <Label htmlFor="organizer-search" className="text-sm">
@@ -108,13 +175,20 @@ export default function OrganizerDashboardPage() {
                 type="search"
                 placeholder="Search event."
                 className="rounded-lg"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             <div className="w-[190px] space-y-1.5">
               <Label className="text-sm">
                 Event Status <span className="text-destructive">*</span>
               </Label>
-              <Select>
+              <Select
+                value={statusFilter}
+                onValueChange={(value) =>
+                  setStatusFilter(value as OrganizerEventStatusFilterValue)
+                }
+              >
                 <SelectTrigger
                   id="organizer-status"
                   className="w-full rounded-lg"
@@ -134,7 +208,12 @@ export default function OrganizerDashboardPage() {
               <Label className="text-sm">
                 Event Sort <span className="text-destructive">*</span>
               </Label>
-              <Select>
+              <Select
+                value={sortValue}
+                onValueChange={(value) =>
+                  setSortValue(value as OrganizerEventSortValue)
+                }
+              >
                 <SelectTrigger
                   id="organizer-sort"
                   className="w-full rounded-lg"
@@ -152,7 +231,16 @@ export default function OrganizerDashboardPage() {
             </div>
           </div>
 
-          {/* Coming Event */}
+          {!userId && (
+            <p className="text-sm text-muted-foreground">
+              Sign in as an organizer to view your events.
+            </p>
+          )}
+
+          {isLoading && (
+            <p className="text-sm text-muted-foreground">Loading events...</p>
+          )}
+
           <section className="flex flex-col gap-4">
             <h2 className="text-xl leading-7 font-normal text-foreground">
               Coming Event
@@ -164,7 +252,6 @@ export default function OrganizerDashboardPage() {
             </div>
           </section>
 
-          {/* All Events */}
           <section className="flex flex-col gap-4">
             <h2 className="text-xl leading-7 font-normal text-foreground">
               All Events

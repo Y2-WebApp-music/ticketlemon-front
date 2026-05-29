@@ -5,7 +5,8 @@ export interface OrganizerEvent {
   event_id: string
   image_url: string
   image_alt?: string
-  date: string
+  show_start_date: string
+  show_end_date: string
   title: string
   venue: string
   status: EventStatus

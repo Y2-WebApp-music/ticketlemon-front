@@ -305,6 +305,7 @@ export default function CreateEventPage() {
           is_collapsed: ticket.is_collapsed,
         })),
         create_by_id: user_id ?? formData.create_by_id ?? "",
+        user_id: user_id ?? formData.create_by_id ?? "",
         create_by: org_name ?? "",
       }
 

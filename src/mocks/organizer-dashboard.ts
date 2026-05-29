@@ -17,7 +17,8 @@ function event(
     event_id: id,
     image_url: placeholderImage,
     image_alt: "Event",
-    date: "8 Mar - 10 Mar",
+    show_start_date: "2026-03-08T17:00:00",
+    show_end_date: "2026-03-10T17:00:00",
     title:
       "DONG WOOK 2025-2026 FANMEETING TOUR [MY SWEET HOME] in Bangkok 2026",
     venue: "Phenix Grand Ballroom",

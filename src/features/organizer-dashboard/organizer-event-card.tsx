@@ -8,12 +8,14 @@ import {
   getEventStatusLabel,
   type EventStatus,
 } from "@/constants/event-status.constant"
+import { formatTitleDate } from "@/utils/formatDate"
 
 export interface OrganizerEventCardProps {
   event_id: string
   image_url: string
   image_alt?: string
-  date: string
+  show_start_date: string
+  show_end_date: string
   title: string
   venue: string
   status: EventStatus
@@ -25,7 +27,8 @@ export function OrganizerEventCard({
   event_id,
   image_url,
   image_alt = "",
-  date,
+  show_start_date,
+  show_end_date,
   title,
   venue,
   status,
@@ -54,9 +57,13 @@ export function OrganizerEventCard({
           </div>
         </div>
         <div className="flex flex-1 flex-col gap-2 p-3">
-          <p className="text-lg leading-7 font-medium text-primary">{date}</p>
-          <p className="line-clamp-2 text-sm leading-6 font-normal text-foreground">
+          <p className="text-base leading-6 font-medium text-primary">
             {title}
+          </p>
+          <p className="line-clamp-2 text-sm leading-6 font-normal text-foreground">
+            {show_start_date
+              ? `${formatTitleDate(show_start_date)} - ${formatTitleDate(show_end_date || show_start_date)}`
+              : "No schedule"}
           </p>
           <p className="text-sm leading-[14px] font-medium text-muted-foreground">
             {venue}

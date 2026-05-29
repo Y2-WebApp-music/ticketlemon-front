@@ -55,6 +55,7 @@ export interface EventRequestPayload {
   ticket_max_per_order?: string
   staff_code: string
   /** Creator fields (optional) */
+  user_id?: string
   create_by_id?: string
   create_by?: string
 }
@@ -170,12 +171,22 @@ export async function searchEvents(keyword: string): Promise<ApiEvent[]> {
   return response.data
 }
 
+export interface EventsByUserQueryParams {
+  search?: string
+  status?: string
+}
+
 export async function getEventsByCreateById(
-  create_by_id: string
+  userId: string,
+  params?: EventsByUserQueryParams
 ): Promise<ApiEvent[]> {
   const response = await apiService.fetchData<ApiEvent[]>({
     method: "GET",
-    url: `/api/event/create-by/${create_by_id}`,
+    url: `/api/event/create-by/${encodeURIComponent(userId)}`,
+    params: {
+      ...(params?.search ? { search: params.search } : {}),
+      ...(params?.status ? { status: params.status } : {}),
+    },
   })
 
   return response.data
