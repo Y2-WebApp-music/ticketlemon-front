@@ -9,6 +9,12 @@ import type {
   EventSellingQueryParams,
   SellingTableResponse,
 } from "@/types/organizer"
+import type { EventTicketType } from "@/types/event"
+
+export interface EventSoldTicketCountResponse {
+  count: number
+  by_ticket_type: Record<string, number>
+}
 
 export interface EventDateEntryRequest {
   id: string
@@ -186,4 +192,51 @@ export async function getEventSelling(
   })
 
   return response.data
+}
+
+export async function getEventSoldTicketCount(
+  eventId: string
+): Promise<EventSoldTicketCountResponse> {
+  const response = await apiService.fetchData<EventSoldTicketCountResponse>({
+    method: "GET",
+    url: `/api/event/${eventId}/count-ticket`,
+  })
+
+  return response.data
+}
+
+export function mapApiEventToTicketTypes(
+  apiEvent: ApiEvent,
+  soldByType: Record<string, number> = {}
+): EventTicketType[] {
+  const eventDateMap = new Map(
+    apiEvent.event_date_entries.map((entry) => [entry.id, entry.start_date])
+  )
+  const saleDateMap = new Map(
+    apiEvent.sale_date_entries.map((entry) => [entry.id, entry.start_date])
+  )
+
+  return apiEvent.ticket_types.map((ticket) => {
+    const total = Number(ticket.quantity) || 0
+    const sold = soldByType[ticket.name] ?? 0
+
+    return {
+      id: ticket.id,
+      title: ticket.name,
+      description: ticket.detail ?? undefined,
+      price: String(ticket.price),
+      total,
+      remaining: Math.max(0, total - sold),
+      start_sale_date:
+        saleDateMap.get(ticket.sale_ticket_on) ??
+        apiEvent.sale_date_entries[0]?.start_date ??
+        "",
+      end_sale_date: null,
+      event_date:
+        eventDateMap.get(ticket.use_for_event_date_time) ??
+        apiEvent.event_date_entries[0]?.start_date ??
+        "",
+      sold_out_date: null,
+    }
+  })
 }

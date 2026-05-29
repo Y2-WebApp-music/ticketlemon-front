@@ -7,6 +7,8 @@ import type { TicketTypeCardProps } from "@/features/ticket-type"
 import {
   getEventById,
   getEventSelling,
+  getEventSoldTicketCount,
+  mapApiEventToTicketTypes,
   updateEvent,
 } from "@/services/eventService"
 import { DEFAULT_SELLING_TICKET_SELECTION } from "@/mocks/organizer-event-selling"
@@ -221,41 +223,13 @@ export default function OrganizerEventDetailPage({
 
     const load = async () => {
       try {
-        const apiEvent = await getEventById(eventId)
-        const eventDateMap = new Map(
-          apiEvent.event_date_entries.map((entry) => [
-            entry.id,
-            entry.start_date,
-          ])
-        )
-        const saleDateMap = new Map(
-          apiEvent.sale_date_entries.map((entry) => [
-            entry.id,
-            entry.start_date,
-          ])
-        )
-        const ticketTypes: EventTicketType[] = apiEvent.ticket_types.map(
-          (ticket) => {
-            const total = Number(ticket.quantity) || 0
-            return {
-              id: ticket.id,
-              title: ticket.name,
-              description: ticket.detail ?? undefined,
-              price: String(ticket.price),
-              total,
-              remaining: total,
-              start_sale_date:
-                saleDateMap.get(ticket.sale_ticket_on) ??
-                apiEvent.sale_date_entries[0]?.start_date ??
-                "",
-              end_sale_date: null,
-              event_date:
-                eventDateMap.get(ticket.use_for_event_date_time) ??
-                apiEvent.event_date_entries[0]?.start_date ??
-                "",
-              sold_out_date: null,
-            }
-          }
+        const [apiEvent, soldTickets] = await Promise.all([
+          getEventById(eventId),
+          getEventSoldTicketCount(eventId),
+        ])
+        const ticketTypes = mapApiEventToTicketTypes(
+          apiEvent,
+          soldTickets.by_ticket_type
         )
 
         const dateEntryIdByLabel: Record<string, string> = {}
