@@ -90,6 +90,29 @@ export interface ApiTicketMutationResponse extends ApiMessageResponse {
   ticket: ApiTicket
 }
 
+export interface ApiCheckInTicketType {
+  id: string
+  name: string
+  price: number | string
+  quantity: number | string
+  detail: string | null
+  use_for_event_date_time: string
+  sale_ticket_on: string
+  is_collapsed: boolean
+  event_date: string
+}
+
+export interface ApiCheckInResponse extends ApiMessageResponse {
+  user_name: string
+  age: number | null
+  ticket_type: ApiCheckInTicketType
+  ticket: {
+    id: string
+    is_used: boolean
+    qr_code: string
+  }
+}
+
 export type ApiTicketListByUserResponse = MyTicketItem[]
 export type ApiTicketDetailByUserEventResponse = MyTicketDetail
 

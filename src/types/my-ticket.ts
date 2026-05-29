@@ -1,12 +1,11 @@
-/** Ticket type variant in "my ticket" detail (e.g. unused vs used) */
-export type MyTicketTicketTypeVariant = "unused" | "used"
+import type { OutputData } from "@editorjs/editorjs"
 
 /** Single ticket type as returned from my-ticket detail API */
 export interface MyTicketTicketType {
   id: string
   title: string
   description: string
-  variant: MyTicketTicketTypeVariant
+  is_used: boolean
   event_date: string
   qr_code: string
 }
@@ -19,7 +18,7 @@ export interface MyTicketDetail {
   show_start_date: string
   show_end_date: string
   venue: string
-  description: string
+  description: OutputData
   ticket_types: MyTicketTicketType[]
 }
 

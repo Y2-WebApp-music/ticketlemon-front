@@ -8,7 +8,6 @@ export type { UserProfile, PaymentMethod } from "./profile"
 export type {
   MyTicketDetail,
   MyTicketTicketType,
-  MyTicketTicketTypeVariant,
   MyTicketItem,
 } from "./my-ticket"
 export type { OrganizerEvent } from "./organizer"

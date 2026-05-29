@@ -11,6 +11,11 @@ export interface UserState {
   last_name: string | null
   org_name: string | null
   setUserFromSignIn: (payload: SignInResponse) => void
+  patchUser: (
+    fields: Partial<
+      Pick<UserState, "email" | "first_name" | "last_name" | "org_name">
+    >
+  ) => void
   clearUser: () => void
 }
 
@@ -34,6 +39,7 @@ export const useUserStore = create<UserState>()(
           last_name: payload.last_name ?? null,
           org_name: payload.org_name ?? null,
         }),
+      patchUser: (fields) => set((state) => ({ ...state, ...fields })),
       clearUser: () => set(initialState),
     }),
     {

@@ -6,6 +6,7 @@ import {
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import {
   getEventById,
+  getEventCheckIn,
   getEventSelling,
   getEventSoldTicketCount,
   mapApiEventToTicketTypes,
@@ -14,6 +15,8 @@ import {
 import { DEFAULT_SELLING_TICKET_SELECTION } from "@/mocks/organizer-event-selling"
 import type { EventTicketType, OrganizerEventDetail } from "@/types/event"
 import type {
+  CheckInTableResponse,
+  EventCheckInQueryParams,
   EventSellingQueryParams,
   SellingTableResponse,
   SellingTicketSelection,
@@ -103,6 +106,11 @@ export default function OrganizerEventDetailPage({
   const [sellingTableResponse, setSellingTableResponse] =
     useState<SellingTableResponse | null>(null)
   const [sellingTableLoading, setSellingTableLoading] = useState(false)
+  const [checkInTableResponse, setCheckInTableResponse] =
+    useState<CheckInTableResponse | null>(null)
+  const [checkInTableLoading, setCheckInTableLoading] = useState(false)
+  const [openingCheckInList, setOpeningCheckInList] = useState(0)
+  const [checkInCount, setCheckInCount] = useState<number | null>(null)
   const [descriptionOverrides, setDescriptionOverrides] = useState<
     Record<string, OutputData>
   >({})
@@ -160,6 +168,39 @@ export default function OrganizerEventDetailPage({
     },
     [loadSellingTable]
   )
+
+  const loadCheckInTable = useCallback(
+    async (params: EventCheckInQueryParams) => {
+      setCheckInTableLoading(true)
+      try {
+        const response = await getEventCheckIn(eventId, params)
+        setCheckInTableResponse(response)
+        setCheckInCount(response.total)
+      } catch (error) {
+        const message =
+          typeof error === "object" && error !== null && "message" in error
+            ? String(error.message)
+            : "Failed to load check-in data"
+        toast.error(message)
+        setCheckInTableResponse(null)
+      } finally {
+        setCheckInTableLoading(false)
+      }
+    },
+    [eventId]
+  )
+
+  const handleCheckInQueryChange = useCallback(
+    (params: EventCheckInQueryParams) => {
+      void loadCheckInTable(params)
+    },
+    [loadCheckInTable]
+  )
+
+  const handleSeeCheckIn = useCallback(() => {
+    setOpeningCheckInList((key) => key + 1)
+    void loadCheckInTable({ page: 1, per_page: 15 })
+  }, [loadCheckInTable])
 
   const handleDescriptionSave = useCallback(
     async (data: OutputData) => {
@@ -223,9 +264,10 @@ export default function OrganizerEventDetailPage({
 
     const load = async () => {
       try {
-        const [apiEvent, soldTickets] = await Promise.all([
+        const [apiEvent, soldTickets, checkInSummary] = await Promise.all([
           getEventById(eventId),
           getEventSoldTicketCount(eventId),
+          getEventCheckIn(eventId, { page: 1, per_page: 1 }).catch(() => null),
         ])
         const ticketTypes = mapApiEventToTicketTypes(
           apiEvent,
@@ -237,6 +279,7 @@ export default function OrganizerEventDetailPage({
           dateEntryIdByLabel[formatDateLabel(entry.start_date)] = entry.id
         }
         setEventDateEntryIdByLabel(dateEntryIdByLabel)
+        setCheckInCount(checkInSummary?.total ?? null)
 
         const lastShowDate =
           apiEvent.event_date_entries[apiEvent.event_date_entries.length - 1]
@@ -300,9 +343,11 @@ export default function OrganizerEventDetailPage({
         </div> */}
         <OrganizerEventHero
           event={eventData}
+          checkInCount={checkInCount}
           onSeeSelling={() =>
             setOpeningSellingTicket({ ...DEFAULT_SELLING_TICKET_SELECTION })
           }
+          onSeeCheckIn={handleSeeCheckIn}
         />
         <OrganizerEventTabs
           eventId={eventData.id}
@@ -315,6 +360,10 @@ export default function OrganizerEventDetailPage({
           onSellingQueryChange={handleSellingQueryChange}
           onSellingTicketSelect={handleSellingTicketSelect}
           openingSellingTicket={openingSellingTicket}
+          checkInTableResponse={checkInTableResponse}
+          checkInTableLoading={checkInTableLoading}
+          onCheckInQueryChange={handleCheckInQueryChange}
+          openingCheckInList={openingCheckInList}
           onDescriptionSave={handleDescriptionSave}
         />
       </div>

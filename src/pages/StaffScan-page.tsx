@@ -66,6 +66,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
   const navigate = useNavigate()
   const eventFromStore = useStaffScanStore((s) => s.event)
   const eventDetailFromStore = useStaffScanStore((s) => s.eventDetail)
+  const setCheckInResult = useStaffScanStore((s) => s.setCheckInResult)
   const [event, setLocalEvent] = React.useState<EventCardItem | null>(
     eventFromStore ?? null
   )
@@ -160,7 +161,8 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
       setIsCheckingIn(true)
 
       try {
-        await checkInTicket(code)
+        const result = await checkInTicket(code)
+        setCheckInResult(result)
       } catch (error) {
         stopScanning()
 
@@ -191,6 +193,7 @@ export default function StaffScanPage({ eventId }: { eventId: string }) {
       eventId,
       loadDuplicateTicketInfo,
       navigate,
+      setCheckInResult,
       stopScanning,
     ]
   )

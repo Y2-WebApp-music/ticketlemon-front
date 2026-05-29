@@ -54,6 +54,33 @@ export interface EventSellingQueryParams {
   status?: string
 }
 
+export interface CheckInTableRow {
+  name: string
+  email: string
+  /** ISO datetime string of event round time */
+  eventRound: string
+  ticketType: string
+  /** ISO datetime string of check-in timestamp */
+  checkInTime: string
+}
+
+export interface CheckInTableResponse {
+  data: CheckInTableRow[]
+  total: number
+  page: number
+  perPage: number
+  event_date_entries: SellingTableEventDateEntry[]
+  ticket_types: SellingTableTicketType[]
+}
+
+export interface EventCheckInQueryParams {
+  page?: number
+  per_page?: number
+  event_date_entry_id?: string
+  ticket_type_id?: string
+  search?: string
+}
+
 export interface SellingTicketSelection {
   sessionLabel: string
   title: string

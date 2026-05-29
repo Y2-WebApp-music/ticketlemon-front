@@ -6,7 +6,9 @@ import type {
   ApiMessageResponse,
 } from "@/types/api-response"
 import type {
+  EventCheckInQueryParams,
   EventSellingQueryParams,
+  CheckInTableResponse,
   SellingTableResponse,
 } from "@/types/organizer"
 import type { EventTicketType } from "@/types/event"
@@ -199,6 +201,19 @@ export async function getEventSelling(
   const response = await apiService.fetchData<SellingTableResponse>({
     method: "GET",
     url: `/api/event/${eventId}/selling`,
+    params,
+  })
+
+  return response.data
+}
+
+export async function getEventCheckIn(
+  eventId: string,
+  params?: EventCheckInQueryParams
+): Promise<CheckInTableResponse> {
+  const response = await apiService.fetchData<CheckInTableResponse>({
+    method: "GET",
+    url: `/api/event/${eventId}/check-in`,
     params,
   })
 

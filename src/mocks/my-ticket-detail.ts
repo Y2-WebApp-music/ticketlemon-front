@@ -13,12 +13,22 @@ export const myTicketDetailsById: Record<string, MyTicketDetail> = {
     show_start_date: "2026-03-29T17:00:00",
     show_end_date: "2026-04-02T17:00:00",
     venue: "Phenix Grand Ballroom",
-    description:
-      "เตรียมหัวใจไว้ให้ดี!!  JOY กำลังจะมาสาดความสดใสใส่ ReVeluv แบบไม่ทันตั้งตัว 💦🍀  ในงาน 2026 JOY ASIA TOUR ‘JOY SPLASH’ IN BANGKOK วันที่ 28 มีนาคม 2569 ที่ Phenix Grand Ballroom เวลา 18.00 น.\n\nชวนทุกคนมาสนุกสาดความสุขไปตามเสียงเพลง 💦🎶\n\nพร้อมการแสดงสุดพิเศษที่ JOY ตั้งใจจัดเต็ม 💖 เพื่อให้ทุกจังหวะ ทุกเสียงกรี๊ดและทุกโมเมนต์ให้กลายเป็นความทรงจำแสนพิเศษที่จะสร้างไปด้วยกัน!!",
+    description: {
+      time: Date.now(),
+      version: "2.31.0",
+      blocks: [
+        {
+          type: "paragraph",
+          data: {
+            text: "เตรียมหัวใจไว้ให้ดี!!  JOY กำลังจะมาสาดความสดใสใส่ ReVeluv แบบไม่ทันตั้งตัว 💦🍀  ในงาน 2026 JOY ASIA TOUR ‘JOY SPLASH’ IN BANGKOK วันที่ 28 มีนาคม 2569 ที่ Phenix Grand Ballroom เวลา 18.00 น.\n\nชวนทุกคนมาสนุกสาดความสุขไปตามเสียงเพลง 💦🎶\n\nพร้อมการแสดงสุดพิเศษที่ JOY ตั้งใจจัดเต็ม 💖 เพื่อให้ทุกจังหวะ ทุกเสียงกรี๊ดและทุกโมเมนต์ให้กลายเป็นความทรงจำแสนพิเศษที่จะสร้างไปด้วยกัน!!",
+          },
+        },
+      ],
+    },
     ticket_types: [
       {
         id: "1",
-        variant: "unused",
+        is_used: false,
         title: "VVIP + Soundcheck (29 Mar 2026, 17:00)",
         description: LOREM,
         event_date: "2026-03-29T17:00:00",
@@ -26,7 +36,7 @@ export const myTicketDetailsById: Record<string, MyTicketDetail> = {
       },
       {
         id: "2",
-        variant: "unused",
+        is_used: false,
         title: "VVIP + Soundcheck (29 Mar 2026, 17:00)",
         description: LOREM,
         event_date: "2026-03-29T17:00:00",
@@ -34,7 +44,7 @@ export const myTicketDetailsById: Record<string, MyTicketDetail> = {
       },
       {
         id: "3",
-        variant: "used",
+        is_used: true,
         title: "VVIP + Soundcheck (29 Mar 2026, 17:00)",
         description: LOREM,
         event_date: "2026-03-29T17:00:00",

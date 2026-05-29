@@ -10,14 +10,27 @@ import {
 } from "@/features/auth"
 import { signIn, signUp } from "@/services/authService"
 import { updateUser } from "@/services/staffService"
+import { useAuthStore } from "@/stores/auth-store"
+import { useUserStore } from "@/stores/user-store"
 import { initialAuthDataForm } from "@/types/auth"
 import type { ErrorResponseProps } from "@/types/responseHandler"
 import { useNavigate } from "@tanstack/react-router"
 import * as React from "react"
 import type { OrganizerRegisterFormPayload } from "@/types/auth"
 
-export default function SignInPage() {
+export interface SignInPageProps {
+  completeOrganizer?: boolean
+}
+
+export default function SignInPage({
+  completeOrganizer = false,
+}: SignInPageProps) {
   const navigate = useNavigate()
+  const userId = useUserStore((state) => state.user_id)
+  const userEmail = useUserStore((state) => state.email)
+  const accessToken = useAuthStore((state) => state.access_token)
+  const patchUser = useUserStore((state) => state.patchUser)
+  const isExistingUser = Boolean(userId && accessToken)
   const [isRegister, setIsRegister] = React.useState(false)
   const [isOrganizerSignIn, setIsOrganizerSignIn] = React.useState(false)
   const [isOrganizerRegister, setIsOrganizerRegister] = React.useState(false)
@@ -37,6 +50,15 @@ export default function SignInPage() {
   const [organizerSignUpError, setOrganizerSignUpError] = React.useState<
     string | null
   >(null)
+
+  React.useEffect(() => {
+    if (!completeOrganizer) return
+    setIsOrganizerSignIn(true)
+    setIsOrganizerRegister(true)
+    if (userEmail) {
+      setSignInDataForm((prev) => ({ ...prev, email: userEmail }))
+    }
+  }, [completeOrganizer, userEmail])
 
   const goToRegister = () => {
     if (isOrganizerSignIn) {
@@ -60,17 +82,44 @@ export default function SignInPage() {
     setOrganizerSignUpError(null)
     setOrganizerSignUpLoading(true)
     try {
+      const orgName = payload.organizerName.trim()
+
+      if (payload.isExistingUser && userId) {
+        await updateUser(userId, {
+          org_name: orgName,
+          role: "organizer",
+        })
+        patchUser({ org_name: orgName })
+        if (accessToken) {
+          useAuthStore.getState().setAuth({
+            access_token: accessToken,
+            role: "organizer",
+          })
+        }
+        navigate({ to: "/organizer" })
+        return
+      }
+
       const email = payload.organizerEmail.trim()
       const password = payload.password
+      if (!password) {
+        setOrganizerSignUpError("Password is required")
+        return
+      }
 
-      const signInPayload = await signIn({ email, password })
-      setSignInDataForm({ email, password })
-
-      await updateUser(signInPayload.user_id, {
-        org_name: payload.organizerName.trim(),
+      await signUp({
+        email,
+        password,
+        first_name: "",
+        last_name: "",
+        phone_number: "",
+        birthdate: "",
+        gender: "",
+        org_name: orgName,
         role: "organizer",
       })
 
+      await signIn({ email, password })
       navigate({ to: "/organizer" })
     } catch (err) {
       const message =
@@ -135,7 +184,7 @@ export default function SignInPage() {
     }
   }
 
-  const handleSignIn = async () => {
+  const handleSignIn = async (fromOrganizerSignIn: boolean) => {
     setSignInError(null)
     setSignInLoading(true)
     try {
@@ -143,9 +192,23 @@ export default function SignInPage() {
         email: signInDataForm.email,
         password: signInDataForm.password,
       })
-      if (payload.role === "organizer" || payload.role === "admin") {
-        navigate({ to: "/organizer" })
-      } else if (payload.role === "staff") {
+
+      if (fromOrganizerSignIn) {
+        if (payload.role === "staff") {
+          setSignInError("Please use Event Staff sign in for staff accounts.")
+          return
+        }
+
+        if (payload.role === "organizer" || payload.role === "admin") {
+          navigate({ to: "/organizer" })
+          return
+        }
+
+        setIsOrganizerRegister(true)
+        return
+      }
+
+      if (payload.role === "staff") {
         navigate({ to: "/staff-sign-in" })
       } else {
         navigate({ to: "/" })
@@ -169,7 +232,27 @@ export default function SignInPage() {
 
         <div className="mt-8 w-full rounded-lg bg-card p-5">
           <div className="mx-auto flex w-full max-w-[300px] flex-col items-center gap-5">
-            {isRegister ? (
+            {isOrganizerSignIn && isOrganizerRegister ? (
+              <>
+                {organizerSignUpError && (
+                  <p className="-mt-2 w-full text-sm text-destructive">
+                    {organizerSignUpError}
+                  </p>
+                )}
+                <OrganizerRegisterForm
+                  idPrefix="mobile"
+                  variant="mobile"
+                  customerEmail={signInDataForm.email}
+                  isExistingUser={isExistingUser}
+                  onSignIn={goToSignIn}
+                  onCreateOrganizer={(payload) => {
+                    if (!organizerSignUpLoading) {
+                      handleOrganizerSignUp(payload)
+                    }
+                  }}
+                />
+              </>
+            ) : isRegister ? (
               registerStep === 1 ? (
                 <RegisterStep1Form
                   idPrefix="mobile"
@@ -203,6 +286,8 @@ export default function SignInPage() {
               <SignInForm
                 idPrefix="mobile"
                 variant="mobile"
+                title={isOrganizerSignIn ? "Organizer Sign In" : "Sign In"}
+                isOrganizerSignIn={isOrganizerSignIn}
                 email={signInDataForm.email}
                 password={signInDataForm.password}
                 onEmailChange={(value) => {
@@ -275,6 +360,7 @@ export default function SignInPage() {
                       idPrefix="desktop"
                       variant="desktop"
                       customerEmail={signInDataForm.email}
+                      isExistingUser={isExistingUser}
                       onSignIn={goToSignIn}
                       onCreateOrganizer={(payload) => {
                         if (!organizerSignUpLoading) {
@@ -318,6 +404,7 @@ export default function SignInPage() {
                     idPrefix="desktop"
                     variant="desktop"
                     title={isOrganizerSignIn ? "Organizer Sign In" : "Sign In"}
+                    isOrganizerSignIn={isOrganizerSignIn}
                     email={signInDataForm.email}
                     password={signInDataForm.password}
                     onEmailChange={(value) => {

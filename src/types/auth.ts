@@ -54,7 +54,8 @@ export const initialAuthDataForm: RegisterDataForm = {
 export interface OrganizerRegisterFormPayload {
   organizerName: string
   organizerEmail: string
-  password: string
+  password?: string
   subscribeNewsletter: boolean
   acceptTerms: boolean
+  isExistingUser?: boolean
 }

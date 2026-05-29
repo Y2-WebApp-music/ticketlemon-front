@@ -33,7 +33,7 @@ export default function MyTicketQrPage({ eventId }: { eventId: string }) {
     load()
   }, [eventId, userId])
 
-  const ticketType = detail?.ticket_types.find((t) => t.variant === "unused")
+  const ticketType = detail?.ticket_types.find((t) => !t.is_used)
 
   useEffect(() => {
     const generate = async () => {

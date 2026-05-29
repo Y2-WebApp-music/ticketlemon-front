@@ -1,5 +1,6 @@
 import apiService from "./apiService"
 import type {
+  ApiCheckInResponse,
   ApiMessageResponse,
   ApiTicket,
   ApiTicketDetailByUserEventResponse,
@@ -71,10 +72,8 @@ export async function deleteTicket(id: string): Promise<ApiMessageResponse> {
   return response.data
 }
 
-export async function checkInTicket(
-  id: string
-): Promise<ApiTicketMutationResponse> {
-  const response = await apiService.fetchData<ApiTicketMutationResponse>({
+export async function checkInTicket(id: string): Promise<ApiCheckInResponse> {
+  const response = await apiService.fetchData<ApiCheckInResponse>({
     method: "POST",
     url: `/api/ticket/${id}/check-in`,
   })

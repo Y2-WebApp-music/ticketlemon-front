@@ -1,13 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { formatDateLabel } from "@/utils/formatDate"
 import { Ticket } from "lucide-react"
-
-export type TicketTypeCardVariant = "unused" | "used"
 
 export interface TicketTypeCardProps {
   title: string
   description: string
-  variant: TicketTypeCardVariant
+  event_date: string
+  is_used: boolean
   onViewQr?: () => void
   onClick?: () => void
   className?: string
@@ -16,13 +16,12 @@ export interface TicketTypeCardProps {
 export function TicketTypeCard({
   title,
   description,
-  variant,
+  event_date,
+  is_used: isUsed,
   onViewQr,
   onClick,
   className,
 }: TicketTypeCardProps) {
-  const isUsed = variant === "used"
-
   return (
     <div
       className={cn(
@@ -49,7 +48,7 @@ export function TicketTypeCard({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
           <p className="text-sm leading-6 font-medium text-foreground sm:text-lg sm:leading-7 sm:tracking-tight">
-            {title}
+            {title} ({formatDateLabel(event_date)})
           </p>
           <p className="text-xs leading-5 text-muted-foreground sm:text-sm sm:leading-6">
             {description}

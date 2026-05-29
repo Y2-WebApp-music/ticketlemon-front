@@ -5,6 +5,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp"
 import { staffSignIn } from "@/services/eventService"
 import { useStaffScanStore } from "@/stores/staff-scan-store"
 import { Link, useNavigate } from "@tanstack/react-router"
@@ -47,6 +48,7 @@ export default function StaffSignInPage() {
 
         <Link
           to="/sign-in"
+          search={{ completeOrganizer: false }}
           className="mt-14 inline-flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-primary hover:bg-muted"
         >
           <ChevronLeft className="size-4" />
@@ -60,6 +62,8 @@ export default function StaffSignInPage() {
 
           <InputOTP
             maxLength={6}
+            pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+            inputMode="text"
             value={staffCode}
             onChange={(value) => setStaffCode(value.toUpperCase())}
             containerClassName="mt-5"

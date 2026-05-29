@@ -2,10 +2,21 @@ import { PageLayout } from "@/components/layouts/page-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useStaffScanStore } from "@/stores/staff-scan-store"
-import { formatTitleDate } from "@/utils/formatDate"
+import { formatDateLabel, formatTitleDate } from "@/utils/formatDate"
 import { Link } from "@tanstack/react-router"
 import { CheckCircle2, ChevronLeft, UserRoundCheck } from "lucide-react"
 import { toast } from "sonner"
+
+function formatCheckInTicketTypeLabel(
+  name: string,
+  eventDate?: string
+): string {
+  if (eventDate) {
+    return `${name} (${formatDateLabel(eventDate)})`
+  }
+
+  return name
+}
 
 export default function StaffScanSuccessPage({
   eventId,
@@ -15,8 +26,14 @@ export default function StaffScanSuccessPage({
   code: string
 }) {
   const eventFromStore = useStaffScanStore((s) => s.event)
+  const checkInResult = useStaffScanStore((s) => s.checkInResult)
   const resetStaffScan = useStaffScanStore((s) => s.reset)
   const event = eventFromStore
+  const ticketType = checkInResult?.ticket_type
+  const ticketTypeLabel = ticketType
+    ? formatCheckInTicketTypeLabel(ticketType.name, ticketType.event_date)
+    : "-"
+  const qrValue = checkInResult?.ticket.qr_code ?? code
 
   return (
     <PageLayout className="min-h-svh bg-muted/30">
@@ -66,19 +83,28 @@ export default function StaffScanSuccessPage({
             <div className="space-y-2">
               <p className="text-lg leading-7 text-foreground">
                 Name:
-                <span className="ml-2 font-medium">-</span>
+                <span className="ml-2 font-medium">
+                  {checkInResult?.user_name ?? "-"}
+                </span>
               </p>
               <p className="text-base leading-7 text-foreground">
-                Age: <span className="font-medium">-</span>
+                Age:{" "}
+                <span className="font-medium">
+                  {checkInResult?.age != null ? checkInResult.age : "-"}
+                </span>
               </p>
             </div>
 
             <div className="space-y-1">
               <p className="text-lg font-medium text-primary">Ticket Type</p>
-              <p className="text-base font-medium text-foreground">-</p>
-              <p className="text-sm text-muted-foreground">-</p>
+              <p className="text-base font-medium text-foreground">
+                {ticketTypeLabel}
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {ticketType?.detail ?? "-"}
+              </p>
               <p className="mt-2 text-xs text-muted-foreground">
-                QR: {code || "-"}
+                QR: {qrValue || "-"}
               </p>
             </div>
 

@@ -40,6 +40,8 @@ import { toast } from "sonner"
 export interface OrganizerEventHeroProps {
   event: OrganizerEventDetail
   onSeeSelling?: () => void
+  onSeeCheckIn?: () => void
+  checkInCount?: number | null
 }
 
 /** Returns current time, re-renders every intervalMs (for live countdown/duration). */
@@ -142,6 +144,8 @@ function InfoBlock({
 export function OrganizerEventHero({
   event,
   onSeeSelling,
+  onSeeCheckIn,
+  checkInCount = null,
 }: OrganizerEventHeroProps) {
   const [statusDialogOpen, setStatusDialogOpen] = useState(false)
   const [staffCodeDialogOpen, setStaffCodeDialogOpen] = useState(false)
@@ -280,8 +284,15 @@ export function OrganizerEventHero({
     if (eventStatus === EVENT_STATUS.SHOW) {
       const showBeginTarget = getShowBeginTarget(showDateList)
       const countdownMs = showBeginTarget ? getRemainingMs(showBeginTarget) : 0
+      const checkInValue =
+        checkInCount != null ? checkInCount.toLocaleString() : "—"
       const blocks: Block[] = [
-        { key: "check-in", label: "Check In", value: "—", subtext: "TODO" },
+        {
+          key: "check-in",
+          label: "Check In",
+          value: checkInValue,
+          subtext: checkInCount != null ? "Attendees checked in" : undefined,
+        },
         {
           key: "show-begin",
           label: "Show Begin",
@@ -292,6 +303,12 @@ export function OrganizerEventHero({
         },
       ]
       const buttons: ButtonConfig[] = [
+        {
+          key: "see-check-in",
+          label: "Check In List",
+          variant: "default",
+          icon: "ticket",
+        },
         {
           key: "staff",
           label: "Staff Code",
@@ -304,10 +321,23 @@ export function OrganizerEventHero({
 
     // End
     if (eventStatus === EVENT_STATUS.END) {
+      const checkInValue =
+        checkInCount != null ? checkInCount.toLocaleString() : "—"
       const blocks: Block[] = [
-        { key: "check-in", label: "Check In", value: "—", subtext: "TODO" },
+        {
+          key: "check-in",
+          label: "Check In",
+          value: checkInValue,
+          subtext: checkInCount != null ? "Attendees checked in" : undefined,
+        },
       ]
       const buttons: ButtonConfig[] = [
+        {
+          key: "see-check-in",
+          label: "Check In List",
+          variant: "default",
+          icon: "ticket",
+        },
         {
           key: "export",
           label: "Export Data",
@@ -319,7 +349,7 @@ export function OrganizerEventHero({
     }
 
     return { blocks: [] as Block[], buttons: [] as ButtonConfig[] }
-  }, [event, now])
+  }, [event, now, checkInCount])
 
   const renderStatusButton = (config: {
     key: string
@@ -338,9 +368,11 @@ export function OrganizerEventHero({
         onClick={
           config.key === "see-selling"
             ? onSeeSelling
-            : config.key === "staff"
-              ? () => setStaffCodeDialogOpen(true)
-              : undefined
+            : config.key === "see-check-in"
+              ? onSeeCheckIn
+              : config.key === "staff"
+                ? () => setStaffCodeDialogOpen(true)
+                : undefined
         }
       >
         {config.icon === "focus" && <Focus className={iconClass} aria-hidden />}

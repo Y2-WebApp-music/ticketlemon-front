@@ -39,6 +39,8 @@ export default function EditEventPage() {
   const [formData, setFormData] = useState<CreateEventPayload>(() =>
     createInitialCreateEventPayload()
   )
+  const [posterFile, setPosterFile] = useState<File | null>(null)
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -82,10 +84,16 @@ export default function EditEventPage() {
       return
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      poster_url: URL.createObjectURL(file),
-    }))
+    setPosterFile(file)
+    setFormData((prev) => {
+      if (prev.poster_url?.startsWith("blob:")) {
+        URL.revokeObjectURL(prev.poster_url)
+      }
+      return {
+        ...prev,
+        poster_url: URL.createObjectURL(file),
+      }
+    })
   }
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -95,16 +103,34 @@ export default function EditEventPage() {
       return
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      thumbnail_url: URL.createObjectURL(file),
-    }))
+    setThumbnailFile(file)
+    setFormData((prev) => {
+      if (prev.thumbnail_url?.startsWith("blob:")) {
+        URL.revokeObjectURL(prev.thumbnail_url)
+      }
+      return {
+        ...prev,
+        thumbnail_url: URL.createObjectURL(file),
+      }
+    })
   }
   const handlePosterRemove = () => {
-    setFormData((prev) => ({ ...prev, poster_url: null }))
+    setPosterFile(null)
+    setFormData((prev) => {
+      if (prev.poster_url?.startsWith("blob:")) {
+        URL.revokeObjectURL(prev.poster_url)
+      }
+      return { ...prev, poster_url: null }
+    })
   }
   const handleThumbnailRemove = () => {
-    setFormData((prev) => ({ ...prev, thumbnail_url: null }))
+    setThumbnailFile(null)
+    setFormData((prev) => {
+      if (prev.thumbnail_url?.startsWith("blob:")) {
+        URL.revokeObjectURL(prev.thumbnail_url)
+      }
+      return { ...prev, thumbnail_url: null }
+    })
   }
 
   const updateEventDateEntry = (id: string, patch: Partial<DateRangeEntry>) => {
@@ -239,6 +265,8 @@ export default function EditEventPage() {
         setIsLoading(true)
         const event = await getEventById(eventId)
 
+        setPosterFile(null)
+        setThumbnailFile(null)
         setFormData({
           event_name: event.event_name,
           category: event.category,
@@ -353,8 +381,16 @@ export default function EditEventPage() {
         description: formData.description
           ? JSON.stringify(formData.description)
           : null,
-        poster_url: formData.poster_url ?? undefined,
-        thumbnail_url: formData.thumbnail_url ?? undefined,
+        poster_url: posterFile
+          ? posterFile
+          : formData.poster_url === null
+            ? ""
+            : undefined,
+        thumbnail_url: thumbnailFile
+          ? thumbnailFile
+          : formData.thumbnail_url === null
+            ? ""
+            : undefined,
         event_date_entries: formData.event_date_entries.map((entry) => ({
           id: entry.id,
           start_date: entry.start_date ? entry.start_date.toISOString() : "",

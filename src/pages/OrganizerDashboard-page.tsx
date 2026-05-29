@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -24,9 +24,16 @@ import type { OrganizerEvent } from "@/types"
 import type { ApiEvent } from "@/types/api-response"
 import { getEventsByCreateById } from "@/services/eventService"
 import { useUserStore } from "@/stores/user-store"
+import dayjs from "dayjs"
 import { Plus } from "lucide-react"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
+
+function formatBottomLineDate(iso: string): string {
+  const d = dayjs(iso)
+  if (!d.isValid()) return iso
+  return d.format("DD MMM YY HH:mm")
+}
 
 function mapApiEventToOrganizerEvent(event: ApiEvent): OrganizerEvent {
   const showStartDate = event.event_date_entries[0]?.start_date ?? ""
@@ -34,7 +41,7 @@ function mapApiEventToOrganizerEvent(event: ApiEvent): OrganizerEvent {
     event.event_date_entries[event.event_date_entries.length - 1]?.start_date ??
     showStartDate
   const showBeginLabel = showStartDate
-    ? `Show begin ${new Date(showStartDate).toLocaleString()}`
+    ? `Show begin ${formatBottomLineDate(showStartDate)}`
     : "No schedule"
 
   return {
@@ -71,6 +78,7 @@ function sortOrganizerEvents(
 }
 
 export default function OrganizerDashboardPage() {
+  const navigate = useNavigate()
   const userId = useUserStore((state) => state.user_id)
   const orgName = useUserStore((state) => state.org_name)
   const firstName = useUserStore((state) => state.first_name)
@@ -95,6 +103,16 @@ export default function OrganizerDashboardPage() {
     if (fullName) return fullName
     return email ?? "Organizer"
   }, [email, firstName, lastName, orgName])
+
+  useEffect(() => {
+    if (!userId) return
+    if (orgName?.trim()) return
+    navigate({
+      to: "/sign-in",
+      search: { completeOrganizer: true },
+      replace: true,
+    })
+  }, [navigate, orgName, userId])
 
   useEffect(() => {
     const timerId = window.setTimeout(() => {

@@ -16,7 +16,7 @@ export interface SignInFormProps {
   password: string
   onEmailChange: (value: string) => void
   onPasswordChange: (value: string) => void
-  onSignIn: () => void
+  onSignIn: (isOrganizerSignIn: boolean) => void
   onGoogleSignIn: () => void
   onForgotPassword: () => void
   onRegister: () => void
@@ -26,6 +26,7 @@ export interface SignInFormProps {
   signInError?: string | null
   title?: string
   showGoogleSignIn?: boolean
+  isOrganizerSignIn?: boolean
 }
 
 export function SignInForm({
@@ -43,6 +44,7 @@ export function SignInForm({
   signInError = null,
   title = "Sign In",
   showGoogleSignIn = true,
+  isOrganizerSignIn = false,
 }: SignInFormProps) {
   const [emailError, setEmailError] = React.useState("")
   const [passwordError, setPasswordError] = React.useState("")
@@ -69,7 +71,7 @@ export function SignInForm({
     }
 
     if (!hasError) {
-      onSignIn()
+      onSignIn(isOrganizerSignIn)
     }
   }
 

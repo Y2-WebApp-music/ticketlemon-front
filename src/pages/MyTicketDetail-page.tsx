@@ -1,4 +1,5 @@
 import { PageLayout } from "@/components/layouts"
+import { EditorJs, defaultEditorTools } from "@/components/editor-js"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { TicketTypeCard } from "@/features/my-ticket-detail"
 import { getTicketsByUserIdAndEventId } from "@/services/ticketService"
@@ -10,6 +11,41 @@ import { ChevronLeft } from "lucide-react"
 import * as React from "react"
 import QRCode from "qrcode"
 import { toast } from "sonner"
+import type { OutputData } from "@editorjs/editorjs"
+
+function toOutputData(raw: unknown): OutputData {
+  if (!raw) return { time: Date.now(), version: "2.31.0", blocks: [] }
+
+  if (typeof raw === "object" && raw !== null && "blocks" in raw) {
+    const maybe = raw as Partial<OutputData>
+    if (Array.isArray(maybe.blocks)) {
+      return (
+        (raw as OutputData) ?? {
+          time: Date.now(),
+          version: "2.31.0",
+          blocks: [],
+        }
+      )
+    }
+  }
+
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw) as OutputData
+      if (parsed && Array.isArray(parsed.blocks)) return parsed
+    } catch {
+      // fallback to paragraph below
+    }
+
+    return {
+      time: Date.now(),
+      version: "2.31.0",
+      blocks: [{ type: "paragraph", data: { text: raw } }],
+    }
+  }
+
+  return { time: Date.now(), version: "2.31.0", blocks: [] }
+}
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = React.useState(false)
@@ -43,7 +79,11 @@ export default function MyTicketDetailPage({ eventId }: { eventId: string }) {
       if (!userId) return
       try {
         const response = await getTicketsByUserIdAndEventId(userId, eventId)
-        setDetail(response)
+        setDetail({
+          ...response,
+          description: toOutputData(response.description),
+        })
+        console.log("response ", response)
       } catch (error) {
         const message =
           typeof error === "object" && error !== null && "message" in error
@@ -148,14 +188,18 @@ export default function MyTicketDetailPage({ eventId }: { eventId: string }) {
               <div className="h-px w-full bg-border" aria-hidden />
             </div>
 
-            {/* :TODO Change to editorJS */}
             <div className="hidden space-y-2 sm:block">
               <p className="text-xl leading-7 font-medium text-foreground">
                 Description
               </p>
-              <div className="text-base leading-6 whitespace-pre-wrap text-foreground">
-                {detail.description}
-              </div>
+              <EditorJs
+                key="my-ticket-desc"
+                readOnly
+                initialData={detail.description}
+                tools={defaultEditorTools}
+                minHeight={200}
+                className="min-h-[200px]"
+              />
             </div>
           </div>
 
@@ -170,9 +214,11 @@ export default function MyTicketDetailPage({ eventId }: { eventId: string }) {
                   key={i}
                   {...t}
                   onClick={
-                    t.variant === "unused"
+                    !t.is_used
                       ? () => {
-                          setQrTicketTitle(t.title)
+                          setQrTicketTitle(
+                            `${t.title} ${formatDateLabel(t.event_date)}`
+                          )
                           setQrTicketDescription(t.description)
                           setQrTicketValue(t.id)
                           if (isDesktop) {
@@ -187,9 +233,11 @@ export default function MyTicketDetailPage({ eventId }: { eventId: string }) {
                       : undefined
                   }
                   onViewQr={
-                    t.variant === "unused"
+                    !t.is_used
                       ? () => {
-                          setQrTicketTitle(t.title)
+                          setQrTicketTitle(
+                            `${t.title} ${formatDateLabel(t.event_date)}`
+                          )
                           setQrTicketDescription(t.description)
                           setQrTicketValue(t.id)
                           setQrOpen(true)

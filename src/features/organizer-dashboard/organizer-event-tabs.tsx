@@ -15,12 +15,15 @@ import {
   OrganizerEventSellingTable,
   type OrganizerSellingTicketSelection,
 } from "./organizer-event-selling-table"
+import { OrganizerEventCheckInTable } from "./organizer-event-check-in-table"
 import { TicketTypeCard } from "@/features/ticket-type"
 import type { TicketTypeCardProps } from "@/features/ticket-type"
 import type { OutputData } from "@editorjs/editorjs"
 import { ChevronUp, Pencil, Save, Ticket } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import type {
+  CheckInTableResponse,
+  EventCheckInQueryParams,
   EventSellingQueryParams,
   SellingTableResponse,
 } from "@/types/organizer"
@@ -41,6 +44,11 @@ export interface OrganizerEventTabsProps {
   onSellingTicketSelect?: (selection: OrganizerSellingTicketSelection) => void
   /** Open selling table from external trigger (e.g. hero See Selling button). */
   openingSellingTicket?: OrganizerSellingTicketSelection | null
+  checkInTableResponse: CheckInTableResponse | null
+  checkInTableLoading?: boolean
+  onCheckInQueryChange?: (params: EventCheckInQueryParams) => void
+  /** Open check-in table from external trigger (e.g. hero Check In button). */
+  openingCheckInList?: number
   /** Called when description is saved (e.g. after Save button); omit to only allow in-place editing */
   onDescriptionSave?: (data: OutputData) => void | Promise<void>
 }
@@ -83,6 +91,15 @@ function DescriptionEditToolbar({
   )
 }
 
+const EMPTY_CHECK_IN_RESPONSE: CheckInTableResponse = {
+  data: [],
+  total: 0,
+  page: 1,
+  perPage: 15,
+  event_date_entries: [],
+  ticket_types: [],
+}
+
 export function OrganizerEventTabs({
   eventId,
   description,
@@ -92,6 +109,10 @@ export function OrganizerEventTabs({
   onSellingQueryChange,
   onSellingTicketSelect,
   openingSellingTicket,
+  checkInTableResponse,
+  checkInTableLoading = false,
+  onCheckInQueryChange,
+  openingCheckInList = 0,
   onDescriptionSave,
 }: OrganizerEventTabsProps) {
   const [isEditing, setIsEditing] = useState(false)
@@ -102,6 +123,7 @@ export function OrganizerEventTabs({
   )
   const [selectedSellingTicket, setSelectedSellingTicket] =
     useState<OrganizerSellingTicketSelection | null>(null)
+  const [showCheckInList, setShowCheckInList] = useState(false)
 
   const handleDescriptionSave = useCallback(
     async (data: OutputData) => {
@@ -119,6 +141,7 @@ export function OrganizerEventTabs({
   const openSellingTicket = useCallback(
     (selection: OrganizerSellingTicketSelection) => {
       setActiveTab("ticket-type")
+      setShowCheckInList(false)
       setSelectedSellingTicket(selection)
       onSellingTicketSelect?.(selection)
     },
@@ -132,6 +155,16 @@ export function OrganizerEventTabs({
     }, 0)
     return () => window.clearTimeout(timerId)
   }, [openingSellingTicket, openSellingTicket])
+
+  useEffect(() => {
+    if (!openingCheckInList) return
+    const timerId = window.setTimeout(() => {
+      setActiveTab("ticket-type")
+      setSelectedSellingTicket(null)
+      setShowCheckInList(true)
+    }, 0)
+    return () => window.clearTimeout(timerId)
+  }, [openingCheckInList])
 
   return (
     <div className="mx-auto mt-6 w-full max-w-[1280px] px-4 pb-16 sm:px-6">
@@ -190,9 +223,18 @@ export function OrganizerEventTabs({
           </div>
         </TabsContent>
         <TabsContent value="ticket-type" className="mt-0 space-y-3">
-          {selectedSellingTicket &&
-          sellingTableResponse &&
-          onSellingQueryChange ? (
+          {showCheckInList && onCheckInQueryChange ? (
+            <OrganizerEventCheckInTable
+              checkInTableResponse={
+                checkInTableResponse ?? EMPTY_CHECK_IN_RESPONSE
+              }
+              isLoading={checkInTableLoading || !checkInTableResponse}
+              onQueryChange={onCheckInQueryChange}
+              onBack={() => setShowCheckInList(false)}
+            />
+          ) : selectedSellingTicket &&
+            sellingTableResponse &&
+            onSellingQueryChange ? (
             <OrganizerEventSellingTable
               selectedTicket={selectedSellingTicket}
               sellingTableResponse={sellingTableResponse}
