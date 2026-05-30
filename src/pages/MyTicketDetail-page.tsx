@@ -83,7 +83,6 @@ export default function MyTicketDetailPage({ eventId }: { eventId: string }) {
           ...response,
           description: toOutputData(response.description),
         })
-        console.log("response ", response)
       } catch (error) {
         const message =
           typeof error === "object" && error !== null && "message" in error

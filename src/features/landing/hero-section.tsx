@@ -5,7 +5,15 @@ import {
 } from "@/components/ui/input-group"
 import { Search } from "lucide-react"
 
-export function LandingHeroSection() {
+export interface LandingHeroSectionProps {
+  searchQuery: string
+  onSearchQueryChange: (value: string) => void
+}
+
+export function LandingHeroSection({
+  searchQuery,
+  onSearchQueryChange,
+}: LandingHeroSectionProps) {
   return (
     <div className="relative bg-linear-to-t from-background to-[#ffedd5] pt-12 pb-[290px] sm:pt-16 dark:to-primary/10">
       <div className="mx-auto max-w-[1520px] px-4 sm:px-6">
@@ -24,6 +32,8 @@ export function LandingHeroSection() {
           <InputGroupInput
             type="search"
             placeholder="Search Event"
+            value={searchQuery}
+            onChange={(event) => onSearchQueryChange(event.target.value)}
             className="min-w-0 text-base placeholder:text-muted-foreground"
             aria-label="Search events"
           />

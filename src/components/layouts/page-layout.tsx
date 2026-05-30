@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router"
 import { LogOut, Menu, Moon, Sun, Ticket, UserCircle, X } from "lucide-react"
@@ -75,7 +74,7 @@ function NavBar() {
     import("@/services/authService").then(({ signOut }) => {
       signOut()
       closeMobileMenu()
-      navigate({ to: "/sign-in" })
+      navigate({ to: "/sign-in", search: { completeOrganizer: false } })
     })
   }
 
@@ -98,14 +97,6 @@ function NavBar() {
                   aria-label="ticketlemon"
                 />
               </Link>
-              <div className="hidden w-full max-w-[384px] md:block">
-                <Input
-                  type="search"
-                  placeholder="Search event"
-                  className="h-9 w-full rounded-lg border-border bg-background text-base text-foreground placeholder:text-muted-foreground"
-                  aria-label="Search events"
-                />
-              </div>
             </div>
           ) : (
             <Link

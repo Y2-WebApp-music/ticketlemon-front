@@ -1,4 +1,5 @@
 export { LandingHeroSection } from "./hero-section"
+export type { LandingHeroSectionProps } from "./hero-section"
 export { RecommendedEventsSection } from "./recommended-events-section"
 export type { RecommendedEventsSectionProps } from "./recommended-events-section"
 export { AllEventsSection } from "./all-events-section"

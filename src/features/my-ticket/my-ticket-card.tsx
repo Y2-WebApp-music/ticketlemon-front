@@ -43,13 +43,6 @@ export function MyTicketCard({
       )
     : undefined
 
-  const viewEventLink = (
-    <Link to="/my-tickets/$ticketId" params={{ ticketId: event_id }}>
-      <Ticket className="size-4" aria-hidden />
-      View Ticket
-    </Link>
-  )
-
   const purchaseLink = (
     <Link to="/events/$eventId/purchase" params={{ eventId: event_id }}>
       <DollarSign className="size-4" aria-hidden />
@@ -122,9 +115,12 @@ export function MyTicketCard({
               asChild
               variant="outline"
               size="sm"
-              className="shrink-0 border-primary/50 text-primary hover:bg-primary/10"
+              className="pointer-events-none shrink-0 border-primary/50 text-primary hover:bg-primary/10"
             >
-              {viewEventLink}
+              <span>
+                <Ticket className="size-4" aria-hidden />
+                View Ticket
+              </span>
             </Button>
           )}
         </div>

@@ -126,6 +126,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
   const [event, setEvent] = useState<EventDetail>()
   const [step, setStep] = useState<"detail" | "choose">("detail")
   const [quantities, setQuantities] = useState<Record<string, number>>({})
+  const [now] = useState(() => Date.now())
 
   useEffect(() => {
     const toOutputData = (raw: unknown): OutputData => {
@@ -214,7 +215,6 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
 
   const { saleNotStarted, saleStartLabel } = useMemo(() => {
     const types = event?.ticket_types ?? []
-    const now = Date.now()
     const hasOnSaleTicket = types.some(
       (tt) => new Date(tt.start_sale_date).getTime() <= now
     )
@@ -234,7 +234,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
         ? formatDateLabel(earliestStart)
         : undefined,
     }
-  }, [event?.ticket_types])
+  }, [event?.ticket_types, now])
 
   const updateQuantity = useCallback((ticketId: string, qty: number) => {
     setQuantities((prev) => ({ ...prev, [ticketId]: Math.max(0, qty) }))
