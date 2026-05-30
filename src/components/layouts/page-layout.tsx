@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { useUserStore } from "@/stores/user-store"
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router"
 import { LogOut, Menu, Moon, Sun, Ticket, UserCircle, X } from "lucide-react"
 import * as React from "react"
@@ -43,6 +44,8 @@ function NavBar() {
   } = useNavMenuState()
   const { theme, setTheme } = useTheme()
   const navigate = useNavigate()
+  const userId = useUserStore((state) => state.user_id)
+  const isSignedIn = Boolean(userId)
 
   const isMyTickets = pathname === "/my-tickets"
   const isProfile = pathname === "/profile"
@@ -53,7 +56,7 @@ function NavBar() {
     "rounded-lg px-4 py-2 text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
   const organizerDesktopLinks = [
     { to: "/", label: "Customer Site" },
-    { to: "/profile", label: "Profile" },
+    { to: "/profile", label: "Profile", requiresAuth: true },
   ] as const
   const customerDesktopLinks = [
     { to: "/organizer", label: "Organizer Site" },
@@ -77,6 +80,10 @@ function NavBar() {
       navigate({ to: "/sign-in", search: { completeOrganizer: false } })
     })
   }
+
+  const visibleOrganizerDesktopLinks = organizerDesktopLinks.filter(
+    (link) => isSignedIn || !("requiresAuth" in link && link.requiresAuth)
+  )
 
   const showMobileMenu = isCustomer || isStaffRole
 
@@ -112,21 +119,29 @@ function NavBar() {
 
           {role === "organizer" && (
             <div className="flex shrink-0 items-center gap-5">
-              {organizerDesktopLinks.map((link, index) => (
+              {visibleOrganizerDesktopLinks.map((link, index) => (
                 <React.Fragment key={link.to}>
                   <Link to={link.to} className={desktopLinkClass}>
                     {link.label}
                   </Link>
-                  {index < organizerDesktopLinks.length - 1 && (
+                  {index < visibleOrganizerDesktopLinks.length - 1 && (
                     <div className="h-9 w-px bg-border" aria-hidden />
                   )}
                 </React.Fragment>
               ))}
-              <ProfileAvatarMenu
-                isDarkMode={isDarkMode}
-                onToggleDarkMode={handleToggleDarkMode}
-                onSignOut={handleSignOut}
-              />
+              {isSignedIn ? (
+                <ProfileAvatarMenu
+                  isDarkMode={isDarkMode}
+                  onToggleDarkMode={handleToggleDarkMode}
+                  onSignOut={handleSignOut}
+                />
+              ) : (
+                <Button asChild>
+                  <Link to="/sign-in" search={{ completeOrganizer: false }}>
+                    Sign In
+                  </Link>
+                </Button>
+              )}
             </div>
           )}
 
@@ -141,33 +156,43 @@ function NavBar() {
 
           {isCustomer && (
             <nav className="hidden shrink-0 items-center gap-1 sm:flex">
-              {customerDesktopLinks.map((link, index) => (
-                <React.Fragment key={link.to}>
-                  <Link
-                    to={link.to}
-                    className={
-                      "isActive" in link
-                        ? cn(
-                            desktopActiveLinkClass,
-                            link.isActive
-                              ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                              : "text-primary hover:bg-muted"
-                          )
-                        : desktopLinkClass
-                    }
-                  >
-                    {link.label}
+              {isSignedIn ? (
+                <>
+                  {customerDesktopLinks.map((link, index) => (
+                    <React.Fragment key={link.to}>
+                      <Link
+                        to={link.to}
+                        className={
+                          "isActive" in link
+                            ? cn(
+                                desktopActiveLinkClass,
+                                link.isActive
+                                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                  : "text-primary hover:bg-muted"
+                              )
+                            : desktopLinkClass
+                        }
+                      >
+                        {link.label}
+                      </Link>
+                      {index === 0 && (
+                        <div className="h-9 w-px bg-border" aria-hidden />
+                      )}
+                    </React.Fragment>
+                  ))}
+                  <ProfileAvatarMenu
+                    isDarkMode={isDarkMode}
+                    onToggleDarkMode={handleToggleDarkMode}
+                    onSignOut={handleSignOut}
+                  />
+                </>
+              ) : (
+                <Button asChild>
+                  <Link to="/sign-in" search={{ completeOrganizer: false }}>
+                    Sign In
                   </Link>
-                  {index === 0 && (
-                    <div className="h-9 w-px bg-border" aria-hidden />
-                  )}
-                </React.Fragment>
-              ))}
-              <ProfileAvatarMenu
-                isDarkMode={isDarkMode}
-                onToggleDarkMode={handleToggleDarkMode}
-                onSignOut={handleSignOut}
-              />
+                </Button>
+              )}
             </nav>
           )}
 
@@ -236,32 +261,46 @@ function NavBar() {
           className="z-50 sm:hidden"
         >
           <nav className="flex flex-col gap-1 px-4 py-4">
-            <Link
-              to="/my-tickets"
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                isMyTickets
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "text-primary hover:bg-muted"
-              )}
-              onClick={closeMobileMenu}
-            >
-              <Ticket className="size-5 shrink-0" aria-hidden />
-              My Ticket
-            </Link>
-            <Link
-              to="/profile"
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                isProfile
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                  : "text-primary hover:bg-muted"
-              )}
-              onClick={closeMobileMenu}
-            >
-              <UserCircle className="size-5 shrink-0" aria-hidden />
-              My Profile
-            </Link>
+            {isSignedIn ? (
+              <>
+                <Link
+                  to="/my-tickets"
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    isMyTickets
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "text-primary hover:bg-muted"
+                  )}
+                  onClick={closeMobileMenu}
+                >
+                  <Ticket className="size-5 shrink-0" aria-hidden />
+                  My Ticket
+                </Link>
+                <Link
+                  to="/profile"
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    isProfile
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "text-primary hover:bg-muted"
+                  )}
+                  onClick={closeMobileMenu}
+                >
+                  <UserCircle className="size-5 shrink-0" aria-hidden />
+                  My Profile
+                </Link>
+              </>
+            ) : (
+              <Button asChild className="w-full">
+                <Link
+                  to="/sign-in"
+                  search={{ completeOrganizer: false }}
+                  onClick={closeMobileMenu}
+                >
+                  Sign In
+                </Link>
+              </Button>
+            )}
             <div className="pt-2">
               <Button
                 type="button"
@@ -280,17 +319,19 @@ function NavBar() {
                 {isDarkMode ? "Light mode" : "Dark mode"}
               </Button>
             </div>
-            <div className="pt-2">
-              <Button
-                type="button"
-                variant="destructive"
-                className="w-full gap-2"
-                onClick={handleSignOut}
-              >
-                <LogOut className="size-4" />
-                Sign Out
-              </Button>
-            </div>
+            {isSignedIn && (
+              <div className="pt-2">
+                <Button
+                  type="button"
+                  variant="destructive"
+                  className="w-full gap-2"
+                  onClick={handleSignOut}
+                >
+                  <LogOut className="size-4" />
+                  Sign Out
+                </Button>
+              </div>
+            )}
           </nav>
         </NavMenuSheet>
       )}
